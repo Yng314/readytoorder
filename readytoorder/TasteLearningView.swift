@@ -11,6 +11,7 @@ import UIKit
 struct TasteLearningView: View {
     @StateObject private var viewModel = TasteTrainerViewModel()
     @State private var dragOffset: CGSize = .zero
+    @State private var backCardFrostOpacity: Double = 0.12
     @State private var isAnimatingSwipe = false
     @State private var isShowingProfilePopup = false
 
@@ -29,7 +30,7 @@ struct TasteLearningView: View {
 
                 GeometryReader { proxy in
                     let cardWidth = min(proxy.size.width - 36, 360)
-                    let cardHeight = max(440, min(560, proxy.size.height * 0.62))
+                    let cardHeight = max(440, min(560, proxy.size.height * 0.55))
                     let actionBottomPadding = max(80, proxy.safeAreaInsets.bottom + 50)
 
                     ZStack {
@@ -125,7 +126,20 @@ struct TasteLearningView: View {
 
     private func cardDeckSection(cardHeight: CGFloat) -> some View {
         ZStack {
-            if viewModel.visibleDeck.isEmpty {
+            if let dish = viewModel.currentDish {
+                if let nextDish = viewModel.visibleDeck.dropFirst().first {
+                    DishSwipeCard(dish: nextDish)
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .fill(.ultraThinMaterial)
+                                .opacity(backCardFrostOpacity)
+                        }
+                        .allowsHitTesting(false)
+                        .zIndex(0)
+                }
+                cardView(dish: dish)
+                    .zIndex(1)
+            } else {
                 RoundedRectangle(cornerRadius: 28, style: .continuous)
                     .fill(.white.opacity(0.8))
                     .frame(height: cardHeight)
@@ -145,44 +159,34 @@ struct TasteLearningView: View {
                                 .padding(.horizontal, 24)
                         }
                     }
-            } else {
-                ForEach(Array(viewModel.visibleDeck.enumerated()).reversed(), id: \.element.id) { index, dish in
-                    cardView(dish: dish, index: index)
-                }
             }
         }
         .frame(height: cardHeight)
-        .animation(.spring(response: 0.32, dampingFraction: 0.85), value: viewModel.visibleDeck)
+        .animation(.spring(response: 0.32, dampingFraction: 0.85), value: viewModel.currentDish?.id)
     }
 
-    @ViewBuilder
-    private func cardView(dish: DishCandidate, index: Int) -> some View {
-        let stackedOffset = CGFloat(index) * 11
-        let stackedScale = 1 - CGFloat(index) * 0.04
-        let isTop = index == 0
+    private var baseBackCardFrostOpacity: Double { 0.5 }
 
-        if isTop {
-            DishSwipeCard(dish: dish)
-                .scaleEffect(stackedScale)
-                .offset(
-                    x: dragOffset.width,
-                    y: dragOffset.height * 0.18
-                )
-                .rotationEffect(.degrees(Double(dragOffset.width / 18)))
-                .overlay(alignment: .top) {
-                    swipeBadgeOverlay
-                        .padding(.top, 14)
-                }
-                .zIndex(Double(10 - index))
-                .allowsHitTesting(!isAnimatingSwipe)
-                .gesture(swipeGesture)
-        } else {
-            DishSwipeCard(dish: dish)
-                .scaleEffect(stackedScale)
-                .offset(y: stackedOffset)
-                .zIndex(Double(10 - index))
-                .allowsHitTesting(false)
-        }
+    private var maxBackCardFrostOpacity: Double { 0.99 }
+
+    private func dynamicBackCardFrostOpacity(for width: CGFloat) -> Double {
+        let progress = min(1, abs(width) / 150)
+        return baseBackCardFrostOpacity + Double(progress) * (maxBackCardFrostOpacity - baseBackCardFrostOpacity)
+    }
+
+    private func cardView(dish: DishCandidate) -> some View {
+        DishSwipeCard(dish: dish)
+            .offset(
+                x: dragOffset.width,
+                y: dragOffset.height * 0.18
+            )
+            .rotationEffect(.degrees(Double(dragOffset.width / 18)))
+            .overlay(alignment: .top) {
+                swipeBadgeOverlay
+                    .padding(.top, 14)
+            }
+            .allowsHitTesting(!isAnimatingSwipe)
+            .gesture(swipeGesture)
     }
 
     private var swipeBadgeOverlay: some View {
@@ -224,6 +228,7 @@ struct TasteLearningView: View {
                 guard !isAnimatingSwipe else { return }
                 withAnimation(.interactiveSpring(response: 0.2, dampingFraction: 0.86)) {
                     dragOffset = value.translation
+                    backCardFrostOpacity = dynamicBackCardFrostOpacity(for: value.translation.width)
                 }
             }
             .onEnded { value in
@@ -241,6 +246,7 @@ struct TasteLearningView: View {
         } else {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 dragOffset = .zero
+                backCardFrostOpacity = baseBackCardFrostOpacity
             }
         }
     }
@@ -249,12 +255,24 @@ struct TasteLearningView: View {
         isAnimatingSwipe = true
         withAnimation(.spring(response: 0.26, dampingFraction: 0.85)) {
             dragOffset = CGSize(width: endX, height: 26)
+            backCardFrostOpacity = maxBackCardFrostOpacity
         }
 
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(170))
-            viewModel.submitSwipe(action)
-            dragOffset = .zero
+
+            withAnimation(.easeOut(duration: 0.2)) {
+                backCardFrostOpacity = baseBackCardFrostOpacity
+            }
+
+            try? await Task.sleep(for: .milliseconds(120))
+
+            var noAnimation = Transaction()
+            noAnimation.disablesAnimations = true
+            withTransaction(noAnimation) {
+                viewModel.submitSwipe(action)
+                dragOffset = .zero
+            }
             isAnimatingSwipe = false
         }
     }
@@ -544,6 +562,32 @@ private struct DishSwipeCard: View {
 }
 
 private struct DishPlaceholderImage: View {
+    private let fadeZoneRatio: CGFloat = 0.5
+    private let fadeSampleCount = 28
+    private let fadeDecay: Double = 0.5
+    private let fadePlateau: Double = 0.01
+
+    private var exponentialFadeStops: [Gradient.Stop] {
+        let denominator = 1 - Foundation.exp(-fadeDecay)
+
+        return (0...fadeSampleCount).map { index in
+            let t = Double(index) / Double(fadeSampleCount)
+            let alpha: Double
+
+            if t <= fadePlateau {
+                alpha = 1
+            } else {
+                let normalized = (t - fadePlateau) / (1 - fadePlateau)
+                alpha = (Foundation.exp(-fadeDecay * normalized) - Foundation.exp(-fadeDecay)) / denominator
+            }
+
+            return .init(
+                color: .white.opacity(max(0, min(alpha, 1))),
+                location: t
+            )
+        }
+    }
+
     var body: some View {
         ZStack {
             if let uiImage = UIImage(named: "dish_placeholder") {
@@ -565,6 +609,18 @@ private struct DishPlaceholderImage: View {
                         .font(.system(size: 34, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.72))
                 )
+            }
+        }
+        .overlay {
+            GeometryReader { proxy in
+                LinearGradient(
+                    gradient: Gradient(stops: exponentialFadeStops),
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                .frame(height: proxy.size.height * fadeZoneRatio)
+                .frame(maxHeight: .infinity, alignment: .top)
+                .allowsHitTesting(false)
             }
         }
         .clipped()
