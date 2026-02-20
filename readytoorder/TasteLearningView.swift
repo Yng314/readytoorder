@@ -134,6 +134,18 @@ struct TasteLearningView: View {
                                 .fill(.ultraThinMaterial)
                                 .opacity(backCardFrostOpacity)
                         }
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 30, style: .continuous)
+                                .fill(swipeFeedbackColor.opacity(0.34 * Double(swipeFeedbackProgress)))
+                                .overlay {
+                                    Image(systemName: swipeFeedbackIcon)
+                                        .font(.system(size: 76, weight: .black))
+                                        .foregroundStyle(.white.opacity(0.95))
+                                        .opacity(Double(swipeFeedbackProgress))
+                                        .scaleEffect(0.92 + 0.08 * Double(swipeFeedbackProgress))
+                                }
+                                .opacity(swipeFeedbackIsActive ? 1 : 0)
+                        }
                         .allowsHitTesting(false)
                         .zIndex(0)
                 }
@@ -169,6 +181,22 @@ struct TasteLearningView: View {
 
     private var maxBackCardFrostOpacity: Double { 0.99 }
 
+    private var swipeFeedbackProgress: CGFloat {
+        min(1, abs(dragOffset.width) / 150)
+    }
+
+    private var swipeFeedbackIsActive: Bool {
+        abs(dragOffset.width) > 8
+    }
+
+    private var swipeFeedbackColor: Color {
+        dragOffset.width >= 0 ? .green : .red
+    }
+
+    private var swipeFeedbackIcon: String {
+        dragOffset.width >= 0 ? "heart.fill" : "xmark"
+    }
+
     private func dynamicBackCardFrostOpacity(for width: CGFloat) -> Double {
         let progress = min(1, abs(width) / 150)
         return baseBackCardFrostOpacity + Double(progress) * (maxBackCardFrostOpacity - baseBackCardFrostOpacity)
@@ -181,45 +209,8 @@ struct TasteLearningView: View {
                 y: dragOffset.height * 0.18
             )
             .rotationEffect(.degrees(Double(dragOffset.width / 18)))
-            .overlay(alignment: .top) {
-                swipeBadgeOverlay
-                    .padding(.top, 14)
-            }
             .allowsHitTesting(!isAnimatingSwipe)
             .gesture(swipeGesture)
-    }
-
-    private var swipeBadgeOverlay: some View {
-        HStack {
-            swipeBadge(
-                text: "不喜欢",
-                icon: "xmark.circle.fill",
-                color: .red,
-                opacity: max(0, min(1, -dragOffset.width / 110))
-            )
-            Spacer()
-            swipeBadge(
-                text: "喜欢",
-                icon: "heart.circle.fill",
-                color: .green,
-                opacity: max(0, min(1, dragOffset.width / 110))
-            )
-        }
-        .padding(.horizontal, 16)
-    }
-
-    private func swipeBadge(text: String, icon: String, color: Color, opacity: Double) -> some View {
-        Label(text, systemImage: icon)
-            .font(.subheadline.weight(.semibold))
-            .padding(.horizontal, 12)
-            .padding(.vertical, 7)
-            .background(color.opacity(0.14), in: Capsule())
-            .overlay(
-                Capsule()
-                    .stroke(color.opacity(0.45), lineWidth: 1)
-            )
-            .foregroundStyle(color)
-            .opacity(opacity)
     }
 
     private var swipeGesture: some Gesture {
@@ -527,11 +518,11 @@ private struct DishSwipeCard: View {
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 14)
+                .padding(.horizontal, 30)
+                .padding(.top, 30)
                 .padding(.bottom, 12)
                 .frame(maxWidth: .infinity, minHeight: textHeight, alignment: .topLeading)
-                .background(Color.white.opacity(0.88))
+                .background(Color.white.opacity(0.94))
 
                 DishPlaceholderImage()
                     .frame(width: geo.size.width, height: imageSide)
@@ -562,13 +553,11 @@ private struct DishSwipeCard: View {
 }
 
 private struct DishPlaceholderImage: View {
-    private let fadeZoneRatio: CGFloat = 0.5
-    private let fadeSampleCount = 28
-    private let fadeDecay: Double = 0.5
-    private let fadePlateau: Double = 0.01
+    private let fadeZoneRatio: CGFloat = 0.3
+    private let fadeSampleCount = 40
+    private let fadePlateau: Double = 0.1
 
-    private var exponentialFadeStops: [Gradient.Stop] {
-        let denominator = 1 - Foundation.exp(-fadeDecay)
+    private var smoothFadeStops: [Gradient.Stop] {
 
         return (0...fadeSampleCount).map { index in
             let t = Double(index) / Double(fadeSampleCount)
@@ -578,7 +567,9 @@ private struct DishPlaceholderImage: View {
                 alpha = 1
             } else {
                 let normalized = (t - fadePlateau) / (1 - fadePlateau)
-                alpha = (Foundation.exp(-fadeDecay * normalized) - Foundation.exp(-fadeDecay)) / denominator
+                // Use an ease-in falloff so the top stays whiter longer, then fades faster lower down.
+                let eased = normalized * normalized * normalized
+                alpha = 1 - eased
             }
 
             return .init(
@@ -614,7 +605,7 @@ private struct DishPlaceholderImage: View {
         .overlay {
             GeometryReader { proxy in
                 LinearGradient(
-                    gradient: Gradient(stops: exponentialFadeStops),
+                    gradient: Gradient(stops: smoothFadeStops),
                     startPoint: .top,
                     endPoint: .bottom
                 )
