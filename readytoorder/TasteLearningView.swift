@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct TasteLearningView: View {
     @StateObject private var viewModel = TasteTrainerViewModel()
@@ -27,17 +28,23 @@ struct TasteLearningView: View {
                 .ignoresSafeArea()
 
                 GeometryReader { proxy in
-                    let cardHeight = max(320, min(430, proxy.size.height * 0.5))
-                    let actionBottomPadding = max(80, proxy.safeAreaInsets.bottom + 80)
+                    let cardWidth = min(proxy.size.width - 36, 360)
+                    let cardHeight = max(440, min(560, proxy.size.height * 0.62))
+                    let actionBottomPadding = max(80, proxy.safeAreaInsets.bottom + 50)
 
                     ZStack {
                         cardDeckSection(cardHeight: cardHeight)
+                            .frame(width: cardWidth, height: cardHeight, alignment: .center)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                            .padding(.top, 10)
-                            .padding(.bottom, 60)
+                            .padding(.top, 0)
+                            .padding(.bottom, 90)
 
                         VStack(spacing: 0) {
-                            dishInfoSection
+                            HStack(spacing: 10) {
+                                Spacer()
+                                tasteStatusPill
+                                profileIconButton
+                            }
                             Spacer()
                         }
 
@@ -116,53 +123,6 @@ struct TasteLearningView: View {
         return .blue
     }
 
-    private var dishInfoSection: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .center, spacing: 10) {
-                if let dish = viewModel.currentDish {
-                    Text(dish.name)
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-                        .foregroundStyle(.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                } else {
-                    Text("正在准备菜品")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .lineLimit(1)
-                }
-                Spacer()
-                tasteStatusPill
-                profileIconButton
-            }
-
-            if let dish = viewModel.currentDish {
-                Text(dish.subtitle)
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-
-                TagFlowLayout(itemSpacing: 8, rowSpacing: 8) {
-                    ForEach(dish.normalizedTags, id: \.self) { tag in
-                        Text(tag)
-                            .font(.caption.weight(.semibold))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 6)
-                            .background(Color.blue.opacity(0.12), in: Capsule())
-                            .foregroundStyle(Color.blue)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-            } else {
-                Text(viewModel.deckStatusText)
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-    }
-
     private func cardDeckSection(cardHeight: CGFloat) -> some View {
         ZStack {
             if viewModel.visibleDeck.isEmpty {
@@ -202,7 +162,7 @@ struct TasteLearningView: View {
         let isTop = index == 0
 
         if isTop {
-            DishSwipeCard()
+            DishSwipeCard(dish: dish)
                 .scaleEffect(stackedScale)
                 .offset(
                     x: dragOffset.width,
@@ -217,7 +177,7 @@ struct TasteLearningView: View {
                 .allowsHitTesting(!isAnimatingSwipe)
                 .gesture(swipeGesture)
         } else {
-            DishSwipeCard()
+            DishSwipeCard(dish: dish)
                 .scaleEffect(stackedScale)
                 .offset(y: stackedOffset)
                 .zIndex(Double(10 - index))
@@ -515,23 +475,50 @@ struct TasteLearningView: View {
 }
 
 private struct DishSwipeCard: View {
+    let dish: DishCandidate
+
     var body: some View {
         let cardShape = RoundedRectangle(cornerRadius: 30, style: .continuous)
 
-        VStack(spacing: 14) {
-            Spacer()
-            Image(systemName: "photo.on.rectangle.angled")
-                .font(.system(size: 38, weight: .semibold))
-                .foregroundStyle(.secondary)
+        GeometryReader { geo in
+            let imageSide = geo.size.width
+            let textHeight = max(120, geo.size.height - imageSide)
 
-            Text("菜品图片位")
-                .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 0) {
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(dish.name)
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.82)
 
-            Text("后续接入菜单识别与图片")
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-            Spacer()
+                    Text(dish.subtitle)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+
+                    TagFlowLayout(itemSpacing: 8, rowSpacing: 8) {
+                        ForEach(dish.normalizedTags, id: \.self) { tag in
+                            Text(tag)
+                                .font(.caption.weight(.semibold))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color.white.opacity(0.5), in: Capsule())
+                                .foregroundStyle(Color.primary.opacity(0.9))
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .padding(.horizontal, 16)
+                .padding(.top, 14)
+                .padding(.bottom, 12)
+                .frame(maxWidth: .infinity, minHeight: textHeight, alignment: .topLeading)
+                .background(Color.white.opacity(0.88))
+
+                DishPlaceholderImage()
+                    .frame(width: geo.size.width, height: imageSide)
+            }
+            .frame(width: geo.size.width, height: geo.size.height)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
@@ -553,6 +540,34 @@ private struct DishSwipeCard: View {
                 .stroke(.white.opacity(0.9), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 10)
+    }
+}
+
+private struct DishPlaceholderImage: View {
+    var body: some View {
+        ZStack {
+            if let uiImage = UIImage(named: "dish_placeholder") {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.58, green: 0.14, blue: 0.10),
+                        Color(red: 0.82, green: 0.22, blue: 0.12),
+                        Color(red: 0.45, green: 0.11, blue: 0.08)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                .overlay(
+                    Image(systemName: "photo")
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(.white.opacity(0.72))
+                )
+            }
+        }
+        .clipped()
     }
 }
 
