@@ -483,19 +483,25 @@ private struct DishSwipeCard: View {
                         .shadow(color: .black.opacity(0.28), radius: 4, x: 0, y: 1)
 
                     let tagGroups = dish.displayCategoryTags
+                    let pills = tagPills(from: tagGroups)
 
-                    VStack(alignment: .leading, spacing: 4) {
-                        if !tagGroups.cuisine.isEmpty {
-                            tagLine(title: "菜系", values: tagGroups.cuisine)
+                    if !pills.isEmpty {
+                        TagFlowLayout(itemSpacing: 8, rowSpacing: 8) {
+                            ForEach(pills) { pill in
+                                Text(pill.text)
+                                    .font(.caption.weight(.semibold))
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(pill.kind.tint.opacity(0.34), in: Capsule())
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(.white.opacity(0.46), lineWidth: 1)
+                                    )
+                                    .foregroundStyle(.white)
+                            }
                         }
-                        if !tagGroups.flavor.isEmpty {
-                            tagLine(title: "口味", values: tagGroups.flavor)
-                        }
-                        if !tagGroups.ingredient.isEmpty {
-                            tagLine(title: "原材料", values: tagGroups.ingredient)
-                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .padding(.horizontal, textHorizontalPadding)
                 .padding(.top, textTopPadding)
@@ -548,18 +554,40 @@ private struct DishSwipeCard: View {
         .allowsHitTesting(false)
     }
 
-    @ViewBuilder
-    private func tagLine(title: String, values: [String]) -> some View {
-        HStack(alignment: .firstTextBaseline, spacing: 6) {
-            Text("\(title)：")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white.opacity(0.86))
+    private func tagPills(from groups: DishCategoryTags) -> [TagPill] {
+        var pills: [TagPill] = []
+        for (index, value) in groups.cuisine.enumerated() {
+            pills.append(TagPill(id: "cuisine-\(index)-\(value)", text: value, kind: .cuisine))
+        }
+        for (index, value) in groups.flavor.enumerated() {
+            pills.append(TagPill(id: "flavor-\(index)-\(value)", text: value, kind: .flavor))
+        }
+        for (index, value) in groups.ingredient.enumerated() {
+            pills.append(TagPill(id: "ingredient-\(index)-\(value)", text: value, kind: .ingredient))
+        }
+        return pills
+    }
 
-            Text(values.joined(separator: " · "))
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.white)
-                .lineLimit(1)
-                .minimumScaleFactor(0.82)
+    private struct TagPill: Identifiable {
+        let id: String
+        let text: String
+        let kind: TagKind
+    }
+
+    private enum TagKind {
+        case cuisine
+        case flavor
+        case ingredient
+
+        var tint: Color {
+            switch self {
+            case .cuisine:
+                return Color(red: 0.32, green: 0.60, blue: 0.95)
+            case .flavor:
+                return Color(red: 0.95, green: 0.46, blue: 0.42)
+            case .ingredient:
+                return Color(red: 0.34, green: 0.74, blue: 0.56)
+            }
         }
     }
 }
