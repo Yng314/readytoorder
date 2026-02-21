@@ -115,7 +115,7 @@ final class TasteBackendClient {
 
     private var baseURL: URL? {
         let raw = UserDefaults.standard.string(forKey: "readytoorder.setting.backendURL")?.trimmingCharacters(in: .whitespacesAndNewlines)
-        let value = (raw?.isEmpty ?? true) ? "http://127.0.0.1:8000" : raw
+        let value = (raw?.isEmpty ?? true) ? "https://readytoorder-production.up.railway.app" : raw
         guard let value, let url = URL(string: value) else {
             return nil
         }

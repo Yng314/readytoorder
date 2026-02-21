@@ -159,7 +159,7 @@ private struct OrderingView: View {
 private struct SettingsView: View {
     @AppStorage("readytoorder.setting.haptics") private var hapticsEnabled = true
     @AppStorage("readytoorder.setting.autoRefill") private var autoRefillEnabled = true
-    @AppStorage("readytoorder.setting.backendURL") private var backendURL = "http://127.0.0.1:8000"
+    @AppStorage("readytoorder.setting.backendURL") private var backendURL = "https://readytoorder-production.up.railway.app"
 
     var body: some View {
         NavigationStack {
@@ -215,7 +215,7 @@ private struct SettingsView: View {
         VStack(alignment: .leading, spacing: 8) {
             Text("Gemini 后端 URL")
                 .font(.subheadline.weight(.semibold))
-            TextField("http://127.0.0.1:8000", text: $backendURL)
+            TextField("https://readytoorder-production.up.railway.app", text: $backendURL)
                 .textInputAutocapitalization(.never)
                 .keyboardType(.URL)
                 .autocorrectionDisabled(true)
@@ -223,7 +223,7 @@ private struct SettingsView: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 10)
                 .background(.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            Text("模拟器可用 127.0.0.1；真机请改成你电脑局域网 IP。")
+            Text("默认使用 Railway 云端地址；本地调试时可改成局域网 IP。")
                 .font(.caption)
                 .foregroundStyle(.secondary)
         }

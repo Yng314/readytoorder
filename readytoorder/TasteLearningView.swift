@@ -11,7 +11,6 @@ import UIKit
 struct TasteLearningView: View {
     @StateObject private var viewModel = TasteTrainerViewModel()
     @State private var dragOffset: CGSize = .zero
-    @State private var backCardFrostOpacity: Double = 0.12
     @State private var isAnimatingSwipe = false
     @State private var isShowingProfilePopup = false
 
@@ -29,9 +28,11 @@ struct TasteLearningView: View {
                 .ignoresSafeArea()
 
                 GeometryReader { proxy in
-                    let cardWidth = min(proxy.size.width - 36, 360)
-                    let cardHeight = max(440, min(560, proxy.size.height * 0.55))
                     let actionBottomPadding = max(80, proxy.safeAreaInsets.bottom + 50)
+                    let maxCardWidth = min(proxy.size.width - 36, 360)
+                    let maxCardHeight = max(360, proxy.size.height - actionBottomPadding - 120)
+                    let cardHeight = min(maxCardHeight, maxCardWidth * 1.5)
+                    let cardWidth = cardHeight * (2.0 / 3.0)
 
                     ZStack {
                         cardDeckSection(cardHeight: cardHeight)
@@ -127,28 +128,18 @@ struct TasteLearningView: View {
     private func cardDeckSection(cardHeight: CGFloat) -> some View {
         ZStack {
             if let dish = viewModel.currentDish {
-                if let nextDish = viewModel.visibleDeck.dropFirst().first {
-                    DishSwipeCard(dish: nextDish)
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                                .fill(.ultraThinMaterial)
-                                .opacity(backCardFrostOpacity)
-                        }
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 30, style: .continuous)
-                                .fill(swipeFeedbackColor.opacity(0.34 * Double(swipeFeedbackProgress)))
-                                .overlay {
-                                    Image(systemName: swipeFeedbackIcon)
-                                        .font(.system(size: 76, weight: .black))
-                                        .foregroundStyle(.white.opacity(0.95))
-                                        .opacity(Double(swipeFeedbackProgress))
-                                        .scaleEffect(0.92 + 0.08 * Double(swipeFeedbackProgress))
-                                }
-                                .opacity(swipeFeedbackIsActive ? 1 : 0)
-                        }
-                        .allowsHitTesting(false)
-                        .zIndex(0)
-                }
+                RoundedRectangle(cornerRadius: 30, style: .continuous)
+                    .fill(swipeFeedbackColor.opacity(0.14 + 0.34 * Double(swipeFeedbackProgress)))
+                    .overlay {
+                        Image(systemName: swipeFeedbackIcon)
+                            .font(.system(size: 76, weight: .black))
+                            .foregroundStyle(.white.opacity(0.95))
+                            .opacity(Double(swipeFeedbackProgress))
+                            .scaleEffect(0.9 + 0.1 * Double(swipeFeedbackProgress))
+                    }
+                    .opacity(Double(swipeFeedbackProgress))
+                    .allowsHitTesting(false)
+                    .zIndex(0)
                 cardView(dish: dish)
                     .zIndex(1)
             } else {
@@ -177,16 +168,8 @@ struct TasteLearningView: View {
         .animation(.spring(response: 0.32, dampingFraction: 0.85), value: viewModel.currentDish?.id)
     }
 
-    private var baseBackCardFrostOpacity: Double { 0.5 }
-
-    private var maxBackCardFrostOpacity: Double { 0.99 }
-
     private var swipeFeedbackProgress: CGFloat {
         min(1, abs(dragOffset.width) / 150)
-    }
-
-    private var swipeFeedbackIsActive: Bool {
-        abs(dragOffset.width) > 8
     }
 
     private var swipeFeedbackColor: Color {
@@ -195,11 +178,6 @@ struct TasteLearningView: View {
 
     private var swipeFeedbackIcon: String {
         dragOffset.width >= 0 ? "heart.fill" : "xmark"
-    }
-
-    private func dynamicBackCardFrostOpacity(for width: CGFloat) -> Double {
-        let progress = min(1, abs(width) / 150)
-        return baseBackCardFrostOpacity + Double(progress) * (maxBackCardFrostOpacity - baseBackCardFrostOpacity)
     }
 
     private func cardView(dish: DishCandidate) -> some View {
@@ -219,7 +197,6 @@ struct TasteLearningView: View {
                 guard !isAnimatingSwipe else { return }
                 withAnimation(.interactiveSpring(response: 0.2, dampingFraction: 0.86)) {
                     dragOffset = value.translation
-                    backCardFrostOpacity = dynamicBackCardFrostOpacity(for: value.translation.width)
                 }
             }
             .onEnded { value in
@@ -237,7 +214,6 @@ struct TasteLearningView: View {
         } else {
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
                 dragOffset = .zero
-                backCardFrostOpacity = baseBackCardFrostOpacity
             }
         }
     }
@@ -246,17 +222,10 @@ struct TasteLearningView: View {
         isAnimatingSwipe = true
         withAnimation(.spring(response: 0.26, dampingFraction: 0.85)) {
             dragOffset = CGSize(width: endX, height: 26)
-            backCardFrostOpacity = maxBackCardFrostOpacity
         }
 
         Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(170))
-
-            withAnimation(.easeOut(duration: 0.2)) {
-                backCardFrostOpacity = baseBackCardFrostOpacity
-            }
-
-            try? await Task.sleep(for: .milliseconds(120))
 
             var noAnimation = Transaction()
             noAnimation.disablesAnimations = true
@@ -553,32 +522,6 @@ private struct DishSwipeCard: View {
 }
 
 private struct DishPlaceholderImage: View {
-    private let fadeZoneRatio: CGFloat = 0.3
-    private let fadeSampleCount = 40
-    private let fadePlateau: Double = 0.1
-
-    private var smoothFadeStops: [Gradient.Stop] {
-
-        return (0...fadeSampleCount).map { index in
-            let t = Double(index) / Double(fadeSampleCount)
-            let alpha: Double
-
-            if t <= fadePlateau {
-                alpha = 1
-            } else {
-                let normalized = (t - fadePlateau) / (1 - fadePlateau)
-                // Use an ease-in falloff so the top stays whiter longer, then fades faster lower down.
-                let eased = normalized * normalized * normalized
-                alpha = 1 - eased
-            }
-
-            return .init(
-                color: .white.opacity(max(0, min(alpha, 1))),
-                location: t
-            )
-        }
-    }
-
     var body: some View {
         ZStack {
             if let uiImage = UIImage(named: "dish_placeholder") {
@@ -600,18 +543,6 @@ private struct DishPlaceholderImage: View {
                         .font(.system(size: 34, weight: .semibold))
                         .foregroundStyle(.white.opacity(0.72))
                 )
-            }
-        }
-        .overlay {
-            GeometryReader { proxy in
-                LinearGradient(
-                    gradient: Gradient(stops: smoothFadeStops),
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                .frame(height: proxy.size.height * fadeZoneRatio)
-                .frame(maxHeight: .infinity, alignment: .top)
-                .allowsHitTesting(false)
             }
         }
         .clipped()
