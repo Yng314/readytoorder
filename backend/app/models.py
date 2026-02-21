@@ -38,6 +38,7 @@ class Dish(Base):
     name: Mapped[str] = mapped_column(String(80), nullable=False, unique=True, index=True)
     subtitle: Mapped[str] = mapped_column(String(160), nullable=False)
     signals: Mapped[dict] = mapped_column(JSON, nullable=False)
+    category_tags: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     status: Mapped[str] = mapped_column(String(20), nullable=False, default="ready")
     source: Mapped[str] = mapped_column(String(30), nullable=False, default="gemini")
     image_id: Mapped[str | None] = mapped_column(String(36), ForeignKey("dish_images.id"), nullable=True)

@@ -1,6 +1,6 @@
 import os
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, inspect, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
@@ -38,3 +38,16 @@ def init_db() -> None:
     from . import models  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
+    _ensure_schema_compatibility()
+
+
+def _ensure_schema_compatibility() -> None:
+    inspector = inspect(engine)
+    try:
+        dish_columns = {column["name"] for column in inspector.get_columns("dishes")}
+    except Exception:
+        return
+
+    if "category_tags" not in dish_columns:
+        with engine.begin() as conn:
+            conn.execute(text("ALTER TABLE dishes ADD COLUMN category_tags JSON"))

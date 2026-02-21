@@ -78,6 +78,7 @@ final class TasteBackendClient {
                 name: item.name,
                 subtitle: item.subtitle,
                 signals: normalized,
+                categoryTags: normalizedCategoryTags(item.category_tags),
                 imageDataURL: item.image_data_url
             )
         }
@@ -136,6 +137,25 @@ final class TasteBackendClient {
             throw NSError(domain: "TasteBackendClient", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: message])
         }
     }
+
+    private func normalizedCategoryTags(_ payload: DeckResponsePayload.DishPayload.CategoryTagsPayload?) -> DishCategoryTags? {
+        guard let payload else { return nil }
+
+        let cuisine = payload.cuisine
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        let flavor = payload.flavor
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+        let ingredient = payload.ingredient
+            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
+            .filter { !$0.isEmpty }
+
+        guard !cuisine.isEmpty || !flavor.isEmpty || !ingredient.isEmpty else {
+            return nil
+        }
+        return DishCategoryTags(cuisine: cuisine, flavor: flavor, ingredient: ingredient)
+    }
 }
 
 private struct FeatureScorePayload: Codable {
@@ -155,9 +175,23 @@ private struct DeckRequestPayload: Codable {
 
 private struct DeckResponsePayload: Decodable {
     struct DishPayload: Decodable {
+        struct CategoryTagsPayload: Decodable {
+            let cuisine: [String]
+            let flavor: [String]
+            let ingredient: [String]
+
+            init(from decoder: Decoder) throws {
+                let container = try decoder.container(keyedBy: CodingKeys.self)
+                cuisine = try container.decodeIfPresent([String].self, forKey: .cuisine) ?? []
+                flavor = try container.decodeIfPresent([String].self, forKey: .flavor) ?? []
+                ingredient = try container.decodeIfPresent([String].self, forKey: .ingredient) ?? []
+            }
+        }
+
         let name: String
         let subtitle: String
         let signals: [String: Double]
+        let category_tags: CategoryTagsPayload?
         let image_data_url: String?
     }
 

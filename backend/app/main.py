@@ -38,6 +38,10 @@ FEATURE_NAME_MAP = {
     "highProtein": "高蛋白偏好", "lowCarb": "低碳倾向", "veggieForward": "蔬菜导向",
 }
 
+CUISINE_OPTIONS = ["川菜", "粤菜", "日式", "泰式"]
+FLAVOR_ATOMIC_OPTIONS = ["酸", "甜", "苦", "辣", "咸", "麻", "鲜"]
+INGREDIENT_OPTIONS = ["鸡肉", "鸭肉", "猪肉", "牛肉", "羊肉", "海鲜", "豆腐", "菌菇"]
+
 GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3-flash-preview")
 GEMINI_IMAGE_MODEL = os.getenv("GEMINI_IMAGE_MODEL", "gemini-3-pro-image-preview")
 GEMINI_API_BASE = os.getenv("GEMINI_API_BASE", "https://generativelanguage.googleapis.com")
@@ -76,10 +80,17 @@ class DeckRequest(BaseModel):
     locale: str = "zh-CN"
 
 
+class DeckCategoryTags(BaseModel):
+    cuisine: List[str] = Field(default_factory=list)
+    flavor: List[str] = Field(default_factory=list)
+    ingredient: List[str] = Field(default_factory=list)
+
+
 class DeckDish(BaseModel):
     name: str
     subtitle: str
     signals: Dict[str, float]
+    category_tags: DeckCategoryTags = Field(default_factory=DeckCategoryTags)
     image_data_url: str | None = None
 
 
@@ -123,6 +134,159 @@ def _normalized_avoid_names(items: Sequence[str]) -> set[str]:
 
 def _clamp(value: float, low: float = -1.0, high: float = 1.0) -> float:
     return max(low, min(high, value))
+
+
+def _ordered_unique(items: Sequence[str]) -> List[str]:
+    seen = set()
+    output: List[str] = []
+    for item in items:
+        value = str(item).strip()
+        if not value or value in seen:
+            continue
+        seen.add(value)
+        output.append(value)
+    return output
+
+
+def _normalize_cuisine_tags(raw_tags: object) -> List[str]:
+    if not isinstance(raw_tags, list):
+        return []
+    result: List[str] = []
+    for raw in raw_tags:
+        value = str(raw).strip()
+        if not value:
+            continue
+        if "川" in value:
+            result.append("川菜")
+        elif "粤" in value or "广" in value:
+            result.append("粤菜")
+        elif "日" in value:
+            result.append("日式")
+        elif "泰" in value:
+            result.append("泰式")
+        elif value in CUISINE_OPTIONS:
+            result.append(value)
+    return _ordered_unique(result)[:2]
+
+
+def _normalize_flavor_tags(raw_tags: object) -> List[str]:
+    if not isinstance(raw_tags, list):
+        return []
+    result: List[str] = []
+    for raw in raw_tags:
+        value = str(raw).strip()
+        if not value:
+            continue
+        for flavor in FLAVOR_ATOMIC_OPTIONS:
+            if flavor in value:
+                result.append(flavor)
+    return _ordered_unique(result)[:4]
+
+
+def _normalize_ingredient_tags(raw_tags: object) -> List[str]:
+    if not isinstance(raw_tags, list):
+        return []
+    result: List[str] = []
+    for raw in raw_tags:
+        value = str(raw).strip()
+        if not value:
+            continue
+        if "鸡" in value:
+            result.append("鸡肉")
+        elif "鸭" in value:
+            result.append("鸭肉")
+        elif "猪" in value:
+            result.append("猪肉")
+        elif "牛" in value:
+            result.append("牛肉")
+        elif "羊" in value:
+            result.append("羊肉")
+        elif any(token in value for token in ["虾", "蟹", "鱼", "贝", "海鲜"]):
+            result.append("海鲜")
+        elif "豆腐" in value or value == "豆":
+            result.append("豆腐")
+        elif "菌" in value or "菇" in value:
+            result.append("菌菇")
+        elif value in INGREDIENT_OPTIONS:
+            result.append(value)
+    return _ordered_unique(result)[:4]
+
+
+def _infer_category_tags_from_signals(signals: Dict[str, float]) -> DeckCategoryTags:
+    cuisine_candidates = [
+        ("chuanStyle", "川菜"),
+        ("cantoneseStyle", "粤菜"),
+        ("japaneseStyle", "日式"),
+        ("thaiStyle", "泰式"),
+    ]
+    top_cuisine = max(cuisine_candidates, key=lambda item: signals.get(item[0], 0.0), default=None)
+    cuisine: List[str] = []
+    if top_cuisine and signals.get(top_cuisine[0], 0.0) >= 0.45:
+        cuisine = [top_cuisine[1]]
+
+    flavor_candidates = [
+        ("sour", "酸"),
+        ("sweet", "甜"),
+        ("spicy", "辣"),
+        ("salty", "咸"),
+        ("numbing", "麻"),
+        ("umami", "鲜"),
+    ]
+    flavor = [
+        label
+        for _, label in sorted(
+            (
+                (feature_id, label)
+                for feature_id, label in flavor_candidates
+                if signals.get(feature_id, 0.0) >= 0.5
+            ),
+            key=lambda pair: signals.get(pair[0], 0.0),
+            reverse=True,
+        )[:3]
+    ]
+
+    ingredient_candidates = [
+        ("chicken", "鸡肉"),
+        ("duck", "鸭肉"),
+        ("pork", "猪肉"),
+        ("beef", "牛肉"),
+        ("lamb", "羊肉"),
+        ("seafood", "海鲜"),
+        ("tofu", "豆腐"),
+        ("mushroom", "菌菇"),
+    ]
+    ingredient = [
+        label
+        for _, label in sorted(
+            (
+                (feature_id, label)
+                for feature_id, label in ingredient_candidates
+                if signals.get(feature_id, 0.0) >= 0.54
+            ),
+            key=lambda pair: signals.get(pair[0], 0.0),
+            reverse=True,
+        )[:3]
+    ]
+
+    return DeckCategoryTags(cuisine=cuisine, flavor=flavor, ingredient=ingredient)
+
+
+def _sanitize_category_tags(raw_tags: object, signals: Dict[str, float]) -> DeckCategoryTags:
+    if isinstance(raw_tags, dict):
+        normalized = DeckCategoryTags(
+            cuisine=_normalize_cuisine_tags(raw_tags.get("cuisine", [])),
+            flavor=_normalize_flavor_tags(raw_tags.get("flavor", [])),
+            ingredient=_normalize_ingredient_tags(raw_tags.get("ingredient", [])),
+        )
+    else:
+        normalized = DeckCategoryTags()
+
+    inferred = _infer_category_tags_from_signals(signals)
+    return DeckCategoryTags(
+        cuisine=normalized.cuisine or inferred.cuisine,
+        flavor=normalized.flavor or inferred.flavor,
+        ingredient=normalized.ingredient or inferred.ingredient,
+    )
 
 
 def _top_feature_pairs(items: List[FeatureScore], limit: int = 5) -> str:
@@ -186,6 +350,7 @@ def _sanitize_dishes(raw_dishes: list) -> List[DeckDish]:
         name = str(item.get("name", "")).strip()
         subtitle = str(item.get("subtitle", "")).strip()
         signal_map = item.get("signals", {})
+        raw_category_tags = item.get("category_tags", {})
 
         if not name or name in seen_names or not isinstance(signal_map, dict):
             continue
@@ -205,11 +370,13 @@ def _sanitize_dishes(raw_dishes: list) -> List[DeckDish]:
             continue
 
         seen_names.add(name)
+        category_tags = _sanitize_category_tags(raw_category_tags, normalized)
         cleaned.append(
             DeckDish(
                 name=name,
                 subtitle=subtitle or "口味特征生成",
                 signals=normalized,
+                category_tags=category_tags,
             )
         )
 
@@ -324,7 +491,16 @@ def _build_deck_prompt(req: DeckRequest, needed: int, used_names: Sequence[str])
 - 只能返回一个 JSON 对象，格式：
   {{
     "dishes": [
-      {{"name": "菜名", "subtitle": "简短描述", "signals": {{"featureId": 0.0}}}}
+      {{
+        "name": "菜名",
+        "subtitle": "简短描述",
+        "signals": {{"featureId": 0.0}},
+        "category_tags": {{
+          "cuisine": ["川菜|粤菜|日式|泰式"],
+          "flavor": ["酸|甜|苦|辣|咸|麻|鲜"],
+          "ingredient": ["鸡肉|鸭肉|猪肉|牛肉|羊肉|海鲜|豆腐|菌菇"]
+        }}
+      }}
     ]
   }}
 - dishes 数组长度必须等于 {needed}。
@@ -333,6 +509,9 @@ def _build_deck_prompt(req: DeckRequest, needed: int, used_names: Sequence[str])
 - signals：只允许以下 featureId，值范围 0.2-1.0：
   {", ".join(FEATURE_IDS)}
 - 每个菜至少 3 个 signals，最多 6 个。
+- category_tags.cuisine：1-2 个标签，从「川菜、粤菜、日式、泰式」中选。
+- category_tags.flavor：1-4 个标签，只能使用单一口味词「酸、甜、苦、辣、咸、麻、鲜」。
+- category_tags.ingredient：1-4 个标签，从「鸡肉、鸭肉、猪肉、牛肉、羊肉、海鲜、豆腐、菌菇」中选。
 - 结合用户偏好提高多样性，避免全是同一种菜系。
 
 用户画像输入：
@@ -410,6 +589,7 @@ def _load_image_map(session: Session, dishes: Sequence[Dish]) -> Dict[str, DishI
 
 def _to_deck_dish(row: Dish, image: DishImage | None) -> DeckDish:
     signal_map = row.signals if isinstance(row.signals, dict) else {}
+    raw_category_tags = row.category_tags if isinstance(row.category_tags, dict) else {}
     normalized: Dict[str, float] = {}
     for key, value in signal_map.items():
         if key not in FEATURE_IDS:
@@ -418,10 +598,13 @@ def _to_deck_dish(row: Dish, image: DishImage | None) -> DeckDish:
             continue
         normalized[key] = round(max(0.2, min(1.0, float(value))), 3)
 
+    category_tags = _sanitize_category_tags(raw_category_tags, normalized)
+
     return DeckDish(
         name=row.name,
         subtitle=row.subtitle,
         signals=normalized,
+        category_tags=category_tags,
         image_data_url=image.data_url if image else None,
     )
 
@@ -518,6 +701,7 @@ async def _generate_and_store_dishes(
                 name=dish.name,
                 subtitle=dish.subtitle,
                 signals=dish.signals,
+                category_tags=dish.category_tags.model_dump(),
                 status="ready",
                 source="gemini",
                 image_id=image_id,

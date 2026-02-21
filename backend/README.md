@@ -2,6 +2,7 @@
 
 FastAPI backend for:
 - `POST /v1/taste/deck`: return cached dishes first, auto-refill when inventory is low
+  - each dish includes `category_tags` (`cuisine` / `flavor` / `ingredient`)
 - `POST /v1/taste/analyze`: summarize taste profile from swipe history
 - `GET /health`: health info including current cached dish count
 
@@ -43,6 +44,7 @@ curl http://127.0.0.1:8000/health
 ## Notes
 
 - Data tables are auto-created on startup (`dishes`, `dish_images`, `generation_jobs`).
+- Startup includes a lightweight compatibility patch for `dishes.category_tags` when upgrading older DB schema.
 - The deck endpoint prefers DB cache and only calls Gemini when cache is insufficient.
 - Dish image prompt template:
   - `生成一个[菜品名]的图片，俯视角，图像比例2:3，食物主体在下方2/3区域内`
