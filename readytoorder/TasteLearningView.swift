@@ -7,6 +7,7 @@
 
 import SwiftUI
 import UIKit
+import Combine
 
 struct TasteLearningView: View {
     @StateObject private var viewModel = TasteTrainerViewModel()
@@ -29,9 +30,10 @@ struct TasteLearningView: View {
 
                 GeometryReader { proxy in
                     let actionBottomPadding = max(80, proxy.safeAreaInsets.bottom + 50)
-                    let maxCardWidth = min(proxy.size.width - 36, 360)
+                    let availableWidth = max(0, proxy.size.width - 36)
+                    let maxCardWidth = min(availableWidth, 360)
                     let maxCardHeight = max(360, proxy.size.height - actionBottomPadding - 120)
-                    let cardHeight = min(maxCardHeight, maxCardWidth * 1.5)
+                    let cardHeight = max(0, min(maxCardHeight, maxCardWidth * 1.5))
                     let cardWidth = cardHeight * (2.0 / 3.0)
 
                     ZStack {
@@ -454,98 +456,201 @@ struct TasteLearningView: View {
 
 private struct DishSwipeCard: View {
     let dish: DishCandidate
+    private let textHorizontalPadding: CGFloat = 20
+    private let textTopPadding: CGFloat = 22
+    private let frostStart: CGFloat = 0.33
+    private let frostFullStop: CGFloat = 0.24
+    private let frostEnd: CGFloat = 0.50
 
     var body: some View {
         let cardShape = RoundedRectangle(cornerRadius: 30, style: .continuous)
 
-        GeometryReader { geo in
-            let imageSide = geo.size.width
-            let textHeight = max(120, geo.size.height - imageSide)
-
-            VStack(alignment: .leading, spacing: 0) {
+        DishCardImageView(imageDataURL: dish.imageDataURL)
+            .overlay(topFrostOverlay)
+            .overlay(alignment: .topLeading) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(dish.name)
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(.primary)
+                        .font(.system(size: 30, weight: .bold, design: .rounded))
+                        .foregroundStyle(.white)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.82)
+                        .minimumScaleFactor(0.8)
+                        .shadow(color: .black.opacity(0.35), radius: 4, x: 0, y: 1)
 
                     Text(dish.subtitle)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.white.opacity(0.95))
                         .lineLimit(2)
+                        .shadow(color: .black.opacity(0.28), radius: 4, x: 0, y: 1)
 
-                    TagFlowLayout(itemSpacing: 8, rowSpacing: 8) {
-                        ForEach(dish.normalizedTags, id: \.self) { tag in
-                            Text(tag)
-                                .font(.caption.weight(.semibold))
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color.white.opacity(0.5), in: Capsule())
-                                .foregroundStyle(Color.primary.opacity(0.9))
+                    let tagGroups = dish.displayCategoryTags
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        if !tagGroups.cuisine.isEmpty {
+                            tagLine(title: "菜系", values: tagGroups.cuisine)
+                        }
+                        if !tagGroups.flavor.isEmpty {
+                            tagLine(title: "口味", values: tagGroups.flavor)
+                        }
+                        if !tagGroups.ingredient.isEmpty {
+                            tagLine(title: "原材料", values: tagGroups.ingredient)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
                 }
-                .padding(.horizontal, 30)
-                .padding(.top, 30)
-                .padding(.bottom, 12)
-                .frame(maxWidth: .infinity, minHeight: textHeight, alignment: .topLeading)
-                .background(Color.white.opacity(0.94))
-
-                DishPlaceholderImage()
-                    .frame(width: geo.size.width, height: imageSide)
+                .padding(.horizontal, textHorizontalPadding)
+                .padding(.top, textTopPadding)
+                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
             }
-            .frame(width: geo.size.width, height: geo.size.height)
-        }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            cardShape
-                .fill(
-                    LinearGradient(
-                        colors: [
-                            .white,
-                            Color(red: 0.985, green: 0.988, blue: 0.995)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
-        )
         .clipShape(cardShape)
         .overlay(
             cardShape
-                .stroke(.white.opacity(0.9), lineWidth: 1)
+                .stroke(.white.opacity(0.82), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.08), radius: 18, x: 0, y: 10)
+        .shadow(color: .black.opacity(0.14), radius: 18, x: 0, y: 10)
+    }
+
+    private var topFrostOverlay: some View {
+        let mask = LinearGradient(
+            stops: [
+                .init(color: .white, location: 0.0),
+                .init(color: .white, location: frostFullStop),
+                .init(color: .white.opacity(0.94), location: frostStart),
+                .init(color: .white.opacity(0.45), location: min(1, frostStart + 0.08)),
+                .init(color: .clear, location: frostEnd),
+                .init(color: .clear, location: 1.0)
+            ],
+            startPoint: .top,
+            endPoint: .bottom
+        )
+
+        return ZStack {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .opacity(0.98)
+                .mask(mask)
+
+            Rectangle()
+                .fill(.white.opacity(0.18))
+                .mask(mask)
+
+            LinearGradient(
+                colors: [
+                    .black.opacity(0.34),
+                    .black.opacity(0.12),
+                    .black.opacity(0.0)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .mask(mask)
+        }
+        .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private func tagLine(title: String, values: [String]) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 6) {
+            Text("\(title)：")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white.opacity(0.86))
+
+            Text(values.joined(separator: " · "))
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.white)
+                .lineLimit(1)
+                .minimumScaleFactor(0.82)
+        }
     }
 }
 
-private struct DishPlaceholderImage: View {
+private struct DishCardImageView: View {
+    let imageDataURL: String?
+    @StateObject private var loader = DishCardImageLoader()
+
     var body: some View {
         ZStack {
-            if let uiImage = UIImage(named: "dish_placeholder") {
-                Image(uiImage: uiImage)
+            if let image = loader.image {
+                Image(uiImage: image)
                     .resizable()
                     .scaledToFill()
             } else {
                 LinearGradient(
                     colors: [
-                        Color(red: 0.58, green: 0.14, blue: 0.10),
-                        Color(red: 0.82, green: 0.22, blue: 0.12),
-                        Color(red: 0.45, green: 0.11, blue: 0.08)
+                        Color(red: 0.22, green: 0.23, blue: 0.27),
+                        Color(red: 0.30, green: 0.32, blue: 0.38),
+                        Color(red: 0.24, green: 0.26, blue: 0.30)
                     ],
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
                 )
                 .overlay(
-                    Image(systemName: "photo")
+                    Image(systemName: "fork.knife")
                         .font(.system(size: 34, weight: .semibold))
-                        .foregroundStyle(.white.opacity(0.72))
+                        .foregroundStyle(.white.opacity(0.75))
                 )
             }
         }
+        .onAppear {
+            loader.load(from: imageDataURL)
+        }
+        .onChange(of: imageDataURL) { _, newValue in
+            loader.load(from: newValue)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .clipped()
+    }
+}
+
+private final class DishCardImageLoader: ObservableObject {
+    @Published private(set) var image: UIImage?
+
+    private var currentKey: String?
+    private let cache = NSCache<NSString, UIImage>()
+
+    func load(from rawDataURL: String?) {
+        let normalized = rawDataURL?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        guard !normalized.isEmpty else {
+            currentKey = nil
+            image = nil
+            return
+        }
+
+        if currentKey == normalized, image != nil {
+            return
+        }
+        currentKey = normalized
+
+        if let cached = cache.object(forKey: normalized as NSString) {
+            image = cached
+            return
+        }
+
+        image = nil
+        let decoded = Self.decodeImage(from: normalized)
+        if let decoded {
+            cache.setObject(decoded, forKey: normalized as NSString)
+        }
+        guard currentKey == normalized else { return }
+        image = decoded
+    }
+
+    private static func decodeImage(from dataURL: String) -> UIImage? {
+        if let commaIndex = dataURL.firstIndex(of: ",") {
+            let payload = String(dataURL[dataURL.index(after: commaIndex)...])
+            if let data = Data(base64Encoded: payload, options: [.ignoreUnknownCharacters]),
+               let image = UIImage(data: data) {
+                return image
+            }
+        }
+
+        guard let url = URL(string: dataURL),
+              url.scheme?.lowercased() == "data",
+              let data = try? Data(contentsOf: url),
+              let image = UIImage(data: data) else {
+            return nil
+        }
+        return image
     }
 }
 

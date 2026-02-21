@@ -17,10 +17,11 @@ final class TasteTrainerViewModel: ObservableObject {
     @Published private(set) var isAnalyzingTaste = false
     @Published private(set) var deckErrorMessage: String?
     @Published private(set) var analysisErrorMessage: String?
+    @Published private(set) var isFetchingDeck = false
 
     private let store: TasteProfileStore
     private let backendClient: TasteBackendClient
-    private let localGenerator = LocalPlaceholderDishGenerator()
+    private var queuedRefillTarget: Int?
 
     private let initialDeckSize = 20
     private let refillDeckSize = 20
@@ -72,7 +73,7 @@ final class TasteTrainerViewModel: ObservableObject {
     }
 
     var isGeneratingDeck: Bool {
-        deck.isEmpty
+        deck.isEmpty && isFetchingDeck
     }
 
     var deckStatusText: String {
@@ -158,11 +159,12 @@ final class TasteTrainerViewModel: ObservableObject {
         profile = TasteProfile()
         history = []
         latestAnalysis = nil
-        deck = localGenerator.makeDeck(count: initialDeckSize)
+        deck = []
         deckErrorMessage = nil
         analysisErrorMessage = nil
         store.clear()
         persist()
+        refillDeckIfNeeded(targetCount: initialDeckSize)
     }
 
     func refreshAnalysisNow() {
@@ -174,47 +176,89 @@ final class TasteTrainerViewModel: ObservableObject {
         if let snapshot = store.load() {
             profile = snapshot.profile
             history = snapshot.history
-            if snapshot.deck.isEmpty {
-                let usedNames = Set(snapshot.history.map(\.dish.name))
-                if usedNames.isEmpty {
-                    deck = localGenerator.makeDeck(count: initialDeckSize)
-                    deckErrorMessage = nil
-                } else {
-                    deck = localGenerator.makeDeck(count: initialDeckSize, avoiding: usedNames)
-                    deckErrorMessage = deck.isEmpty ? "菜品没有了，点击重置重新开始。" : nil
-                }
-            } else {
-                deck = snapshot.deck
-                deckErrorMessage = nil
-            }
+            deck = []
+            deckErrorMessage = nil
             latestAnalysis = snapshot.latestAnalysis
             persist()
             return
         }
 
-        deck = localGenerator.makeDeck(count: initialDeckSize)
+        deck = []
         persist()
     }
 
     private func persist() {
-        let snapshot = TasteTrainingSnapshot(profile: profile, deck: deck, history: history, latestAnalysis: latestAnalysis)
+        let persistableDeck = deck.map { $0.withoutImagePayload() }
+        let persistableHistory = history.map {
+            SwipeEvent(id: $0.id, dish: $0.dish.withoutImagePayload(), action: $0.action, createdAt: $0.createdAt)
+        }
+        let snapshot = TasteTrainingSnapshot(
+            profile: profile,
+            deck: persistableDeck,
+            history: persistableHistory,
+            latestAnalysis: latestAnalysis
+        )
         store.save(snapshot)
     }
 
     private func refillDeckIfNeeded(targetCount: Int) {
         let needed = max(0, targetCount - deck.count)
         guard needed > 0 else { return }
-
-        let avoidNames = Set(deck.map(\.name)).union(history.map(\.dish.name))
-        let refill = localGenerator.makeDeck(count: needed, avoiding: avoidNames)
-        guard !refill.isEmpty else {
-            deckErrorMessage = "菜品没有了，点击重置重新开始。"
+        guard !isFetchingDeck else {
+            queuedRefillTarget = max(queuedRefillTarget ?? 0, targetCount)
             return
         }
 
-        deck.append(contentsOf: refill)
+        isFetchingDeck = true
         deckErrorMessage = nil
-        persist()
+
+        let requestCount = min(40, max(minimumDeckThreshold, needed))
+        let avoidNames = Set(deck.map(\.name)).union(history.map(\.dish.name))
+        let positive = positiveInsights
+        let negative = negativeInsights
+        let recentLikes = recentLikedDishNames
+
+        Task {
+            defer {
+                Task { @MainActor in
+                    isFetchingDeck = false
+                    if let queuedTarget = queuedRefillTarget {
+                        queuedRefillTarget = nil
+                        refillDeckIfNeeded(targetCount: queuedTarget)
+                    }
+                }
+            }
+
+            do {
+                let result = try await backendClient.fetchDeck(
+                    count: requestCount,
+                    positive: positive,
+                    negative: negative,
+                    recentLikes: recentLikes,
+                    avoidNames: Array(avoidNames)
+                )
+
+                await MainActor.run {
+                    let existingNames = Set(deck.map(\.name)).union(history.map(\.dish.name))
+                    let uniqueDishes = result.dishes.filter { !existingNames.contains($0.name) }
+                    if uniqueDishes.isEmpty {
+                        if deck.isEmpty {
+                            deckErrorMessage = "暂无可用菜品，请稍后重试。"
+                        }
+                    } else {
+                        deck.append(contentsOf: uniqueDishes)
+                        deckErrorMessage = nil
+                    }
+                    persist()
+                }
+            } catch {
+                await MainActor.run {
+                    if deck.isEmpty {
+                        deckErrorMessage = "获取菜品失败：\(error.localizedDescription)"
+                    }
+                }
+            }
+        }
     }
 
     private func triggerAnalysisIfNeeded() {

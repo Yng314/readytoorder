@@ -141,19 +141,33 @@ struct DishCandidate: Identifiable, Codable, Hashable {
     let subtitle: String
     let signals: [TasteFeatureID: Double]
     let categoryTags: DishCategoryTags?
+    let imageDataURL: String?
 
     init(
         id: UUID = UUID(),
         name: String,
         subtitle: String,
         signals: [TasteFeatureID: Double],
-        categoryTags: DishCategoryTags? = nil
+        categoryTags: DishCategoryTags? = nil,
+        imageDataURL: String? = nil
     ) {
         self.id = id
         self.name = name
         self.subtitle = subtitle
         self.signals = signals
         self.categoryTags = categoryTags
+        self.imageDataURL = imageDataURL
+    }
+
+    func withoutImagePayload() -> DishCandidate {
+        DishCandidate(
+            id: id,
+            name: name,
+            subtitle: subtitle,
+            signals: signals,
+            categoryTags: categoryTags,
+            imageDataURL: nil
+        )
     }
 
     var topTags: [TasteFeature] {
@@ -164,29 +178,132 @@ struct DishCandidate: Identifiable, Codable, Hashable {
     }
 
     var normalizedTags: [String] {
-        if let categoryTags {
-            return categoryTags.displayValues
-        }
+        displayCategoryTags.displayValues
+    }
 
+    var displayCategoryTags: DishCategoryTags {
+        let cuisine = normalizedCuisineTags(raw: categoryTags?.cuisine ?? [])
+        let flavor = normalizedFlavorTags(raw: categoryTags?.flavor ?? [])
+        let ingredient = normalizedIngredientTags(raw: categoryTags?.ingredient ?? [])
+
+        return DishCategoryTags(
+            cuisine: cuisine.isEmpty ? inferredCuisineTags() : cuisine,
+            flavor: flavor.isEmpty ? inferredFlavorTags() : flavor,
+            ingredient: ingredient.isEmpty ? inferredIngredientTags() : ingredient
+        )
+    }
+
+    private func inferredCuisineTags() -> [String] {
+        let candidates: [(TasteFeatureID, String)] = [
+            (.chuanStyle, "川菜"),
+            (.cantoneseStyle, "粤菜"),
+            (.japaneseStyle, "日式"),
+            (.thaiStyle, "泰式")
+        ]
+        guard let top = candidates.max(by: { signals[$0.0, default: 0] < signals[$1.0, default: 0] }),
+              signals[top.0, default: 0] >= 0.45 else {
+            return []
+        }
+        return [top.1]
+    }
+
+    private func inferredFlavorTags() -> [String] {
+        let candidates: [(TasteFeatureID, String)] = [
+            (.sour, "酸"),
+            (.sweet, "甜"),
+            (.spicy, "辣"),
+            (.salty, "咸"),
+            (.numbing, "麻"),
+            (.umami, "鲜")
+        ]
+        let ranked = candidates
+            .compactMap { feature, label -> (String, Double)? in
+                let score = signals[feature, default: 0]
+                guard score >= 0.5 else { return nil }
+                return (label, score)
+            }
+            .sorted { $0.1 > $1.1 }
+            .map(\.0)
+        return orderedUnique(Array(ranked.prefix(3)))
+    }
+
+    private func inferredIngredientTags() -> [String] {
+        let candidates: [(TasteFeatureID, String)] = [
+            (.chicken, "鸡肉"),
+            (.duck, "鸭肉"),
+            (.pork, "猪肉"),
+            (.beef, "牛肉"),
+            (.lamb, "羊肉"),
+            (.seafood, "海鲜"),
+            (.tofu, "豆腐"),
+            (.mushroom, "菌菇")
+        ]
+        let ranked = candidates
+            .compactMap { feature, label -> (String, Double)? in
+                let score = signals[feature, default: 0]
+                guard score >= 0.54 else { return nil }
+                return (label, score)
+            }
+            .sorted { $0.1 > $1.1 }
+            .map(\.0)
+        return orderedUnique(Array(ranked.prefix(3)))
+    }
+
+    private func normalizedCuisineTags(raw: [String]) -> [String] {
         var result: [String] = []
-        let cuisineIDs: [TasteFeatureID] = [.chuanStyle, .cantoneseStyle, .japaneseStyle, .thaiStyle]
-        if let cuisine = cuisineIDs.max(by: { signals[$0, default: 0] < signals[$1, default: 0] }),
-           signals[cuisine, default: 0] >= 0.5 {
-            result.append(TasteFeatureCatalog.feature(for: cuisine).name)
+        for item in raw {
+            let value = item.trimmingCharacters(in: .whitespacesAndNewlines)
+            if value.isEmpty { continue }
+            if value.contains("川") {
+                result.append("川菜")
+            } else if value.contains("粤") || value.contains("广") {
+                result.append("粤菜")
+            } else if value.contains("日") {
+                result.append("日式")
+            } else if value.contains("泰") {
+                result.append("泰式")
+            } else {
+                result.append(value)
+            }
         }
+        return orderedUnique(result)
+    }
 
-        let flavorIDs: [TasteFeatureID] = [.sweet, .spicy, .sour, .salty, .numbing, .umami]
-        for id in flavorIDs where signals[id, default: 0] >= 0.55 {
-            result.append(TasteFeatureCatalog.feature(for: id).name)
+    private func normalizedFlavorTags(raw: [String]) -> [String] {
+        let atomicFlavors = ["酸", "甜", "苦", "辣", "咸", "麻", "鲜"]
+        var result: [String] = []
+        for item in raw {
+            for flavor in atomicFlavors where item.contains(flavor) {
+                result.append(flavor)
+            }
         }
+        return orderedUnique(result)
+    }
 
-        let ingredientIDs: [TasteFeatureID] = [.chicken, .beef, .lamb, .pork, .duck, .seafood, .tofu]
-        for id in ingredientIDs where signals[id, default: 0] >= 0.58 {
-            result.append(TasteFeatureCatalog.feature(for: id).name)
-        }
-
-        if result.isEmpty {
-            result.append("鲜味")
+    private func normalizedIngredientTags(raw: [String]) -> [String] {
+        var result: [String] = []
+        for item in raw {
+            let value = item.trimmingCharacters(in: .whitespacesAndNewlines)
+            if value.isEmpty { continue }
+            if value.contains("鸡") {
+                result.append("鸡肉")
+            } else if value.contains("鸭") {
+                result.append("鸭肉")
+            } else if value.contains("猪") {
+                result.append("猪肉")
+            } else if value.contains("牛") {
+                result.append("牛肉")
+            } else if value.contains("羊") {
+                result.append("羊肉")
+            } else if value.contains("虾") || value.contains("蟹") || value.contains("鱼") || value.contains("贝") {
+                result.append("海鲜")
+            } else if value.contains("豆腐") || value.contains("豆") {
+                result.append("豆腐")
+            } else if value.contains("菌") || value.contains("菇") {
+                result.append("菌菇")
+            } else {
+                result.append(value)
+            }
         }
         return orderedUnique(result)
     }

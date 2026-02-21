@@ -74,7 +74,12 @@ final class TasteBackendClient {
             guard !item.name.isEmpty, normalized.count >= 2 else {
                 return nil
             }
-            return DishCandidate(name: item.name, subtitle: item.subtitle, signals: normalized)
+            return DishCandidate(
+                name: item.name,
+                subtitle: item.subtitle,
+                signals: normalized,
+                imageDataURL: item.image_data_url
+            )
         }
 
         return (dishes, decoded.source)
@@ -153,6 +158,7 @@ private struct DeckResponsePayload: Decodable {
         let name: String
         let subtitle: String
         let signals: [String: Double]
+        let image_data_url: String?
     }
 
     let dishes: [DishPayload]
