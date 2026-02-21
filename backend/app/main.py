@@ -50,9 +50,10 @@ GEMINI_READ_TIMEOUT_SECONDS = float(os.getenv("GEMINI_READ_TIMEOUT_SECONDS", "70
 GEMINI_CONNECT_TIMEOUT_SECONDS = float(os.getenv("GEMINI_CONNECT_TIMEOUT_SECONDS", "12"))
 GEMINI_MAX_RETRIES = int(os.getenv("GEMINI_MAX_RETRIES", "3"))
 GEMINI_IMAGE_MAX_BYTES = int(os.getenv("GEMINI_IMAGE_MAX_BYTES", "5242880"))
+IMAGE_GENERATION_CONCURRENCY = int(os.getenv("IMAGE_GENERATION_CONCURRENCY", "4"))
 
 DECK_LOW_WATERMARK = int(os.getenv("DECK_LOW_WATERMARK", "50"))
-DECK_REFILL_BATCH = int(os.getenv("DECK_REFILL_BATCH", "16"))
+DECK_REFILL_BATCH = int(os.getenv("DECK_REFILL_BATCH", "20"))
 BOOTSTRAP_MIN_READY = int(os.getenv("BOOTSTRAP_MIN_READY", "8"))
 
 REFILL_LOCK = asyncio.Lock()
@@ -661,16 +662,22 @@ async def _generate_and_store_dishes(
         extra_avoid_names=extra_avoid_names,
     )
 
-    prepared: list[tuple[DeckDish, str, str, str | None]] = []
-    for dish in generated:
+    image_semaphore = asyncio.Semaphore(max(1, IMAGE_GENERATION_CONCURRENCY))
+
+    async def _prepare_dish_with_image(dish: DeckDish) -> tuple[DeckDish, str, str, str | None]:
         image_prompt = f"生成一个{dish.name}的图片，俯视角，图像比例2:3，食物主体在下方2/3区域内"
         image_mime = "image/png"
         image_data_url: str | None = None
-        try:
-            image_prompt, image_mime, image_data_url = await _generate_dish_image_with_gemini(dish.name)
-        except Exception:
-            logger.exception("dish image generation failed dish=%s", dish.name)
-        prepared.append((dish, image_prompt, image_mime, image_data_url))
+        async with image_semaphore:
+            try:
+                image_prompt, image_mime, image_data_url = await _generate_dish_image_with_gemini(dish.name)
+            except Exception:
+                logger.exception("dish image generation failed dish=%s", dish.name)
+        return (dish, image_prompt, image_mime, image_data_url)
+
+    prepared: list[tuple[DeckDish, str, str, str | None]] = list(
+        await asyncio.gather(*(_prepare_dish_with_image(dish) for dish in generated))
+    )
 
     created_count = 0
     with SessionLocal() as session:
@@ -752,7 +759,7 @@ async def _trigger_background_refill_if_needed(req: DeckRequest) -> None:
     with SessionLocal() as session:
         ready_count = _count_ready_dishes(session)
 
-    if ready_count >= DECK_LOW_WATERMARK:
+    if ready_count > DECK_LOW_WATERMARK:
         return
 
     refill_request = DeckRequest(

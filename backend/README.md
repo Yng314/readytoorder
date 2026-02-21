@@ -26,7 +26,8 @@ export GEMINI_API_BASE="https://generativelanguage.googleapis.com"
 # optional
 export DATABASE_URL="postgresql://..."  # default: sqlite:///./readytoorder.db
 export DECK_LOW_WATERMARK="50"
-export DECK_REFILL_BATCH="16"
+export DECK_REFILL_BATCH="20"
+export IMAGE_GENERATION_CONCURRENCY="4"
 ```
 
 ## 3) Run

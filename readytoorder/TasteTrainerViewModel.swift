@@ -23,9 +23,9 @@ final class TasteTrainerViewModel: ObservableObject {
     private let backendClient: TasteBackendClient
     private var queuedRefillTarget: Int?
 
-    private let initialDeckSize = 20
-    private let refillDeckSize = 20
-    private let minimumDeckThreshold = 6
+    private let initialDeckSize = 30
+    private let refillDeckSize = 30
+    private let minimumDeckThreshold = 15
     private let maxHistory = 200
     private let analysisInterval = 15
     private let minimumSwipesForFirstAnalysis = 15
@@ -139,7 +139,7 @@ final class TasteTrainerViewModel: ObservableObject {
 
         deck.removeFirst()
 
-        if deck.count < minimumDeckThreshold {
+        if deck.count <= minimumDeckThreshold {
             refillDeckIfNeeded(targetCount: refillDeckSize)
         }
 
