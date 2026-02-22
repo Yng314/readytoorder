@@ -14,6 +14,60 @@ struct TasteAnalysisResult: Codable {
     let source: String
 }
 
+enum MenuChatMode: String, Codable {
+    case chat
+    case recommend
+}
+
+enum MenuChatRole: String, Codable {
+    case user
+    case assistant
+}
+
+struct MenuChatImageInput: Codable, Hashable {
+    let mimeType: String
+    let dataBase64: String
+}
+
+struct MenuChatTurnInput: Codable, Hashable {
+    let role: MenuChatRole
+    let text: String
+}
+
+struct MenuChatDetailParamsInput: Codable, Hashable {
+    let diners: Int?
+    let budgetCNY: Int?
+    let spiceLevel: String
+    let allergies: [String]
+    let notes: String
+}
+
+struct MenuTasteContextInput: Hashable {
+    let totalSwipes: Int
+    let topPositive: [TasteInsight]
+    let topNegative: [TasteInsight]
+    let recentLikes: [String]
+}
+
+struct MenuRecommendationItem: Codable, Hashable, Identifiable {
+    let name: String
+    let originalName: String
+    let reason: String
+    let matchScore: Int
+    let style: String
+
+    var id: String {
+        "\(style)|\(name)|\(originalName)"
+    }
+}
+
+struct MenuChatResult: Codable, Hashable {
+    let mode: MenuChatMode
+    let reply: String
+    let recommendations: [MenuRecommendationItem]
+    let source: String
+}
+
 final class TasteBackendClient {
     static let shared = TasteBackendClient()
 
@@ -119,6 +173,62 @@ final class TasteBackendClient {
         return try decoder.decode(TasteAnalysisResult.self, from: data)
     }
 
+    func menuChat(
+        mode: MenuChatMode,
+        message: String,
+        images: [MenuChatImageInput],
+        history: [MenuChatTurnInput],
+        tasteContext: MenuTasteContextInput,
+        params: MenuChatDetailParamsInput?
+    ) async throws -> MenuChatResult {
+        guard let baseURL else { throw URLError(.badURL) }
+
+        let payload = MenuChatRequestPayload(
+            mode: mode.rawValue,
+            message: message,
+            images: images.map { .init(mime_type: $0.mimeType, data_base64: $0.dataBase64) },
+            chat_history: history.map { .init(role: $0.role.rawValue, text: $0.text) },
+            total_swipes: tasteContext.totalSwipes,
+            top_positive: tasteContext.topPositive.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
+            top_negative: tasteContext.topNegative.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
+            recent_likes: tasteContext.recentLikes,
+            params: params.map {
+                .init(
+                    diners: $0.diners,
+                    budget_cny: $0.budgetCNY,
+                    spice_level: $0.spiceLevel,
+                    allergies: $0.allergies,
+                    notes: $0.notes
+                )
+            },
+            locale: "zh-CN"
+        )
+
+        var request = URLRequest(url: baseURL.appendingPathComponent("v1/menu/chat"))
+        request.httpMethod = "POST"
+        request.timeoutInterval = 120
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.httpBody = try encoder.encode(payload)
+
+        let (data, response) = try await session.data(for: request)
+        try ensureSuccess(response: response, data: data)
+        let decoded = try decoder.decode(MenuChatResponsePayload.self, from: data)
+        return MenuChatResult(
+            mode: MenuChatMode(rawValue: decoded.mode) ?? mode,
+            reply: decoded.reply,
+            recommendations: decoded.recommendations.map {
+                MenuRecommendationItem(
+                    name: $0.name,
+                    originalName: $0.original_name,
+                    reason: $0.reason,
+                    matchScore: $0.match_score,
+                    style: $0.style
+                )
+            },
+            source: decoded.source
+        )
+    }
+
     private var baseURL: URL? {
         let raw = UserDefaults.standard.string(forKey: "readytoorder.setting.backendURL")?.trimmingCharacters(in: .whitespacesAndNewlines)
         let value = (raw?.isEmpty ?? true) ? "https://readytoorder-production.up.railway.app" : raw
@@ -216,4 +326,50 @@ private struct AnalyzeRequestPayload: Codable {
     let top_positive: [FeatureScorePayload]
     let top_negative: [FeatureScorePayload]
     let recent_events: [RecentEventPayload]
+}
+
+private struct MenuChatRequestPayload: Codable {
+    struct ImagePayload: Codable {
+        let mime_type: String
+        let data_base64: String
+    }
+
+    struct TurnPayload: Codable {
+        let role: String
+        let text: String
+    }
+
+    struct ParamsPayload: Codable {
+        let diners: Int?
+        let budget_cny: Int?
+        let spice_level: String
+        let allergies: [String]
+        let notes: String
+    }
+
+    let mode: String
+    let message: String
+    let images: [ImagePayload]
+    let chat_history: [TurnPayload]
+    let total_swipes: Int
+    let top_positive: [FeatureScorePayload]
+    let top_negative: [FeatureScorePayload]
+    let recent_likes: [String]
+    let params: ParamsPayload?
+    let locale: String
+}
+
+private struct MenuChatResponsePayload: Decodable {
+    struct RecommendationPayload: Decodable {
+        let name: String
+        let original_name: String
+        let reason: String
+        let match_score: Int
+        let style: String
+    }
+
+    let mode: String
+    let reply: String
+    let recommendations: [RecommendationPayload]
+    let source: String
 }

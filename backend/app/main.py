@@ -6,7 +6,7 @@ import os
 import random
 import re
 from datetime import datetime, timezone
-from typing import Dict, List, Sequence
+from typing import Dict, List, Literal, Sequence
 
 import httpx
 from fastapi import FastAPI, HTTPException
@@ -55,6 +55,9 @@ IMAGE_GENERATION_CONCURRENCY = int(os.getenv("IMAGE_GENERATION_CONCURRENCY", "4"
 DECK_LOW_WATERMARK = int(os.getenv("DECK_LOW_WATERMARK", "50"))
 DECK_REFILL_BATCH = int(os.getenv("DECK_REFILL_BATCH", "20"))
 BOOTSTRAP_MIN_READY = int(os.getenv("BOOTSTRAP_MIN_READY", "8"))
+MENU_MAX_IMAGES = int(os.getenv("MENU_MAX_IMAGES", "6"))
+MENU_MAX_IMAGE_BYTES = int(os.getenv("MENU_MAX_IMAGE_BYTES", "3145728"))
+MENU_CHAT_HISTORY_LIMIT = int(os.getenv("MENU_CHAT_HISTORY_LIMIT", "16"))
 
 REFILL_LOCK = asyncio.Lock()
 logger = logging.getLogger("readytoorder.backend")
@@ -112,6 +115,52 @@ class AnalyzeResponse(BaseModel):
     avoid: str
     strategy: str
     source: str
+
+
+class MenuImageInput(BaseModel):
+    mime_type: str = "image/jpeg"
+    data_base64: str
+
+
+class MenuChatTurn(BaseModel):
+    role: Literal["user", "assistant"]
+    text: str = ""
+
+
+class MenuDetailParams(BaseModel):
+    diners: int | None = Field(default=None, ge=1, le=20)
+    budget_cny: int | None = Field(default=None, ge=1, le=50000)
+    spice_level: Literal["default", "none", "mild", "medium", "hot"] = "default"
+    allergies: List[str] = Field(default_factory=list)
+    notes: str = ""
+
+
+class MenuChatRequest(BaseModel):
+    mode: Literal["chat", "recommend"] = "chat"
+    message: str = ""
+    images: List[MenuImageInput] = Field(default_factory=list)
+    chat_history: List[MenuChatTurn] = Field(default_factory=list)
+    total_swipes: int = 0
+    top_positive: List[FeatureScore] = Field(default_factory=list)
+    top_negative: List[FeatureScore] = Field(default_factory=list)
+    recent_likes: List[str] = Field(default_factory=list)
+    params: MenuDetailParams | None = None
+    locale: str = "zh-CN"
+
+
+class MenuRecommendation(BaseModel):
+    name: str
+    original_name: str = ""
+    reason: str
+    match_score: int = Field(default=0, ge=0, le=100)
+    style: Literal["conservative", "balanced", "adventurous"] = "balanced"
+
+
+class MenuChatResponse(BaseModel):
+    mode: Literal["chat", "recommend"]
+    reply: str
+    recommendations: List[MenuRecommendation] = Field(default_factory=list)
+    source: str = "gemini"
 
 
 app = FastAPI(title="readytoorder-backend", version="0.3.0")
@@ -339,6 +388,238 @@ def _extract_first_inline_image(resp: dict) -> tuple[str, str]:
             mime = inline.get("mimeType") or inline.get("mime_type") or "image/png"
             return str(mime), str(data)
     raise ValueError("Gemini image response has no inline image data")
+
+
+def _safe_text(value: object, *, max_len: int, fallback: str = "") -> str:
+    text = str(value or "").strip()
+    if not text:
+        return fallback
+    return text[:max_len]
+
+
+def _clamp_int(value: object, *, low: int, high: int, default: int) -> int:
+    try:
+        number = int(value)
+    except Exception:
+        return default
+    return max(low, min(high, number))
+
+
+def _format_menu_history(chat_history: Sequence[MenuChatTurn]) -> str:
+    if not chat_history:
+        return "无"
+    lines: List[str] = []
+    for turn in chat_history[-MENU_CHAT_HISTORY_LIMIT:]:
+        role = "用户" if turn.role == "user" else "助手"
+        text = _safe_text(turn.text, max_len=280)
+        if not text:
+            continue
+        lines.append(f"- {role}: {text}")
+    return "\n".join(lines) if lines else "无"
+
+
+def _build_menu_prompt(req: MenuChatRequest) -> str:
+    params = req.params or MenuDetailParams()
+    params_block = [
+        f"- diners: {params.diners if params.diners is not None else '未设置'}",
+        f"- budget_cny: {params.budget_cny if params.budget_cny is not None else '未设置'}",
+        f"- spice_level: {params.spice_level}",
+        f"- allergies: {'、'.join(params.allergies[:10]) if params.allergies else '无'}",
+        f"- notes: {_safe_text(params.notes, max_len=200, fallback='无')}",
+    ]
+    taste_block = [
+        f"- total_swipes: {req.total_swipes}",
+        f"- top_positive: {_top_feature_pairs(req.top_positive, 8)}",
+        f"- top_negative: {_top_feature_pairs(req.top_negative, 8)}",
+        f"- recent_likes: {'、'.join(req.recent_likes[:10]) if req.recent_likes else '无'}",
+    ]
+    user_message = _safe_text(req.message, max_len=400, fallback="请按当前模式处理。")
+    history_block = _format_menu_history(req.chat_history)
+
+    if req.mode == "recommend":
+        return f"""
+你是中文点菜助手。你会看到用户上传的菜单图片与用户口味画像。
+目标：仅基于菜单图片中可点到的菜，给出 5 个推荐。
+
+输出要求：
+- 只输出 JSON，不要输出任何额外文本。
+- JSON 格式：
+{{
+  "reply": "一句话总体说明（40字内）",
+  "recommendations": [
+    {{
+      "name": "中文菜名（若菜单是外语请翻译成中文）",
+      "original_name": "菜单原名；若原名就是中文可为空",
+      "reason": "推荐理由（35字内）",
+      "match_score": 0,
+      "style": "conservative|balanced|adventurous"
+    }}
+  ]
+}}
+
+硬约束：
+- recommendations 长度必须等于 5。
+- 只能推荐菜单里真实存在的菜，不得虚构菜单外菜。
+- 必须至少包含 1 个 conservative 和 1 个 adventurous。
+- match_score 取 0-100 的整数，体现与用户口味匹配度。
+- reason 要结合口味画像，不要空话。
+
+用户画像：
+{chr(10).join(taste_block)}
+
+就餐参数：
+{chr(10).join(params_block)}
+
+聊天上下文：
+{history_block}
+
+用户本轮请求：
+{user_message}
+""".strip()
+
+    return f"""
+你是中文点菜助手。你会看到用户上传的菜单图片与用户口味画像。
+目标：按用户问题进行普通问答，简洁回答即可。
+
+输出要求：
+- 只输出 JSON，不要输出任何额外文本。
+- JSON 格式：
+{{
+  "reply": "回答内容（120字内）"
+}}
+
+规则：
+- 如果问题涉及菜品，优先参考菜单图片中的菜名与信息。
+- 不要主动输出推荐清单，除非用户明确要求推荐。
+- 回答保持简洁、可执行。
+
+用户画像：
+{chr(10).join(taste_block)}
+
+就餐参数：
+{chr(10).join(params_block)}
+
+聊天上下文：
+{history_block}
+
+用户本轮请求：
+{user_message}
+""".strip()
+
+
+def _build_menu_parts(req: MenuChatRequest, prompt: str) -> list[dict]:
+    if len(req.images) > MENU_MAX_IMAGES:
+        raise ValueError(f"too many images: {len(req.images)} > {MENU_MAX_IMAGES}")
+
+    parts: list[dict] = [{"text": prompt}]
+    for image in req.images:
+        mime_type = _safe_text(image.mime_type, max_len=80, fallback="image/jpeg")
+        if not mime_type.startswith("image/"):
+            mime_type = "image/jpeg"
+
+        try:
+            raw_bytes = base64.b64decode(image.data_base64, validate=True)
+        except Exception as exc:
+            raise ValueError("invalid base64 image payload") from exc
+
+        if len(raw_bytes) > MENU_MAX_IMAGE_BYTES:
+            raise ValueError(f"image too large: {len(raw_bytes)} > {MENU_MAX_IMAGE_BYTES}")
+
+        parts.append(
+            {
+                "inlineData": {
+                    "mimeType": mime_type,
+                    "data": image.data_base64,
+                }
+            }
+        )
+
+    return parts
+
+
+def _sanitize_menu_recommendations(raw_items: object) -> List[MenuRecommendation]:
+    if not isinstance(raw_items, list):
+        return []
+
+    used_names = set()
+    normalized: List[MenuRecommendation] = []
+    for item in raw_items:
+        if not isinstance(item, dict):
+            continue
+
+        name = _safe_text(item.get("name"), max_len=40)
+        if not name or name in used_names:
+            continue
+
+        original_name = _safe_text(item.get("original_name"), max_len=60)
+        if original_name == name:
+            original_name = ""
+
+        reason = _safe_text(item.get("reason"), max_len=80, fallback="口味匹配度较高。")
+        style = _safe_text(item.get("style"), max_len=20, fallback="balanced")
+        if style not in {"conservative", "balanced", "adventurous"}:
+            style = "balanced"
+        score = _clamp_int(item.get("match_score"), low=0, high=100, default=70)
+
+        normalized.append(
+            MenuRecommendation(
+                name=name,
+                original_name=original_name,
+                reason=reason,
+                match_score=score,
+                style=style,  # type: ignore[arg-type]
+            )
+        )
+        used_names.add(name)
+        if len(normalized) >= 5:
+            break
+
+    return normalized
+
+
+def _has_required_recommendation_styles(items: Sequence[MenuRecommendation]) -> bool:
+    styles = {item.style for item in items}
+    return "conservative" in styles and "adventurous" in styles
+
+
+async def _menu_chat_with_gemini(req: MenuChatRequest) -> MenuChatResponse:
+    prompt = _build_menu_prompt(req)
+    parts = _build_menu_parts(req, prompt)
+    payload = {
+        "contents": [{"role": "user", "parts": parts}],
+        "generationConfig": {
+            "temperature": 0.35 if req.mode == "recommend" else 0.45,
+            "responseMimeType": "application/json",
+        },
+    }
+
+    attempts = 2 if req.mode == "recommend" else 1
+    for attempt in range(1, attempts + 1):
+        raw = await _call_gemini_api(payload, model=GEMINI_MODEL)
+        text = _extract_first_text(raw)
+        data = _extract_json(text)
+        reply = _safe_text(data.get("reply"), max_len=240, fallback="好的，我明白了。")
+
+        if req.mode == "chat":
+            return MenuChatResponse(mode="chat", reply=reply, recommendations=[], source="gemini")
+
+        recommendations = _sanitize_menu_recommendations(data.get("recommendations", []))
+        if len(recommendations) == 5 and _has_required_recommendation_styles(recommendations):
+            return MenuChatResponse(
+                mode="recommend",
+                reply=reply,
+                recommendations=recommendations,
+                source="gemini",
+            )
+
+        logger.warning(
+            "menu recommend format retry attempt=%s got_count=%s styles_ok=%s",
+            attempt,
+            len(recommendations),
+            _has_required_recommendation_styles(recommendations),
+        )
+
+    raise ValueError("Gemini did not return a valid 5-item recommendation list")
 
 
 def _sanitize_dishes(raw_dishes: list) -> List[DeckDish]:
@@ -906,3 +1187,21 @@ async def analyze_taste(req: AnalyzeRequest) -> AnalyzeResponse:
     except Exception as exc:
         logger.exception("taste analysis failed")
         raise HTTPException(status_code=502, detail=f"Gemini analysis failed: {exc}") from exc
+
+
+@app.post("/v1/menu/chat", response_model=MenuChatResponse)
+async def menu_chat(req: MenuChatRequest) -> MenuChatResponse:
+    if req.mode == "recommend" and not req.images:
+        raise HTTPException(status_code=400, detail="recommend mode requires at least one menu image")
+
+    try:
+        return await _menu_chat_with_gemini(req)
+    except ValueError as exc:
+        message = str(exc)
+        if "too many images" in message or "image too large" in message or "invalid base64" in message:
+            raise HTTPException(status_code=400, detail=message) from exc
+        logger.exception("menu chat response validation failed")
+        raise HTTPException(status_code=502, detail=f"Gemini menu response invalid: {message}") from exc
+    except Exception as exc:
+        logger.exception("menu chat failed")
+        raise HTTPException(status_code=502, detail=f"Gemini menu chat failed: {exc}") from exc

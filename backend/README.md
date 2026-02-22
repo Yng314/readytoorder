@@ -4,6 +4,7 @@ FastAPI backend for:
 - `POST /v1/taste/deck`: return cached dishes first, auto-refill when inventory is low
   - each dish includes `category_tags` (`cuisine` / `flavor` / `ingredient`)
 - `POST /v1/taste/analyze`: summarize taste profile from swipe history
+- `POST /v1/menu/chat`: menu-image chat + menu-internal recommendations
 - `GET /health`: health info including current cached dish count
 
 ## 1) Install
@@ -28,6 +29,8 @@ export DATABASE_URL="postgresql://..."  # default: sqlite:///./readytoorder.db
 export DECK_LOW_WATERMARK="50"
 export DECK_REFILL_BATCH="20"
 export IMAGE_GENERATION_CONCURRENCY="4"
+export MENU_MAX_IMAGES="6"
+export MENU_MAX_IMAGE_BYTES="3145728"
 ```
 
 ## 3) Run

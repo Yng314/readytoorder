@@ -44,7 +44,7 @@ struct ContentView: View {
                 .opacity(selectedTab == .tasteLearning ? 1 : 0)
                 .allowsHitTesting(selectedTab == .tasteLearning)
 
-            OrderingView()
+            OrderingChatView()
                 .opacity(selectedTab == .ordering ? 1 : 0)
                 .allowsHitTesting(selectedTab == .ordering)
 
@@ -100,59 +100,6 @@ private struct BottomPillTabBar: View {
                 .stroke(.white.opacity(0.72), lineWidth: 1)
         )
         .shadow(color: .black.opacity(0.08), radius: 14, x: 0, y: 8)
-    }
-}
-
-private struct OrderingView: View {
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                LinearGradient(
-                    colors: [
-                        Color(red: 0.96, green: 0.98, blue: 1.0),
-                        Color(red: 0.99, green: 0.97, blue: 0.95)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .ignoresSafeArea()
-
-                VStack(spacing: 16) {
-                    Image(systemName: "camera.viewfinder")
-                        .font(.system(size: 38, weight: .semibold))
-                        .foregroundStyle(.secondary)
-
-                    Text("点菜页（下一阶段）")
-                        .font(.title3.weight(.bold))
-
-                    Text("这里将接入菜单拍照/上传、OCR/LLM 解析、再基于口味画像做推荐。")
-                        .font(.subheadline)
-                        .multilineTextAlignment(.center)
-                        .foregroundStyle(.secondary)
-                        .padding(.horizontal, 22)
-
-                    Label("计划接入 Gemini 菜单理解", systemImage: "wand.and.stars")
-                        .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(.white.opacity(0.75), in: Capsule())
-                        .overlay(
-                            Capsule()
-                                .stroke(.white.opacity(0.75), lineWidth: 1)
-                        )
-                        .foregroundStyle(.secondary)
-                }
-                .padding(24)
-                .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 28, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        .stroke(.white.opacity(0.7), lineWidth: 1)
-                )
-                .padding(.horizontal, 18)
-            }
-            .navigationTitle("点菜")
-            .navigationBarTitleDisplayMode(.inline)
-        }
     }
 }
 
