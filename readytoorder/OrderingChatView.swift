@@ -17,6 +17,7 @@ struct OrderingChatView: View {
     @State private var isShowingParams = false
     @State private var isShowingCameraUnavailableAlert = false
     @State private var isShowingClearChatConfirm = false
+    @FocusState private var isComposerFocused: Bool
     private let composerBottomLift: CGFloat = 96
 
     var body: some View {
@@ -154,11 +155,21 @@ struct OrderingChatView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 14)
             }
+            .scrollDismissesKeyboard(.interactively)
             .onAppear {
                 scrollToBottom(proxy: proxy, animated: false)
             }
             .onChange(of: viewModel.messages.last?.id) { _, _ in
                 scrollToBottom(proxy: proxy, animated: false)
+            }
+            .onChange(of: isComposerFocused) { _, focused in
+                guard focused else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
+                    scrollToBottom(proxy: proxy, animated: false)
+                }
+            }
+            .onTapGesture {
+                isComposerFocused = false
             }
         }
     }
@@ -216,6 +227,7 @@ struct OrderingChatView: View {
                 Spacer()
 
                 Button {
+                    isComposerFocused = false
                     viewModel.sendRecommend()
                 } label: {
                     HStack(spacing: 5) {
@@ -235,6 +247,7 @@ struct OrderingChatView: View {
             HStack(alignment: .bottom, spacing: 8) {
                 TextField("问菜单细节，或上传图片后点“推荐菜品”", text: $viewModel.draftText, axis: .vertical)
                     .lineLimit(1...4)
+                    .focused($isComposerFocused)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(false)
                     .padding(.horizontal, 12)
@@ -242,10 +255,12 @@ struct OrderingChatView: View {
                     .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .submitLabel(.send)
                     .onSubmit {
+                        isComposerFocused = false
                         viewModel.sendChat()
                     }
 
                 Button {
+                    isComposerFocused = false
                     viewModel.sendChat()
                 } label: {
                     Image(systemName: "paperplane.fill")
