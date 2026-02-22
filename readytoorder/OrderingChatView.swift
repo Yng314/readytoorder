@@ -17,7 +17,6 @@ struct OrderingChatView: View {
     @State private var isShowingParams = false
     @State private var isShowingCameraUnavailableAlert = false
     @State private var isShowingClearChatConfirm = false
-    @FocusState private var isComposerFocused: Bool
     private let composerBottomLift: CGFloat = 96
 
     var body: some View {
@@ -132,7 +131,9 @@ struct OrderingChatView: View {
     private var chatList: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: 12) {
+                // Keep a plain VStack here: LazyVStack regressed on-device with this chat's
+                // update/scroll pattern and can freeze after recommend -> chat -> fast scroll.
+                VStack(spacing: 12) {
                     ForEach(viewModel.messages) { message in
                         OrderingMessageBubble(message: message)
                             .id(message.id)
@@ -153,26 +154,11 @@ struct OrderingChatView: View {
                 .padding(.horizontal, 14)
                 .padding(.vertical, 14)
             }
-            .scrollDismissesKeyboard(.interactively)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 6)
-                    .onChanged { _ in
-                        if isComposerFocused {
-                            isComposerFocused = false
-                        }
-                    }
-            )
-            .onTapGesture {
-                isComposerFocused = false
-            }
             .onAppear {
                 scrollToBottom(proxy: proxy, animated: false)
             }
             .onChange(of: viewModel.messages.last?.id) { _, _ in
-                scrollToBottom(proxy: proxy, animated: true)
-            }
-            .onChange(of: viewModel.isSending) { _, _ in
-                scrollToBottom(proxy: proxy, animated: true)
+                scrollToBottom(proxy: proxy, animated: false)
             }
         }
     }
@@ -230,7 +216,6 @@ struct OrderingChatView: View {
                 Spacer()
 
                 Button {
-                    isComposerFocused = false
                     viewModel.sendRecommend()
                 } label: {
                     HStack(spacing: 5) {
@@ -250,7 +235,6 @@ struct OrderingChatView: View {
             HStack(alignment: .bottom, spacing: 8) {
                 TextField("问菜单细节，或上传图片后点“推荐菜品”", text: $viewModel.draftText, axis: .vertical)
                     .lineLimit(1...4)
-                    .focused($isComposerFocused)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(false)
                     .padding(.horizontal, 12)
@@ -258,12 +242,10 @@ struct OrderingChatView: View {
                     .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
                     .submitLabel(.send)
                     .onSubmit {
-                        isComposerFocused = false
                         viewModel.sendChat()
                     }
 
                 Button {
-                    isComposerFocused = false
                     viewModel.sendChat()
                 } label: {
                     Image(systemName: "paperplane.fill")
@@ -565,6 +547,7 @@ private final class OrderingChatViewModel: ObservableObject {
         draftText = ""
         attachments = []
         errorBanner = nil
+
         isSending = true
         trimMessagesIfNeeded()
         persistSnapshot()
