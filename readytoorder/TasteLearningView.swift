@@ -239,17 +239,29 @@ struct TasteLearningView: View {
         }
     }
 
+    private func animateNeutralAdvance() {
+        guard !isAnimatingSwipe else { return }
+        isAnimatingSwipe = true
+
+        withAnimation(.spring(response: 0.24, dampingFraction: 0.9)) {
+            dragOffset = CGSize(width: 0, height: 24)
+        }
+
+        Task { @MainActor in
+            try? await Task.sleep(for: .milliseconds(120))
+
+            var noAnimation = Transaction()
+            noAnimation.disablesAnimations = true
+            withTransaction(noAnimation) {
+                viewModel.submitSwipe(.neutral)
+                dragOffset = .zero
+            }
+            isAnimatingSwipe = false
+        }
+    }
+
     private var actionButtons: some View {
         HStack(spacing: 14) {
-            actionButton(
-                icon: "xmark",
-                text: "不喜欢",
-                color: .red,
-                width: 100
-            ) {
-                animateSwipe(.dislike, endX: -620)
-            }
-
             actionButton(
                 icon: "arrow.uturn.backward",
                 text: "撤销",
@@ -266,12 +278,12 @@ struct TasteLearningView: View {
             .disabled(!viewModel.canUndo || isAnimatingSwipe)
 
             actionButton(
-                icon: "heart.fill",
-                text: "喜欢",
-                color: .green,
-                width: 100
+                icon: "minus.circle.fill",
+                text: "一般",
+                color: .blue,
+                width: 128
             ) {
-                animateSwipe(.like, endX: 620)
+                animateNeutralAdvance()
             }
         }
         .disabled(viewModel.currentDish == nil)

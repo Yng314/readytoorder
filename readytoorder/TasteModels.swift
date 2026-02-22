@@ -9,6 +9,7 @@ import Foundation
 
 enum SwipeAction: String, Codable {
     case like
+    case neutral
     case dislike
 }
 
@@ -381,7 +382,15 @@ struct TasteProfile: Codable, Hashable {
     }
 
     private mutating func apply(action: SwipeAction, dish: DishCandidate, intensity: Double, adjustSwipeCount: Int) {
-        let direction = action == .like ? 1.0 : -1.0
+        let direction: Double
+        switch action {
+        case .like:
+            direction = 1.0
+        case .neutral:
+            direction = -0.25
+        case .dislike:
+            direction = -1.0
+        }
 
         for (featureID, signal) in dish.signals {
             scoreByFeature[featureID, default: 0] += direction * signal * intensity
