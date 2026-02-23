@@ -12,14 +12,9 @@ import Combine
 
 struct OrderingChatView: View {
     @Binding var selectedTab: AppTab
-    @StateObject private var viewModel = OrderingChatViewModel()
-    @State private var selectedPhotoItems: [PhotosPickerItem] = []
-    @State private var isShowingCamera = false
+    @ObservedObject var viewModel: OrderingChatViewModel
     @State private var isShowingParams = false
-    @State private var isShowingCameraUnavailableAlert = false
     @State private var isShowingClearChatConfirm = false
-    @FocusState private var isComposerFocused: Bool
-    private let composerBottomLift: CGFloat = 10
 
     var body: some View {
         NavigationStack {
@@ -47,10 +42,6 @@ struct OrderingChatView: View {
                     }
 
                     chatList
-                    composerSection
-                        .padding(.horizontal, 16)
-                        .padding(.top, 8)
-                        .padding(.bottom, composerBottomLift)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -69,26 +60,6 @@ struct OrderingChatView: View {
         }
         .sheet(isPresented: $isShowingParams) {
             OrderingDetailParamsSheet(params: $viewModel.detailParams)
-        }
-        .sheet(isPresented: $isShowingCamera) {
-            CameraCaptureSheet { image in
-                viewModel.ingestCameraImage(image)
-            }
-            .ignoresSafeArea()
-        }
-        .alert("当前设备不支持拍照", isPresented: $isShowingCameraUnavailableAlert) {
-            Button("知道了", role: .cancel) {}
-        } message: {
-            Text("请改用相册上传菜单图片。")
-        }
-        .onChange(of: selectedPhotoItems) { _, newItems in
-            guard !newItems.isEmpty else { return }
-            Task {
-                await viewModel.ingestPhotoPickerItems(newItems)
-                await MainActor.run {
-                    selectedPhotoItems = []
-                }
-            }
         }
     }
 
@@ -184,15 +155,6 @@ struct OrderingChatView: View {
             .onChange(of: viewModel.messages.last?.id) { _, _ in
                 scrollToBottom(proxy: proxy, animated: false)
             }
-            .onChange(of: isComposerFocused) { _, focused in
-                guard focused else { return }
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.06) {
-                    scrollToBottom(proxy: proxy, animated: false)
-                }
-            }
-            .onTapGesture {
-                isComposerFocused = false
-            }
         }
     }
 
@@ -207,23 +169,20 @@ struct OrderingChatView: View {
         }
     }
 
-    private var composerSection: some View {
-        VStack(spacing: 10) {
-            composerInputPanel
-                .padding(.horizontal, 12)
-                .padding(.top, 12)
-
-            BottomPillTabBar(selectedTab: $selectedTab, showsContainer: false)
-        }
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 34, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .stroke(.white.opacity(0.72), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.10), radius: 14, x: 0, y: 8)
+    init(selectedTab: Binding<AppTab>, viewModel: OrderingChatViewModel) {
+        _selectedTab = selectedTab
+        _viewModel = ObservedObject(wrappedValue: viewModel)
     }
+}
 
-    private var composerInputPanel: some View {
+struct OrderingComposerPanel: View {
+    @ObservedObject var viewModel: OrderingChatViewModel
+    @State private var selectedPhotoItems: [PhotosPickerItem] = []
+    @State private var isShowingCamera = false
+    @State private var isShowingCameraUnavailableAlert = false
+    @FocusState private var isComposerFocused: Bool
+
+    var body: some View {
         VStack(spacing: 10) {
             if !viewModel.attachments.isEmpty {
                 attachmentStrip
@@ -351,6 +310,26 @@ struct OrderingChatView: View {
                 RoundedRectangle(cornerRadius: 30, style: .continuous)
                     .stroke(.white.opacity(0.88), lineWidth: 1)
             )
+        }
+        .onChange(of: selectedPhotoItems) { _, newItems in
+            guard !newItems.isEmpty else { return }
+            Task {
+                await viewModel.ingestPhotoPickerItems(newItems)
+                await MainActor.run {
+                    selectedPhotoItems = []
+                }
+            }
+        }
+        .sheet(isPresented: $isShowingCamera) {
+            CameraCaptureSheet { image in
+                viewModel.ingestCameraImage(image)
+            }
+            .ignoresSafeArea()
+        }
+        .alert("当前设备不支持拍照", isPresented: $isShowingCameraUnavailableAlert) {
+            Button("知道了", role: .cancel) {}
+        } message: {
+            Text("请改用相册上传菜单图片。")
         }
     }
 
@@ -608,7 +587,7 @@ private struct OrderingMessageBubble: View {
 }
 
 @MainActor
-private final class OrderingChatViewModel: ObservableObject {
+final class OrderingChatViewModel: ObservableObject {
     @Published var draftText: String = ""
     @Published var detailParams = OrderingDetailParams()
     @Published private(set) var messages: [OrderingChatMessage] = []
@@ -911,19 +890,19 @@ private struct OrderingChatSnapshot: Codable {
     let draftText: String
 }
 
-private struct OrderingImageAttachment: Identifiable {
+struct OrderingImageAttachment: Identifiable {
     let id: UUID
     let mimeType: String
     let dataBase64: String
     let previewImage: UIImage
 }
 
-private struct OrderingChatImage: Identifiable {
+struct OrderingChatImage: Identifiable {
     let id: UUID
     let previewImage: UIImage
 }
 
-private struct OrderingChatMessage: Identifiable {
+struct OrderingChatMessage: Identifiable {
     enum Role: String, Codable {
         case user
         case assistant
@@ -977,7 +956,7 @@ private struct OrderingChatMessage: Identifiable {
     }
 }
 
-private struct OrderingDetailParams: Codable, Hashable {
+struct OrderingDetailParams: Codable, Hashable {
     var dinersText: String = ""
     var budgetText: String = ""
     var spiceLevel: String = "default"
@@ -1150,5 +1129,8 @@ private extension UIImage {
 }
 
 #Preview {
-    OrderingChatView(selectedTab: .constant(.ordering))
+    OrderingChatView(
+        selectedTab: .constant(.ordering),
+        viewModel: OrderingChatViewModel()
+    )
 }

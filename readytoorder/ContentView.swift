@@ -37,38 +37,103 @@ enum AppTab: CaseIterable, Hashable {
 
 struct ContentView: View {
     @State private var selectedTab: AppTab = .tasteLearning
+    @StateObject private var orderingViewModel = OrderingChatViewModel()
+
+    private var orderingExpandedHeight: CGFloat {
+        orderingViewModel.attachments.isEmpty ? 132 : 252
+    }
 
     var body: some View {
         ZStack {
+            LinearGradient(
+                colors: [
+                    Color(red: 185.0 / 255.0, green: 200.0 / 255.0, blue: 213.0 / 255.0),
+                    Color(red: 184.0 / 255.0, green: 185.0 / 255.0, blue: 185.0 / 255.0)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
             TasteLearningView()
                 .opacity(selectedTab == .tasteLearning ? 1 : 0)
                 .allowsHitTesting(selectedTab == .tasteLearning)
+                .zIndex(selectedTab == .tasteLearning ? 1 : 0)
 
-            OrderingChatView(selectedTab: $selectedTab)
+            OrderingChatView(selectedTab: $selectedTab, viewModel: orderingViewModel)
                 .opacity(selectedTab == .ordering ? 1 : 0)
                 .allowsHitTesting(selectedTab == .ordering)
+                .zIndex(selectedTab == .ordering ? 1 : 0)
 
             SettingsView()
                 .opacity(selectedTab == .settings ? 1 : 0)
                 .allowsHitTesting(selectedTab == .settings)
+                .zIndex(selectedTab == .settings ? 1 : 0)
         }
-        .animation(.spring(response: 0.3, dampingFraction: 0.85), value: selectedTab)
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            if selectedTab != .ordering {
-                BottomPillTabBar(selectedTab: $selectedTab)
-                    .padding(.horizontal, 16)
-                    .padding(.top, 8)
-                    .padding(.bottom, 10)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            BottomMorphingTabBar(selectedTab: $selectedTab, expandedMaxHeight: orderingExpandedHeight) {
+                OrderingComposerPanel(viewModel: orderingViewModel)
             }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 10)
         }
         .preferredColorScheme(.light)
     }
 }
 
-struct BottomPillTabBar: View {
+struct BottomMorphingTabBar<ExpandedContent: View>: View {
     @Binding var selectedTab: AppTab
-    var showsContainer: Bool = true
+    let expandedMaxHeight: CGFloat
+    @ViewBuilder var expandedContent: () -> ExpandedContent
+
+    private var expandProgress: CGFloat {
+        selectedTab == .ordering ? 1 : 0
+    }
+
+    private var containerRadius: CGFloat {
+        30 - (4 * expandProgress)
+    }
+
+    private var visibleExpandedHeight: CGFloat {
+        expandedMaxHeight * expandProgress
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            expandedContent()
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
+                .padding(.bottom, 12)
+                .frame(height: visibleExpandedHeight, alignment: .top)
+                .opacity(expandProgress)
+                .clipped()
+                .allowsHitTesting(selectedTab == .ordering)
+
+            BottomPillTabBar(selectedTab: $selectedTab, style: .embedded)
+        }
+        .background(
+            RoundedRectangle(cornerRadius: containerRadius, style: .continuous)
+                .fill(.ultraThinMaterial)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: containerRadius, style: .continuous)
+                .stroke(.white.opacity(0.72), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.08), radius: 14, x: 0, y: 8)
+        .animation(.easeInOut(duration: 0.22), value: selectedTab == .ordering)
+        .animation(.easeInOut(duration: 0.16), value: expandedMaxHeight)
+    }
+}
+
+struct BottomPillTabBar: View {
+    enum Style {
+        case embedded
+    }
+
+    @Binding var selectedTab: AppTab
+    var style: Style = .embedded
+    @Namespace private var tabHighlightNamespace
 
     var body: some View {
         let row = HStack(spacing: 8) {
@@ -91,24 +156,18 @@ struct BottomPillTabBar: View {
                         if selectedTab == tab {
                             Capsule(style: .continuous)
                                 .fill(.white.opacity(0.62))
+                                .matchedGeometryEffect(id: "tab-highlight", in: tabHighlightNamespace)
                         }
                     }
                 }
                 .buttonStyle(.plain)
             }
         }
-        .padding(7)
 
-        if showsContainer {
+        switch style {
+        case .embedded:
             row
-                .background(.ultraThinMaterial, in: Capsule(style: .continuous))
-                .overlay(
-                    Capsule(style: .continuous)
-                        .stroke(.white.opacity(0.72), lineWidth: 1)
-                )
-                .shadow(color: .black.opacity(0.08), radius: 14, x: 0, y: 8)
-        } else {
-            row
+                .padding(7)
         }
     }
 }
