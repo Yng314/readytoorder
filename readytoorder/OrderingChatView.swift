@@ -25,15 +25,20 @@ struct OrderingChatView: View {
             ZStack {
                 LinearGradient(
                     colors: [
-                        Color(red: 0.96, green: 0.98, blue: 1.0),
-                        Color(red: 0.98, green: 0.97, blue: 0.95)
+                        Color(red: 185.0 / 255.0, green: 200.0 / 255.0, blue: 213.0 / 255.0),
+                        Color(red: 184.0 / 255.0, green: 185.0 / 255.0, blue: 185.0 / 255.0)
                     ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
                 .ignoresSafeArea()
 
                 VStack(spacing: 0) {
+                    topControlRow
+                        .padding(.horizontal, 14)
+                        .padding(.top, 10)
+                        .padding(.bottom, 6)
+
                     if let errorBanner = viewModel.errorBanner {
                         errorBannerView(errorBanner)
                             .padding(.horizontal, 14)
@@ -47,23 +52,7 @@ struct OrderingChatView: View {
                         .padding(.bottom, composerBottomLift)
                 }
             }
-            .navigationTitle("点菜")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("清空对话") {
-                        isShowingClearChatConfirm = true
-                    }
-                    .font(.subheadline.weight(.semibold))
-                    .disabled(viewModel.isSending)
-                }
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("详细参数") {
-                        isShowingParams = true
-                    }
-                    .font(.subheadline.weight(.semibold))
-                }
-            }
+            .toolbar(.hidden, for: .navigationBar)
         }
         .confirmationDialog(
             "确定清空当前对话？",
@@ -129,6 +118,37 @@ struct OrderingChatView: View {
         )
     }
 
+    private var topControlRow: some View {
+        HStack(spacing: 10) {
+            Button {
+                isShowingClearChatConfirm = true
+            } label: {
+                Label("清空", systemImage: "trash")
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+                    .background(.white.opacity(0.38), in: Capsule())
+            }
+            .buttonStyle(.plain)
+            .disabled(viewModel.isSending)
+
+            Spacer()
+
+            Button {
+                isShowingParams = true
+            } label: {
+                Label("详细参数", systemImage: "slider.horizontal.3")
+                    .font(.caption.weight(.semibold))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 8)
+                    .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+                    .background(.white.opacity(0.38), in: Capsule())
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
     private var chatList: some View {
         ScrollViewReader { proxy in
             ScrollView {
@@ -141,19 +161,20 @@ struct OrderingChatView: View {
                     }
 
                     if viewModel.isSending {
-                        HStack {
+                        HStack(spacing: 8) {
                             ProgressView()
                                 .controlSize(.small)
-                            Text("正在请求 Gemini...")
+                                .tint(Color(red: 0.45, green: 0.45, blue: 0.55))
+                            Text("Generating in progress...")
                                 .font(.caption)
-                                .foregroundStyle(.secondary)
+                                .foregroundStyle(Color(red: 0.45, green: 0.45, blue: 0.55))
                         }
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 16)
+                        .padding(.horizontal, 6)
                     }
                 }
                 .padding(.horizontal, 14)
-                .padding(.vertical, 14)
+                .padding(.vertical, 18)
             }
             .scrollDismissesKeyboard(.interactively)
             .onAppear {
@@ -201,8 +222,9 @@ struct OrderingChatView: View {
                 } label: {
                     Image(systemName: "camera")
                         .font(.subheadline.weight(.semibold))
-                        .frame(width: 36, height: 36)
-                        .background(.white.opacity(0.76), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+                        .frame(width: 34, height: 34)
+                        .background(.white.opacity(0.60), in: Circle())
                 }
                 .buttonStyle(.plain)
                 .disabled(viewModel.isSending || viewModel.remainingAttachmentSlots <= 0)
@@ -214,14 +236,16 @@ struct OrderingChatView: View {
                 ) {
                     Image(systemName: "photo.on.rectangle.angled")
                         .font(.subheadline.weight(.semibold))
-                        .frame(width: 36, height: 36)
-                        .background(.white.opacity(0.76), in: RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+                        .frame(width: 34, height: 34)
+                        .background(.white.opacity(0.60), in: Circle())
                 }
                 .disabled(viewModel.isSending || viewModel.remainingAttachmentSlots <= 0)
 
-                Text("已选 \(viewModel.attachments.count)/\(viewModel.maxImages) 张")
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
+                Text("\(viewModel.attachments.count)/\(viewModel.maxImages)")
+                    .font(.caption2.weight(.semibold))
+                    .monospacedDigit()
+                    .foregroundStyle(Color(red: 0.42, green: 0.40, blue: 0.48))
                     .lineLimit(1)
 
                 Spacer()
@@ -237,22 +261,38 @@ struct OrderingChatView: View {
                     .font(.caption.weight(.semibold))
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)
-                    .foregroundStyle(.white)
-                    .background(Color(red: 0.16, green: 0.54, blue: 0.36), in: Capsule())
+                    .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+                    .background(
+                        LinearGradient(
+                            colors: [
+                                .white.opacity(0.78),
+                                Color(red: 0.90, green: 0.87, blue: 0.96).opacity(0.95)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        ),
+                        in: Capsule(style: .continuous)
+                    )
+                    .overlay(
+                        Capsule(style: .continuous)
+                            .stroke(.white.opacity(0.85), lineWidth: 1)
+                    )
                 }
                 .buttonStyle(.plain)
                 .disabled(viewModel.isSending)
             }
+            .padding(.horizontal, 2)
 
-            HStack(alignment: .bottom, spacing: 8) {
-                TextField("问菜单细节，或上传图片后点“推荐菜品”", text: $viewModel.draftText, axis: .vertical)
+            HStack(alignment: .bottom, spacing: 10) {
+                TextField("Ask anything...", text: $viewModel.draftText, axis: .vertical)
                     .lineLimit(1...4)
                     .focused($isComposerFocused)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(false)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 10)
-                    .background(.white.opacity(0.82), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+                    .font(.body.weight(.medium))
+                    .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 12)
                     .submitLabel(.send)
                     .onSubmit {
                         isComposerFocused = false
@@ -263,165 +303,299 @@ struct OrderingChatView: View {
                     isComposerFocused = false
                     viewModel.sendChat()
                 } label: {
-                    Image(systemName: "paperplane.fill")
+                    Image(systemName: "arrow.up")
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
-                        .background(Color(red: 0.18, green: 0.36, blue: 0.82), in: Circle())
+                        .foregroundStyle(Color(red: 0.33, green: 0.22, blue: 0.52))
+                        .frame(width: 44, height: 44)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.89, green: 0.84, blue: 0.96),
+                                    .white.opacity(0.95)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            in: Circle()
+                        )
+                        .overlay(
+                            Circle()
+                                .stroke(.white.opacity(0.90), lineWidth: 1)
+                        )
+                        .shadow(color: Color(red: 0.63, green: 0.53, blue: 0.78).opacity(0.45), radius: 12, x: 0, y: 4)
                 }
                 .buttonStyle(.plain)
                 .disabled(viewModel.isSending || viewModel.trimmedDraftText.isEmpty)
             }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(.white.opacity(0.74), in: RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 30, style: .continuous)
+                    .stroke(.white.opacity(0.88), lineWidth: 1)
+            )
         }
         .padding(.horizontal, 12)
-        .padding(.top, 10)
+        .padding(.top, 12)
         .padding(.bottom, 12)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+        .background(.white.opacity(0.34), in: RoundedRectangle(cornerRadius: 34, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 22, style: .continuous)
-                .stroke(.white.opacity(0.8), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 34, style: .continuous)
+                .stroke(.white.opacity(0.58), lineWidth: 1)
         )
-        .shadow(color: .black.opacity(0.08), radius: 12, x: 0, y: 6)
+        .shadow(color: .black.opacity(0.10), radius: 14, x: 0, y: 8)
     }
 
     private var attachmentStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
+            HStack(spacing: 12) {
                 ForEach(viewModel.attachments) { attachment in
                     ZStack(alignment: .topTrailing) {
                         Image(uiImage: attachment.previewImage)
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 70, height: 92)
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .frame(width: 84, height: 112)
+                            .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                             .overlay(
-                                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                    .stroke(.white.opacity(0.78), lineWidth: 1)
+                                RoundedRectangle(cornerRadius: 22, style: .continuous)
+                                    .stroke(.white.opacity(0.72), lineWidth: 1)
                             )
 
                         Button {
                             viewModel.removeAttachment(id: attachment.id)
                         } label: {
                             Image(systemName: "xmark.circle.fill")
-                                .font(.system(size: 18))
+                                .font(.system(size: 19))
                                 .foregroundStyle(.white, Color.black.opacity(0.45))
                         }
-                        .offset(x: 6, y: -6)
+                        .offset(x: 7, y: -7)
                         .buttonStyle(.plain)
                     }
                 }
             }
             .padding(.horizontal, 2)
         }
+        .padding(.horizontal, 2)
     }
 }
 
 private struct OrderingMessageBubble: View {
     let message: OrderingChatMessage
 
-    var body: some View {
-        VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 8) {
-            if !message.images.isEmpty || !message.trimmedText.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    if !message.images.isEmpty {
-                        LazyVGrid(
-                            columns: [
-                                GridItem(.fixed(70), spacing: 8),
-                                GridItem(.fixed(70), spacing: 8),
-                                GridItem(.fixed(70), spacing: 8)
-                            ],
-                            alignment: .leading,
-                            spacing: 8
-                        ) {
-                            ForEach(message.images) { image in
-                                Image(uiImage: image.previewImage)
-                                    .resizable()
-                                    .scaledToFill()
-                                    .frame(width: 70, height: 92)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-                                    .overlay(
-                                        RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                            .stroke(.white.opacity(0.8), lineWidth: 1)
-                                    )
-                            }
-                        }
-                    }
+    private let headlineColor = Color(red: 0.25, green: 0.22, blue: 0.30)
+    private let bodyColor = Color(red: 0.30, green: 0.29, blue: 0.36)
 
-                    if !message.trimmedText.isEmpty {
-                        Text(message.text)
-                            .font(.subheadline)
-                            .foregroundStyle(message.role == .user ? .white : .primary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
+    var body: some View {
+        Group {
+            if message.role == .user {
+                userPromptBubble
+            } else {
+                assistantDigest
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var userPromptBubble: some View {
+        HStack(spacing: 10) {
+            ZStack {
+                Circle()
+                    .fill(.white.opacity(0.58))
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 0.56, green: 0.60, blue: 0.74).opacity(0.95),
+                                Color(red: 0.75, green: 0.73, blue: 0.84).opacity(0.95)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 19, height: 19)
+                    .blur(radius: 1.2)
+            }
+            .frame(width: 30, height: 30)
+
+            Text(userPromptText)
+                .font(.title3.weight(.medium))
+                .foregroundStyle(headlineColor.opacity(0.98))
+                .lineLimit(3)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(.white.opacity(0.44), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(.white.opacity(0.56), lineWidth: 1)
+        )
+    }
+
+    private var assistantDigest: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            if !message.images.isEmpty || !message.recommendations.isEmpty {
+                HStack(spacing: 8) {
+                    Image(systemName: "sparkles")
+                        .font(.caption.weight(.bold))
+                    Text("Created in seconds")
+                        .font(.caption.weight(.medium))
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .fill(bubbleFillColor)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(message.role == .user ? .white.opacity(0.2) : .white.opacity(0.82), lineWidth: 1)
-                )
-                .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
+                .foregroundStyle(bodyColor.opacity(0.52))
+
+                recommendationVisualStrip
             }
 
             if !message.recommendations.isEmpty {
-                VStack(spacing: 8) {
-                    ForEach(message.recommendations) { recommendation in
-                        OrderingRecommendationCard(item: recommendation)
+                Text("Quick concept starters\nfor your next shoot")
+                    .font(.system(size: 47, weight: .bold, design: .rounded))
+                    .foregroundStyle(headlineColor)
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text(assistantSummary)
+                    .font(.body)
+                    .foregroundStyle(bodyColor.opacity(0.86))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                VStack(alignment: .leading, spacing: 14) {
+                    ForEach(Array(message.recommendations.enumerated()), id: \.element.id) { index, item in
+                        recommendationRow(index: index + 1, item: item)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
+            } else if !message.trimmedText.isEmpty {
+                Text(message.text)
+                    .font(.body)
+                    .foregroundStyle(bodyColor.opacity(0.92))
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    .background(.white.opacity(0.40), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                            .stroke(.white.opacity(0.55), lineWidth: 1)
+                    )
             }
+        }
+        .padding(.horizontal, 2)
+    }
+
+    private var recommendationVisualStrip: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 12) {
+                if !message.images.isEmpty {
+                    ForEach(message.images) { image in
+                        previewTile(for: image)
+                    }
+                } else {
+                    ForEach(Array(message.recommendations.prefix(6).enumerated()), id: \.element.id) { index, item in
+                        placeholderTile(for: item, index: index)
+                    }
+                }
+            }
+            .padding(.horizontal, 1)
         }
     }
 
-    private var bubbleFillColor: Color {
-        message.role == .user
-            ? Color(red: 0.20, green: 0.40, blue: 0.85)
-            : .white.opacity(0.9)
-    }
-}
+    private func recommendationRow(index: Int, item: MenuRecommendationItem) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text("\(index).")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(headlineColor)
 
-private struct OrderingRecommendationCard: View {
-    let item: MenuRecommendationItem
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 8) {
-                VStack(alignment: .leading, spacing: 3) {
+            VStack(alignment: .leading, spacing: 6) {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(item.name)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.primary)
+                        .font(.title3.weight(.bold))
+                        .foregroundStyle(headlineColor)
+                        .lineLimit(2)
                     if !item.originalName.isEmpty {
                         Text(item.originalName)
                             .font(.caption)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(bodyColor.opacity(0.7))
                             .lineLimit(1)
                     }
                 }
-                Spacer()
-                Text("匹配 \(item.matchScore)%")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(.green)
+
+                Text(item.reason)
+                    .font(.body)
+                    .foregroundStyle(bodyColor.opacity(0.93))
+                    .fixedSize(horizontal: false, vertical: true)
+
+                Text("匹配度 \(item.matchScore)%")
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.white.opacity(0.95))
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 4)
+                    .background(
+                        Capsule()
+                            .fill(Color(red: 0.45, green: 0.49, blue: 0.60).opacity(0.68))
+                    )
             }
-
-            Text(item.reason)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-                .lineLimit(3)
-
-            ProgressView(value: min(100, max(0, Double(item.matchScore))), total: 100)
-                .tint(.green)
         }
-        .padding(12)
-        .background(.white.opacity(0.86), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private func previewTile(for image: OrderingChatImage) -> some View {
+        Image(uiImage: image.previewImage)
+            .resizable()
+            .scaledToFill()
+            .frame(width: 180, height: 180)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    .stroke(.white.opacity(0.52), lineWidth: 1)
+            )
+    }
+
+    private func placeholderTile(for item: MenuRecommendationItem, index: Int) -> some View {
+        ZStack(alignment: .bottomLeading) {
+            Image("dish_placeholder")
+                .resizable()
+                .scaledToFill()
+                .frame(width: 180, height: 180)
+                .hueRotation(.degrees(Double(index) * 12))
+                .saturation(0.80 + Double(index) * 0.05)
+
+            LinearGradient(
+                colors: [
+                    .clear,
+                    .black.opacity(0.48)
+                ],
+                startPoint: .center,
+                endPoint: .bottom
+            )
+
+            Text(item.name)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.white)
+                .lineLimit(2)
+                .padding(10)
+        }
+        .frame(width: 180, height: 180)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(.white.opacity(0.82), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                .stroke(.white.opacity(0.52), lineWidth: 1)
         )
+    }
+
+    private var userPromptText: String {
+        if !message.trimmedText.isEmpty {
+            return message.text
+        }
+        if !message.images.isEmpty {
+            return "请根据我上传的菜单图片来推荐。"
+        }
+        return "继续这个点菜话题。"
+    }
+
+    private var assistantSummary: String {
+        let trimmed = message.trimmedText
+            .replacingOccurrences(of: "\n", with: " ")
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else {
+            return "结合你的口味画像和菜单内容，先给你一组可直接下单的建议。"
+        }
+        return String(trimmed.prefix(120))
     }
 }
 

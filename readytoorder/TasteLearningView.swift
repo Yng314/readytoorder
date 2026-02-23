@@ -20,11 +20,11 @@ struct TasteLearningView: View {
             ZStack {
                 LinearGradient(
                     colors: [
-                        Color(red: 0.96, green: 0.98, blue: 1.0),
-                        Color(red: 0.98, green: 0.97, blue: 0.95)
+                        Color(red: 185.0 / 255.0, green: 200.0 / 255.0, blue: 213.0 / 255.0),
+                        Color(red: 184.0 / 255.0, green: 185.0 / 255.0, blue: 185.0 / 255.0)
                     ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+                    startPoint: .top,
+                    endPoint: .bottom
                 )
                 .ignoresSafeArea()
 
