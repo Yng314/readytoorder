@@ -11,6 +11,7 @@ import UIKit
 import Combine
 
 struct OrderingChatView: View {
+    @Binding var selectedTab: AppTab
     @StateObject private var viewModel = OrderingChatViewModel()
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
     @State private var isShowingCamera = false
@@ -18,7 +19,7 @@ struct OrderingChatView: View {
     @State private var isShowingCameraUnavailableAlert = false
     @State private var isShowingClearChatConfirm = false
     @FocusState private var isComposerFocused: Bool
-    private let composerBottomLift: CGFloat = 96
+    private let composerBottomLift: CGFloat = 10
 
     var body: some View {
         NavigationStack {
@@ -47,7 +48,7 @@ struct OrderingChatView: View {
 
                     chatList
                     composerSection
-                        .padding(.horizontal, 14)
+                        .padding(.horizontal, 16)
                         .padding(.top, 8)
                         .padding(.bottom, composerBottomLift)
                 }
@@ -208,6 +209,22 @@ struct OrderingChatView: View {
 
     private var composerSection: some View {
         VStack(spacing: 10) {
+            composerInputPanel
+                .padding(.horizontal, 12)
+                .padding(.top, 12)
+
+            BottomPillTabBar(selectedTab: $selectedTab, showsContainer: false)
+        }
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 34, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 34, style: .continuous)
+                .stroke(.white.opacity(0.72), lineWidth: 1)
+        )
+        .shadow(color: .black.opacity(0.10), radius: 14, x: 0, y: 8)
+    }
+
+    private var composerInputPanel: some View {
+        VStack(spacing: 10) {
             if !viewModel.attachments.isEmpty {
                 attachmentStrip
             }
@@ -335,15 +352,6 @@ struct OrderingChatView: View {
                     .stroke(.white.opacity(0.88), lineWidth: 1)
             )
         }
-        .padding(.horizontal, 12)
-        .padding(.top, 12)
-        .padding(.bottom, 12)
-        .background(.white.opacity(0.34), in: RoundedRectangle(cornerRadius: 34, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 34, style: .continuous)
-                .stroke(.white.opacity(0.58), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.10), radius: 14, x: 0, y: 8)
     }
 
     private var attachmentStrip: some View {
@@ -1142,5 +1150,5 @@ private extension UIImage {
 }
 
 #Preview {
-    OrderingChatView()
+    OrderingChatView(selectedTab: .constant(.ordering))
 }

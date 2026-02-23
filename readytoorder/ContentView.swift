@@ -44,7 +44,7 @@ struct ContentView: View {
                 .opacity(selectedTab == .tasteLearning ? 1 : 0)
                 .allowsHitTesting(selectedTab == .tasteLearning)
 
-            OrderingChatView()
+            OrderingChatView(selectedTab: $selectedTab)
                 .opacity(selectedTab == .ordering ? 1 : 0)
                 .allowsHitTesting(selectedTab == .ordering)
 
@@ -54,20 +54,24 @@ struct ContentView: View {
         }
         .animation(.spring(response: 0.3, dampingFraction: 0.85), value: selectedTab)
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            BottomPillTabBar(selectedTab: $selectedTab)
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 10)
+            if selectedTab != .ordering {
+                BottomPillTabBar(selectedTab: $selectedTab)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 8)
+                    .padding(.bottom, 10)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
         }
         .preferredColorScheme(.light)
     }
 }
 
-private struct BottomPillTabBar: View {
+struct BottomPillTabBar: View {
     @Binding var selectedTab: AppTab
+    var showsContainer: Bool = true
 
     var body: some View {
-        HStack(spacing: 8) {
+        let row = HStack(spacing: 8) {
             ForEach(AppTab.allCases, id: \.self) { tab in
                 Button {
                     withAnimation(.spring(response: 0.28, dampingFraction: 0.82)) {
@@ -94,12 +98,18 @@ private struct BottomPillTabBar: View {
             }
         }
         .padding(7)
-        .background(.ultraThinMaterial, in: Capsule(style: .continuous))
-        .overlay(
-            Capsule(style: .continuous)
-                .stroke(.white.opacity(0.72), lineWidth: 1)
-        )
-        .shadow(color: .black.opacity(0.08), radius: 14, x: 0, y: 8)
+
+        if showsContainer {
+            row
+                .background(.ultraThinMaterial, in: Capsule(style: .continuous))
+                .overlay(
+                    Capsule(style: .continuous)
+                        .stroke(.white.opacity(0.72), lineWidth: 1)
+                )
+                .shadow(color: .black.opacity(0.08), radius: 14, x: 0, y: 8)
+        } else {
+            row
+        }
     }
 }
 
