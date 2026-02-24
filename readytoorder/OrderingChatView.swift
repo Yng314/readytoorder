@@ -202,10 +202,10 @@ struct OrderingComposerPanel: View {
     @ObservedObject var viewModel: OrderingChatViewModel
     let outerContainerCornerRadius: CGFloat
     let contentInsetFromOuterCard: CGFloat
+    @Binding var isAttachmentDrawerPresented: Bool
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
     @State private var isShowingCamera = false
     @State private var isShowingPhotoPicker = false
-    @State private var isShowingAttachmentSourcePicker = false
     @State private var isShowingCameraUnavailableAlert = false
     @FocusState private var isComposerFocused: Bool
 
@@ -243,7 +243,9 @@ struct OrderingComposerPanel: View {
             HStack(alignment: .center, spacing: 10) {
                 Button {
                     isComposerFocused = false
-                    isShowingAttachmentSourcePicker = true
+                    withAnimation(.spring(response: 0.30, dampingFraction: 0.86)) {
+                        isAttachmentDrawerPresented.toggle()
+                    }
                 } label: {
                     Image(systemName: "plus")
                         .font(.title3.weight(.bold))
@@ -306,23 +308,6 @@ struct OrderingComposerPanel: View {
         } message: {
             Text("请改用相册上传菜单图片。")
         }
-        .confirmationDialog(
-            "添加菜单图片",
-            isPresented: $isShowingAttachmentSourcePicker,
-            titleVisibility: .visible
-        ) {
-            Button("拍照") {
-                if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                    isShowingCamera = true
-                } else {
-                    isShowingCameraUnavailableAlert = true
-                }
-            }
-            Button("从相册选择") {
-                isShowingPhotoPicker = true
-            }
-            Button("取消", role: .cancel) {}
-        }
         .photosPicker(
             isPresented: $isShowingPhotoPicker,
             selection: $selectedPhotoItems,
@@ -339,7 +324,7 @@ struct OrderingComposerPanel: View {
                         Image(uiImage: attachment.previewImage)
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 84, height: 112)
+                            .frame(width: 84, height: 200)
                             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 22, style: .continuous)
@@ -582,7 +567,7 @@ private struct OrderingImagePreviewScreen: View {
 @MainActor
 final class OrderingChatViewModel: ObservableObject {
     // Temporary debug switch: bypass menu LLM and return fixed templates.
-    private static let menuChatDebugModeEnabled = true
+    private static let menuChatDebugModeEnabled = false
 
     @Published var draftText: String = ""
     @Published var detailParams = OrderingDetailParams()

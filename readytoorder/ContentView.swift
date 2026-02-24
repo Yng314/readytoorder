@@ -44,9 +44,10 @@ enum AppTab: CaseIterable, Hashable {
 struct ContentView: View {
     @State private var selectedTab: AppTab = .tasteLearning
     @StateObject private var orderingViewModel = OrderingChatViewModel()
+    @State private var isAttachmentDrawerPresented = false
 
     private var orderingExpandedHeight: CGFloat {
-        orderingViewModel.attachments.isEmpty ? 80 : 200
+        orderingViewModel.attachments.isEmpty ? 80 : 112
     }
 
     private var orderingBarCornerRadius: CGFloat {
@@ -103,14 +104,76 @@ struct ContentView: View {
                 OrderingComposerPanel(
                     viewModel: orderingViewModel,
                     outerContainerCornerRadius: orderingBarCornerRadius,
-                    contentInsetFromOuterCard: BottomBarLayout.expandedContentInset
+                    contentInsetFromOuterCard: BottomBarLayout.expandedContentInset,
+                    isAttachmentDrawerPresented: $isAttachmentDrawerPresented
                 )
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 10)
         }
+        .overlay {
+            if selectedTab == .ordering {
+                ZStack(alignment: .bottom) {
+                    Color.black.opacity(isAttachmentDrawerPresented ? 0.01 : 0.0)
+                        .ignoresSafeArea()
+                        .allowsHitTesting(isAttachmentDrawerPresented)
+                        .onTapGesture {
+                            withAnimation(.spring(response: 0.34, dampingFraction: 0.86)) {
+                                isAttachmentDrawerPresented = false
+                            }
+                        }
+
+                    OrderingAttachmentDrawerCard()
+                        .offset(y: isAttachmentDrawerPresented ? 0 : 340)
+                        .opacity(isAttachmentDrawerPresented ? 1.0 : 0.001)
+                        .allowsHitTesting(isAttachmentDrawerPresented)
+                }
+                .ignoresSafeArea(edges: .bottom)
+                .zIndex(40)
+                .animation(.spring(response: 0.34, dampingFraction: 0.86), value: isAttachmentDrawerPresented)
+            }
+        }
+        .onChange(of: selectedTab) { _, _ in
+            isAttachmentDrawerPresented = false
+        }
         .preferredColorScheme(.light)
+    }
+}
+
+private struct OrderingAttachmentDrawerCard: View {
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Capsule(style: .continuous)
+                    .fill(.white.opacity(0.70))
+                    .frame(width: 48, height: 5)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.top, 8)
+
+            Text("添加菜单图片")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+                .padding(.top, 2)
+        }
+        .padding(.horizontal, 18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: 200, alignment: .top)
+        .background(
+            UnevenRoundedRectangle(
+                cornerRadii: .init(topLeading: 28, bottomLeading: 0, bottomTrailing: 0, topTrailing: 28),
+                style: .continuous
+            )
+            .fill(.ultraThinMaterial)
+        )
+        .overlay(
+            UnevenRoundedRectangle(
+                cornerRadii: .init(topLeading: 28, bottomLeading: 0, bottomTrailing: 0, topTrailing: 28),
+                style: .continuous
+            )
+            .stroke(.white.opacity(0.76), lineWidth: 1)
+        )
     }
 }
 

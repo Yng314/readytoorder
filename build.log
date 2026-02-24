@@ -1,10 +1,10 @@
-2026-02-24 02:44:20.880 xcodebuild[61366:7718219]  DVTFilePathFSEvents: Failed to start fs event stream.
-2026-02-24 02:44:21.043 xcodebuild[61366:7718218] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
-2026-02-24 02:44:21.340 xcodebuild[61366:7718221] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
-2026-02-24 02:44:21.341 xcodebuild[61366:7718253] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f4e303d0> { count = 1, transaction: 0, voucher = 0x0, contents =
+2026-02-24 18:20:42.349 xcodebuild[87093:7862114]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-02-24 18:20:42.593 xcodebuild[87093:7862112] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+2026-02-24 18:20:43.048 xcodebuild[87093:7862115] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+2026-02-24 18:20:43.048 xcodebuild[87093:7862115] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f4e303d0> { count = 1, transaction: 0, voucher = 0x0, contents =
 	"XPCErrorDescription" => <string: 0x1f4e30518> { string cache = 0x0, length = 18, contents = "Connection invalid" }
 }>
-2026-02-24 02:44:21.341 xcodebuild[61366:7718253] Error opening log file (/Users/young/Library/Logs/CoreSimulator/CoreSimulator.com.apple.dt.xcodebuild.log): Operation not permitted
+2026-02-24 18:20:43.048 xcodebuild[87093:7862115] Error opening log file (/Users/young/Library/Logs/CoreSimulator/CoreSimulator.com.apple.dt.xcodebuild.log): Operation not permitted
 [-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
     "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
     request = "set_developer_dir";
@@ -15,17 +15,17 @@ Command line invocation:
 Build settings from command line:
     CODE_SIGNING_ALLOWED = NO
 
-2026-02-24 02:44:21.391 xcodebuild[61366:7718218] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
-Details:  detectedTypeIdentifier (com.apple.binary-property-list) does not conform to matchedTypeIdentifier in MagicFileDataTypeDetector extenson com.apple.property-list. When both are specified, this conformance is required unless overridden by setting allowNonInheritance. extension.identifier:Xcode.MagicFileDataTypeDetector.BinaryPlist
-Object:   <DVTFileDataTypeDetectionMagicCache: 0xa77c33bd0>
-Method:   -initWithExtension:
-Thread:   <_NSMainThread: 0x1034f6350>{number = 1, name = main}
-Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
-2026-02-24 02:44:21.393 xcodebuild[61366:7718218] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
+2026-02-24 18:20:43.116 xcodebuild[87093:7862112] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
 Details:  detectedTypeIdentifier (com.apple.xml-property-list) does not conform to matchedTypeIdentifier in MagicFileDataTypeDetector extenson com.apple.property-list. When both are specified, this conformance is required unless overridden by setting allowNonInheritance. extension.identifier:Xcode.MagicFileDataTypeDetector.XMLPlist
-Object:   <DVTFileDataTypeDetectionMagicCache: 0xa77c4dfb0>
+Object:   <DVTFileDataTypeDetectionMagicCache: 0xa822341e0>
 Method:   -initWithExtension:
-Thread:   <_NSMainThread: 0x1034f6350>{number = 1, name = main}
+Thread:   <_NSMainThread: 0x105252350>{number = 1, name = main}
+Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
+2026-02-24 18:20:43.118 xcodebuild[87093:7862112] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
+Details:  detectedTypeIdentifier (com.apple.binary-property-list) does not conform to matchedTypeIdentifier in MagicFileDataTypeDetector extenson com.apple.property-list. When both are specified, this conformance is required unless overridden by setting allowNonInheritance. extension.identifier:Xcode.MagicFileDataTypeDetector.BinaryPlist
+Object:   <DVTFileDataTypeDetectionMagicCache: 0xa82236100>
+Method:   -initWithExtension:
+Thread:   <_NSMainThread: 0x105252350>{number = 1, name = main}
 Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
 [-[SimServiceContext initWithDeveloperDir:connectionType:error:]:450] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
 [-[SimDiskImageManager init]:175] ERROR : Could not kickstart simdiskimaged; SimDiskImageManager services will not be available: Error Domain=NSPOSIXErrorDomain Code=53 "Software caused connection abort" UserInfo={NSLocalizedDescription=Error returned in reply from CoreSimulatorService: Connection invalid}
@@ -36,16 +36,16 @@ Please file a bug at https://feedbackassistant.apple.com with this warning messa
     request = "notification_subscription";
     "set_path" = "/Users/young/Library/Developer/CoreSimulator/Devices";
 }) because we are not connected to CoreSimulatorService.
-2026-02-24 02:44:21.407 xcodebuild[61366:7718253] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+2026-02-24 18:20:43.177 xcodebuild[87093:7862115] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
 [-[SimServiceContext sendRequest:reply:error:]:1763] ERROR : Unable to deliver request ({
     request = "notification_subscription";
     "set_path" = "/Users/young/Library/Developer/CoreSimulator/Devices";
 }) because we are not connected to CoreSimulatorService.
-2026-02-24 02:44:21.408 xcodebuild[61366:7718253]  iOSSimulator: [SimServiceContext defaultDeviceSetWithError:] returned nil (Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0xa77c788a0 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}). Simulator device support disabled.
-2026-02-24 02:44:21.408 xcodebuild[61366:7718219] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
-2026-02-24 02:44:21.408 xcodebuild[61366:7718219]  IDESimulatorAvailability: startObservingSimulatorUpdates() FAILED to register SimDeviceSet observer
-2026-02-24 02:44:21.458 xcodebuild[61366:7718256]  DVTProvisioningProfileManager: Failed to load profile "/Users/young/Library/Developer/Xcode/UserData/Provisioning Profiles/56a48496-b44a-45f2-9f28-0ad9c3408827.mobileprovision" (Error Domain=DVTProvisioningProfileProviderErrorDomain Code=1 "Failed to load profile." UserInfo={NSLocalizedDescription=Failed to load profile., NSLocalizedRecoverySuggestion=Profile is missing the required UUID property.})
-2026-02-24 02:44:21.617 xcodebuild[61366:7718218] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+2026-02-24 18:20:43.179 xcodebuild[87093:7862115]  iOSSimulator: [SimServiceContext defaultDeviceSetWithError:] returned nil (Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0xa822363a0 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}). Simulator device support disabled.
+2026-02-24 18:20:43.179 xcodebuild[87093:7862114] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+2026-02-24 18:20:43.180 xcodebuild[87093:7862114]  IDESimulatorAvailability: startObservingSimulatorUpdates() FAILED to register SimDeviceSet observer
+2026-02-24 18:20:43.201 xcodebuild[87093:7862114]  DVTProvisioningProfileManager: Failed to load profile "/Users/young/Library/Developer/Xcode/UserData/Provisioning Profiles/56a48496-b44a-45f2-9f28-0ad9c3408827.mobileprovision" (Error Domain=DVTProvisioningProfileProviderErrorDomain Code=1 "Failed to load profile." UserInfo={NSLocalizedDescription=Failed to load profile., NSLocalizedRecoverySuggestion=Profile is missing the required UUID property.})
+2026-02-24 18:20:43.404 xcodebuild[87093:7862112] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
 ComputePackagePrebuildTargetDependencyGraph
 
 Prepare packages
@@ -75,8 +75,8 @@ ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeD
 
 ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
 
-Build description signature: 9743cf2c40e00b8781a7ff490d30530a
-Build description path: /tmp/readytoorder_dd/Build/Intermediates.noindex/XCBuildData/9743cf2c40e00b8781a7ff490d30530a.xcbuilddata
+Build description signature: 40d0bb5d918871069ed6b55fcb49111d
+Build description path: /tmp/readytoorder_dd/Build/Intermediates.noindex/XCBuildData/40d0bb5d918871069ed6b55fcb49111d.xcbuilddata
 ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
     cd /Users/young/Coding/development/readytoorder/readytoorder.xcodeproj
     /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
@@ -85,11 +85,11 @@ Failed to create FS event stream. Considering the cache up-to-date.
 CompileAssetCatalogVariant thinned /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/readytoorder.app /Users/young/Coding/development/readytoorder/readytoorder/Assets.xcassets (in target 'readytoorder' from project 'readytoorder')
     cd /Users/young/Coding/development/readytoorder
     /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/young/Coding/development/readytoorder/readytoorder/Assets.xcassets --compile /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/assetcatalog_dependencies_thinned --output-partial-info-plist /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 26.2 --platform iphonesimulator
-2026-02-24 02:44:25.247 ibtoold[61384:7718374] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
-2026-02-24 02:44:25.248 ibtoold[61384:7718473] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f4e303d0> { count = 1, transaction: 0, voucher = 0x0, contents =
+2026-02-24 18:20:48.657 ibtoold[87109:7862561] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+2026-02-24 18:20:48.658 ibtoold[87109:7862561] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f4e303d0> { count = 1, transaction: 0, voucher = 0x0, contents =
 	"XPCErrorDescription" => <string: 0x1f4e30518> { string cache = 0x0, length = 18, contents = "Connection invalid" }
 }>
-2026-02-24 02:44:25.248 ibtoold[61384:7718473] Error opening log file (/Users/young/Library/Logs/CoreSimulator/CoreSimulator.com.apple.ibtool.log): Operation not permitted
+2026-02-24 18:20:48.658 ibtoold[87109:7862561] Error opening log file (/Users/young/Library/Logs/CoreSimulator/CoreSimulator.com.apple.ibtool.log): Operation not permitted
 [-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
     "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
     request = "set_developer_dir";
@@ -99,25 +99,25 @@ CompileAssetCatalogVariant thinned /tmp/readytoorder_dd/Build/Products/Debug-iph
 [-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
 [-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:486] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=410 "The service used to manage runtime disk images (simdiskimaged) crashed or is not responding" UserInfo={NSLocalizedDescription=The service used to manage runtime disk images (simdiskimaged) crashed or is not responding}
 [-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
-2026-02-24 02:44:25.331 ibtoold[61384:7718373] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+2026-02-24 18:20:48.821 ibtoold[87109:7862323] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
 [-[SimServiceContext sendRequest:reply:error:]:1763] ERROR : Unable to deliver request ({
     request = "notification_subscription";
     "set_path" = "/Users/young/Library/Developer/CoreSimulator/Devices";
 }) because we are not connected to CoreSimulatorService.
-2026-02-24 02:44:25.670 ibtoold[61384:7718373] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
 [-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
     "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
     request = "set_developer_dir";
 }) because we are not connected to CoreSimulatorService.
+2026-02-24 18:20:49.180 ibtoold[87109:7862593] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
 [-[SimServiceContext initWithDeveloperDir:connectionType:error:]:450] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
 [-[SimDiskImageManager _onQueue_checkConnection:]:219] ERROR : simdiskimaged connection is currently unavailable because connection became invalid
 [-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:486] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=409 "Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded" UserInfo={NSLocalizedDescription=Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded}
 [-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
-    path = "/Applications/Xcode.app/Contents/PlugIns/IDEInterfaceBuilderiOSIntegration.ideplugin/Contents/Resources";
+    path = "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/Library/Xcode/PrivatePlugIns/IDEInterfaceBuilderAppleTVIntegration.framework/Resources";
     request = "add_profiles";
 }) because we are not connected to CoreSimulatorService.
 [-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
-    path = "/Applications/Xcode.app/Contents/Developer/Platforms/AppleTVSimulator.platform/Developer/Library/Xcode/PrivatePlugIns/IDEInterfaceBuilderAppleTVIntegration.framework/Resources";
+    path = "/Applications/Xcode.app/Contents/PlugIns/IDEInterfaceBuilderiOSIntegration.ideplugin/Contents/Resources";
     request = "add_profiles";
 }) because we are not connected to CoreSimulatorService.
 /* com.apple.actool.errors */
@@ -126,177 +126,139 @@ CompileAssetCatalogVariant thinned /tmp/readytoorder_dd/Build/Products/Debug-iph
 /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/assetcatalog_generated_info.plist_thinned
 
 
-SwiftDriver readytoorder normal arm64 com.apple.xcode.tools.swift.compiler (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name readytoorder -Onone -enforce-exclusivity\=checked @/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/readytoorder_dd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -F /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/readytoorder_dd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -sdk-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/readytoorder_dd/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-generated-files.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-own-target-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-project-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources-normal/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-Swift.h -working-directory /Users/young/Coding/development/readytoorder -experimental-emit-module-separately -disable-cmo
-
 SwiftDriver readytoorder normal x86_64 com.apple.xcode.tools.swift.compiler (in target 'readytoorder' from project 'readytoorder')
     cd /Users/young/Coding/development/readytoorder
     builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name readytoorder -Onone -enforce-exclusivity\=checked @/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target x86_64-apple-ios26.2-simulator -g -module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/readytoorder_dd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -F /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/readytoorder_dd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -sdk-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/readytoorder_dd/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-generated-files.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-own-target-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-project-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources-normal/x86_64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/x86_64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder-Swift.h -working-directory /Users/young/Coding/development/readytoorder -experimental-emit-module-separately -disable-cmo
 
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_float-5KR8UFEIFF6BOPC6LK2JKZDEZ.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdarg-546X23Q15RE5B566OT8FQFDOS.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdbool-D2JAJAL4TNA34YITT94AQ8S29.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/SwiftShims-C7R2HDKQG426D8QXHUB1EOAKC.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/DeveloperToolsSupport-1ZR5GNVRSEJKANSAMDKCUULU8.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_SwiftConcurrencyShims-BPFY9KD0YE0P0B6S6LRFRLHJV.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_AvailabilityInternal-C7WYVVGL9QY6UX8DE2AI6DHBP.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/ptrauth-3V5E1SCNT9ZOCNBC13ML7TN8L.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stddef-7VJ2AHSFDPNR8YEFNBYN79WNJ.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/DeveloperToolsSupport-AT6BK47G5FLUDUVBQMQ5E1X2P.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/ptrcheck-B0FIE86IUIT1W7YS40EW2P7VD.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_SwiftConcurrencyShims-4WL9NP3AYLHAVE5O8FKC89DO0.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_AvailabilityInternal-CWUZLELP77EK09SK8T7JXUZYQ.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdarg-4GKVQ9SPVB9NFOA2Y9GCBSBF3.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/SwiftShims-1BN2BWCNAI8ZV918W32VTTEUI.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/ptrauth-3AXVPXJHGWKPEISWCHAI1Y98W.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stddef-A03T4ZE3XRDE9TWSJ9RNK3E8V.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdbool-9ICUU62LB4BIEVVFKUUNR5P1T.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_float-17CTZ4T139UTVGRCP3S63RG22.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/ptrcheck-94JIZIM3UN43D8FYU935P003Y.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_DarwinFoundation1-ENIDNY9XUTEGK3YAW8AUVE0IB.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_DarwinFoundation1-BLOAND9V1DYMQI96ZUL76F07I.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/ExtensionFoundation-ERYQR12EYW5XR46ZWQ7TL7TCI.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_DarwinFoundation2-7AQPP12VTUCY2PJSBGA2CO62F.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_limits-5VZEI1FBGCYYZXAO25PSNNCZL.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_DarwinFoundation2-28QEQIII0QJVJPD0MJ2FPC3FE.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/ExtensionFoundation-1DKFH9LVX4Q5FGOHPUXNMF8QF.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_limits-2ZS2UPQICP2I9ON8H55V7ZZ5G.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/sys_types-APARSGD6JH81QIXMJNIY4EZ8H.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdint-BCSUTR79ZPRZ39RMP63U3U3YS.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_tgmath-3K2GC4LW1257HSWS11YRYW05K.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdint-7HJ457JK4YQM2DPX3Q9U88LZK.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_tgmath-7MUSLTBI2FBVSL515EB7UX8HY.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/sys_types-4QZBSSQJULHD9GTPA0OFWFAG8.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_intrinsics-35E4E4FGEBROYP84GOY5PK8ZU.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdatomic-96WR5Q0CFJCR8TEABIS8BDIU0.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_DarwinFoundation3-39GGLZVKUP4GQRRI4QNWJKNBA.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_DarwinFoundation3-8N7CTC55U4P0R87Z5BZ5RHZZ1.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_stdatomic-CS6QZB2TM3SEXM8ORQZK6U4R.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_inttypes-DYS19EK75NX6AZ48X7JJQ0J4D.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_intrinsics-CWIE7V2C9W1PXJYVCS0INX5FM.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_Builtin_inttypes-CB0GFI7LRY4CB12O6AVA9MZYM.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Darwin-19DXQHR6FR3J0KALYKFGTKN1U.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Darwin-7IGIQG3F4JJPVVP3CS9XLCKOT.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/simd-535YIPHK6DQCYZDAIWXABB1MA.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/ObjectiveC-5C39IKEX6FKRGJCB356ABGH5R.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/MachO-A2OL7ZYPLZ512G2BL21X6RTBY.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/MachO-BABRFY4DQQUFZA7CWF5H4HYR6.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/ObjectiveC-AOMB1XZLJRB1KJC9BJ8RBDV2S.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/simd-17YPQREH7OB6AA7KPHQXR2V5U.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/os_object-1QLBORIAORJF1HO636WP6MA2Y.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/os_object-1SBW7IBN11QCUYF7I9ABZLTSZ.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/os_workgroup-1R4V4GDKBMAY2R39WAZU5A593.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/os_workgroup-176L4F6W7W2UCG099FA7YEF0Q.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Dispatch-7TJQV5NXHO2T50MEFCL6BDEWY.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Dispatch-5MNLCDHUVZOUUUN8H044RKXOB.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Spatial-DD0BIHLUJBWXY7SWO0QUM7Z4J.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/dnssd-EW50KJR8PYNQLQFOWH6AC3YNW.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/XPC-BFBC21A2OUCG9XKWX9YG1PQRY.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreFoundation-7HV5GFISEH8CWXM58Y7L7OVOK.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/dnssd-30ARMXU15L1040TAH6O5WO752.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreFoundation-AK3DRZFU5GS7DPC4HQB1LXU45.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/XPC-6E4DL1CFLKK5WF84E47FFYJVU.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/os-5U4AG5UC09CL62TTHTVY99KFO.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/os-7DIVUP8F4QX8U7F9V04XJ6UCK.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Security-C3ZQI4JGRF3HMRO1DG2Y2SOY8.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreGraphics-5NNQ4INCIGO9HIMWXGLHQ4A2S.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreAudioTypes-CNCB5PT7TWU7194YPYBAAMDF1.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CFNetwork-DKNW8B2BYQJRZO4DULWJVDQYS.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreGraphics-73KAV9O1RXPIITFJJVI2W51VI.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Security-9D8C0WFOLGT1729PYXZ3JTNDZ.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreAudioTypes-AJF5Z1FEC7F24M4SOOENNBXF3.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CFNetwork-OG6VQ5JR89IXQ900KXO53UMR.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Spatial-IB61WNAQCQTHTVI1K1XGE2FK.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreAudio-9HD19UEZFZEGP2ZC5H1WS23KW.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Foundation-4O6MYLPJNVXNLIPRUNYGZRERB.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/ImageIO-CKBHTLXU7ZGM4QAB3QBDZKR3A.pcm
-
-SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreText-1IVP7BASM3ENH5AV82K4J0654.pcm
-
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreAudio-TQVJRWSREZV3AMD8ZPDL5PSX.pcm
+SwiftDriver readytoorder normal arm64 com.apple.xcode.tools.swift.compiler (in target 'readytoorder' from project 'readytoorder')
+    cd /Users/young/Coding/development/readytoorder
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name readytoorder -Onone -enforce-exclusivity\=checked @/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/readytoorder_dd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -F /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/readytoorder_dd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -sdk-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/readytoorder_dd/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-generated-files.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-own-target-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-project-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources-normal/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-Swift.h -working-directory /Users/young/Coding/development/readytoorder -experimental-emit-module-separately -disable-cmo
 
 SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/ImageIO-CDW7FISBFV1LFUVP2W5XF9V9H.pcm
 
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Foundation-9Q28ILDCTKGR9NN77A9K1ZNQ5.pcm
+
 SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreText-1UCKYMEC9WLTVLT8MJ5RJIXU7.pcm
 
-SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Foundation-9Q28ILDCTKGR9NN77A9K1ZNQ5.pcm
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Spatial-IB61WNAQCQTHTVI1K1XGE2FK.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreText-1IVP7BASM3ENH5AV82K4J0654.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Foundation-4O6MYLPJNVXNLIPRUNYGZRERB.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/IOSurface-BJBUZFJ5NS60VSDBU5WQR1WK8.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreTransferable-EDFOGOJM9PHHUN6T1XEZK9LVV.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Accessibility-8LTO333QX221SX8XGFWJZCTZV.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Network-7D6CGD7MGNW7SK2HS70BDNP3M.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/UserNotifications-4QMK19LXIAI72FDMV2TAP50P5.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Symbols-BKFEMN9U5XHGZHNBIRZW0VRHF.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/UIUtilities-4OCCY7RMKFA47NW81UWU90RN.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/OpenGLES-AV314CUSQX8UMH6MQPGUY2LM4.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/_LocationEssentials-4ZR6G2TREQG1188DKSQX1SM2U.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/UIUtilities-B0EIJSJBXRJKWEGPYQFVIC8R1.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/OpenGLES-7R0JLKIRPIQ76RHVUC4C4J3E9.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreTransferable-8RWD7O72212TNW8P2OWX8XQI2.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/DataDetection-RKYXNQBIJ5TU4IWNO12O5KKJ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/IOSurface-5GBTTPIYGDXYOTQWBQHG6Z9O0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreData-ENOYVRL44QDOBQZ0TO8UMPG9F.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Metal-2I9E25Q0FEI9JUG88CWS52G9V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Network-92PJP8TG08YJZSLV4RJ98SYB2.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/AVRouting-1B12Y9WMCWUAG06VWCOK9WR5K.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreData-80IIYOVT7J98PEP7A9P2HC7OA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/_LocationEssentials-RCDECUIU7FENAFOV40QGRRD.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/UniformTypeIdentifiers-1Z88LO1ZEM9RRXV9Q4Y5R6HAN.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/FileProvider-731C5GG1Z7CJ7HXN577QC7NUS.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/DataDetection-CPFGQCT5Q2BMOMY4V7DM8H7ND.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/OSLog-FJDII9142R6I3BSS91QOA24T.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreMIDI-9NYB04RHC57BSZCI3IJN1T8B0.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreLocation-BPBPGCFEPY77DRC18Y5BEC99V.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Metal-7VH1JQ4WIKO7NV7S3CRRGJ6YM.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/UniformTypeIdentifiers-7UDJ82P1I7BMELDXEXVERSUU5.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/OSLog-969X051UOSWG8ACT6H29S3PFA.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/AVRouting-ABNB3QDAG6U6YHJQTB4WLCFIM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/UserNotifications-522G674VOJQVJUMSIDYB9S5OZ.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreMIDI-6DTR3IS8UY5PIFWFBT0122TDU.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Accessibility-7FMNX51HNIQ10943CCNDFAFQS.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreVideo-7GSMMXBGG7YZ6AY9RMTU7F0TK.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/Symbols-5MM1JXNAI358Q5OBZEZ7ZRW38.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreLocation-830EJ9JISM1E472RMLPWEPHN8.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/AudioToolbox-EAZCXKS8RRKITKQR616ETV03V.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/FileProvider-83C9JVW1W6OVQ5266VX9SWRQH.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/AudioToolbox-31ZVX6NHAEP0XXBFBU8OSZYRW.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreMedia-52X9OPVD634MI9P24918BNOJ8.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreImage-7NLDH2OB2NBSH6H0EW702Q5U3.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/QuartzCore-7YJHAHFS6A4YT05SLFJT8E5VX.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreVideo-1N0E853KWE4VBKKF2Y73DIM6I.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/QuartzCore-8FBUCB9K5NDU3MQUHMERUZCVM.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreMedia-7EZ6D5XW0LMW5QPDPEZS7SV9K.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/CoreImage-60MP6WEANGSJH3XCG5RMDUBC0.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/SwiftUICore-48O329NRLMLV0FXGPK8L4GRQF.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/MediaToolbox-6AP1UIFN22ACQ2HZCKMXSNK2E.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/AVFAudio-7TM3N6WB6Y7AD1NJIXZF51U4O.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/UIKit-5W3BE5A7ZPTDHTRWGNIFD0P7W.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/SwiftUICore-5DMADLPN0PISB5XXHB81AJ339.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/UIKit-5E1WJ9HKWP9220BCUPJPHIDOF.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/MediaToolbox-1E2HX9RZA5RSQBIO7RYBX19HC.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/AVFAudio-5X7QTUO7KTERQ4KMHTUE8QJR.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/AVFoundation-7NUUIQXINUARHKP0DW2JQ7BOB.pcm
+
+SwiftExplicitDependencyGeneratePcm arm64 /tmp/readytoorder_dd/ModuleCache.noindex/AVFoundation-59XOMZBRI1FLO466NPMK7R9RV.pcm
+
+SwiftExplicitDependencyGeneratePcm x86_64 /tmp/readytoorder_dd/ModuleCache.noindex/Photos-4MPLDXBGGLYNWN0F3B6IPSS4K.pcm
 
 ** BUILD FAILED **
 

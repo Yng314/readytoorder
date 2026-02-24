@@ -41,7 +41,7 @@ struct TasteLearningView: View {
                             .frame(width: cardWidth, height: cardHeight, alignment: .center)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                             .padding(.top, 0)
-                            .padding(.bottom, 90)
+                            .padding(.bottom, 100)
 
                         VStack(spacing: 0) {
                             HStack(spacing: 10) {
@@ -59,7 +59,7 @@ struct TasteLearningView: View {
                         }
                     }
                     .padding(.horizontal, 18)
-                    .padding(.top, 50)
+                    .padding(.top, 10)
                 }
 
                 if isShowingProfilePopup {
