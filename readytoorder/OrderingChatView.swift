@@ -179,8 +179,30 @@ struct OrderingComposerPanel: View {
     @ObservedObject var viewModel: OrderingChatViewModel
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
     @State private var isShowingCamera = false
+    @State private var isShowingPhotoPicker = false
+    @State private var isShowingAttachmentSourcePicker = false
     @State private var isShowingCameraUnavailableAlert = false
     @FocusState private var isComposerFocused: Bool
+
+    private var hasAttachments: Bool {
+        !viewModel.attachments.isEmpty
+    }
+
+    private var canSendNow: Bool {
+        if hasAttachments {
+            return !viewModel.isSending
+        }
+        return !viewModel.isSending && !viewModel.trimmedDraftText.isEmpty
+    }
+
+    private func sendPrimaryAction() {
+        isComposerFocused = false
+        if hasAttachments {
+            viewModel.sendRecommend()
+        } else {
+            viewModel.sendChat()
+        }
+    }
 
     var body: some View {
         VStack(spacing: 10) {
@@ -188,78 +210,35 @@ struct OrderingComposerPanel: View {
                 attachmentStrip
             }
 
-            HStack(spacing: 10) {
-                Button {
-                    if UIImagePickerController.isSourceTypeAvailable(.camera) {
-                        isShowingCamera = true
-                    } else {
-                        isShowingCameraUnavailableAlert = true
-                    }
-                } label: {
-                    Image(systemName: "camera")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
-                        .frame(width: 34, height: 34)
-                        .background(.white.opacity(0.60), in: Circle())
-                }
-                .buttonStyle(.plain)
-                .disabled(viewModel.isSending || viewModel.remainingAttachmentSlots <= 0)
-
-                PhotosPicker(
-                    selection: $selectedPhotoItems,
-                    maxSelectionCount: max(1, viewModel.remainingAttachmentSlots),
-                    matching: .images
-                ) {
-                    Image(systemName: "photo.on.rectangle.angled")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
-                        .frame(width: 34, height: 34)
-                        .background(.white.opacity(0.60), in: Circle())
-                }
-                .disabled(viewModel.isSending || viewModel.remainingAttachmentSlots <= 0)
-
-                Text("\(viewModel.attachments.count)/\(viewModel.maxImages)")
-                    .font(.caption2.weight(.semibold))
-                    .monospacedDigit()
-                    .foregroundStyle(Color(red: 0.42, green: 0.40, blue: 0.48))
-                    .lineLimit(1)
-
-                Spacer()
-
+            HStack(alignment: .bottom, spacing: 10) {
                 Button {
                     isComposerFocused = false
-                    viewModel.sendRecommend()
+                    isShowingAttachmentSourcePicker = true
                 } label: {
-                    HStack(spacing: 5) {
-                        Image(systemName: "sparkles")
-                        Text("推荐菜品")
-                    }
-                    .font(.caption.weight(.semibold))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
-                    .background(
-                        LinearGradient(
-                            colors: [
-                                .white.opacity(0.78),
-                                Color(red: 0.90, green: 0.87, blue: 0.96).opacity(0.95)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        ),
-                        in: Capsule(style: .continuous)
-                    )
-                    .overlay(
-                        Capsule(style: .continuous)
-                            .stroke(.white.opacity(0.85), lineWidth: 1)
-                    )
+                    Image(systemName: "plus")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Color(red: 0.33, green: 0.22, blue: 0.52))
+                        .frame(width: 44, height: 44)
+                        .background(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.89, green: 0.84, blue: 0.96),
+                                    .white.opacity(0.95)
+                                ],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            ),
+                            in: Circle()
+                        )
+                        .overlay(
+                            Circle()
+                                .stroke(.white.opacity(0.90), lineWidth: 1)
+                        )
+                        .shadow(color: Color(red: 0.63, green: 0.53, blue: 0.78).opacity(0.45), radius: 12, x: 0, y: 4)
                 }
                 .buttonStyle(.plain)
-                .disabled(viewModel.isSending)
-            }
-            .padding(.horizontal, 2)
+                .disabled(viewModel.isSending || viewModel.remainingAttachmentSlots <= 0)
 
-            HStack(alignment: .bottom, spacing: 10) {
                 TextField("Ask anything...", text: $viewModel.draftText, axis: .vertical)
                     .lineLimit(1...4)
                     .focused($isComposerFocused)
@@ -268,16 +247,14 @@ struct OrderingComposerPanel: View {
                     .font(.body.weight(.medium))
                     .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
                     .padding(.horizontal, 10)
-                    .padding(.vertical, 12)
+                    .padding(.vertical, 8)
                     .submitLabel(.send)
                     .onSubmit {
-                        isComposerFocused = false
-                        viewModel.sendChat()
+                        sendPrimaryAction()
                     }
 
                 Button {
-                    isComposerFocused = false
-                    viewModel.sendChat()
+                    sendPrimaryAction()
                 } label: {
                     Image(systemName: "arrow.up")
                         .font(.subheadline.weight(.bold))
@@ -301,7 +278,7 @@ struct OrderingComposerPanel: View {
                         .shadow(color: Color(red: 0.63, green: 0.53, blue: 0.78).opacity(0.45), radius: 12, x: 0, y: 4)
                 }
                 .buttonStyle(.plain)
-                .disabled(viewModel.isSending || viewModel.trimmedDraftText.isEmpty)
+                .disabled(!canSendNow)
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
@@ -331,6 +308,29 @@ struct OrderingComposerPanel: View {
         } message: {
             Text("请改用相册上传菜单图片。")
         }
+        .confirmationDialog(
+            "添加菜单图片",
+            isPresented: $isShowingAttachmentSourcePicker,
+            titleVisibility: .visible
+        ) {
+            Button("拍照") {
+                if UIImagePickerController.isSourceTypeAvailable(.camera) {
+                    isShowingCamera = true
+                } else {
+                    isShowingCameraUnavailableAlert = true
+                }
+            }
+            Button("从相册选择") {
+                isShowingPhotoPicker = true
+            }
+            Button("取消", role: .cancel) {}
+        }
+        .photosPicker(
+            isPresented: $isShowingPhotoPicker,
+            selection: $selectedPhotoItems,
+            maxSelectionCount: max(1, viewModel.remainingAttachmentSlots),
+            matching: .images
+        )
     }
 
     private var attachmentStrip: some View {

@@ -40,7 +40,7 @@ struct ContentView: View {
     @StateObject private var orderingViewModel = OrderingChatViewModel()
 
     private var orderingExpandedHeight: CGFloat {
-        orderingViewModel.attachments.isEmpty ? 132 : 252
+        orderingViewModel.attachments.isEmpty ? 80 : 200
     }
 
     var body: some View {
