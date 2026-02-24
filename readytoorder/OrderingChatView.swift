@@ -16,6 +16,7 @@ struct OrderingChatView: View {
     let composerReservedBottomInset: CGFloat
     @State private var isShowingParams = false
     @State private var isShowingClearChatConfirm = false
+    @State private var previewImageItem: OrderingPreviewImageItem?
 
     var body: some View {
         NavigationStack {
@@ -45,7 +46,18 @@ struct OrderingChatView: View {
                     chatList
                         .padding(.bottom, composerReservedBottomInset)
                 }
+
+                if let item = previewImageItem {
+                    OrderingImagePreviewScreen(previewImage: item.previewImage) {
+                        withAnimation(.easeInOut(duration: 0.20)) {
+                            previewImageItem = nil
+                        }
+                    }
+                    .transition(.opacity)
+                    .zIndex(30)
+                }
             }
+            .animation(.easeInOut(duration: 0.20), value: previewImageItem != nil)
             .toolbar(.hidden, for: .navigationBar)
         }
         .confirmationDialog(
@@ -128,9 +140,13 @@ struct OrderingChatView: View {
             ScrollView {
                 // Keep a plain VStack here: LazyVStack regressed on-device with this chat's
                 // update/scroll pattern and can freeze after recommend -> chat -> fast scroll.
-                VStack(spacing: 12) {
+                VStack(spacing: 18) {
                     ForEach(viewModel.messages) { message in
-                        OrderingMessageBubble(message: message)
+                        OrderingMessageBubble(message: message) { image in
+                            withAnimation(.easeInOut(duration: 0.20)) {
+                                previewImageItem = OrderingPreviewImageItem(previewImage: image.previewImage)
+                            }
+                        }
                             .id(message.id)
                     }
 
@@ -184,6 +200,8 @@ struct OrderingChatView: View {
 
 struct OrderingComposerPanel: View {
     @ObservedObject var viewModel: OrderingChatViewModel
+    let outerContainerCornerRadius: CGFloat
+    let contentInsetFromOuterCard: CGFloat
     @State private var selectedPhotoItems: [PhotosPickerItem] = []
     @State private var isShowingCamera = false
     @State private var isShowingPhotoPicker = false
@@ -200,6 +218,11 @@ struct OrderingComposerPanel: View {
             return !viewModel.isSending
         }
         return !viewModel.isSending && !viewModel.trimmedDraftText.isEmpty
+    }
+
+    private var inputCardCornerRadius: CGFloat {
+        // Equal-offset geometry: keep corner tangents visually parallel to the outer card.
+        max(10, outerContainerCornerRadius - contentInsetFromOuterCard)
     }
 
     private func sendPrimaryAction() {
@@ -238,7 +261,7 @@ struct OrderingComposerPanel: View {
                     .font(.body.weight(.medium))
                     .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
                     .padding(.horizontal, 10)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 16)
                     .submitLabel(.send)
                     .onSubmit {
                         sendPrimaryAction()
@@ -257,9 +280,9 @@ struct OrderingComposerPanel: View {
             }
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
-            .background(.white.opacity(0.74), in: RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .background(.white.opacity(0.74), in: RoundedRectangle(cornerRadius: inputCardCornerRadius, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 30, style: .continuous)
+                RoundedRectangle(cornerRadius: inputCardCornerRadius, style: .continuous)
                     .stroke(.white.opacity(0.88), lineWidth: 1)
             )
         }
@@ -343,6 +366,7 @@ struct OrderingComposerPanel: View {
 
 private struct OrderingMessageBubble: View {
     let message: OrderingChatMessage
+    var onTapImage: (OrderingChatImage) -> Void = { _ in }
 
     private let headlineColor = Color(red: 0.25, green: 0.22, blue: 0.30)
     private let bodyColor = Color(red: 0.30, green: 0.29, blue: 0.36)
@@ -473,15 +497,20 @@ private struct OrderingMessageBubble: View {
     }
 
     private func previewTile(for image: OrderingChatImage) -> some View {
-        Image(uiImage: image.previewImage)
-            .resizable()
-            .scaledToFill()
-            .frame(width: 180, height: 180)
-            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 28, style: .continuous)
-                    .stroke(.white.opacity(0.52), lineWidth: 1)
-            )
+        Button {
+            onTapImage(image)
+        } label: {
+            Image(uiImage: image.previewImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 180, height: 180)
+                .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        .stroke(.white.opacity(0.52), lineWidth: 1)
+                )
+        }
+        .buttonStyle(.plain)
     }
 
     private var userPromptText: String {
@@ -507,6 +536,46 @@ private struct OrderingMessageBubble: View {
             return "结合你的口味画像和菜单内容，先给你一组可直接下单的建议。"
         }
         return message.text
+    }
+}
+
+private struct OrderingPreviewImageItem: Identifiable {
+    let id = UUID()
+    let previewImage: UIImage
+}
+
+private struct OrderingImagePreviewScreen: View {
+    let previewImage: UIImage
+    let onClose: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .topTrailing) {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .ignoresSafeArea()
+                .overlay(Color.white.opacity(0.10).ignoresSafeArea())
+
+            Image(uiImage: previewImage)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 24)
+
+            Button(action: onClose) {
+                Image(systemName: "xmark")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(Color.primary.opacity(0.88))
+                    .frame(width: 36, height: 36)
+                    .background(.regularMaterial, in: Circle())
+            }
+            .buttonStyle(.plain)
+            .padding(.top, 16)
+            .padding(.trailing, 16)
+        }
+        .onTapGesture {
+            onClose()
+        }
     }
 }
 

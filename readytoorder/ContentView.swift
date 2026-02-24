@@ -7,6 +7,12 @@
 
 import SwiftUI
 
+private enum BottomBarLayout {
+    static let collapsedCornerRadius: CGFloat = 30
+    static let orderingCornerRadius: CGFloat = 26
+    static let expandedContentInset: CGFloat = 12
+}
+
 enum AppTab: CaseIterable, Hashable {
     case tasteLearning
     case ordering
@@ -41,6 +47,10 @@ struct ContentView: View {
 
     private var orderingExpandedHeight: CGFloat {
         orderingViewModel.attachments.isEmpty ? 80 : 200
+    }
+
+    private var orderingBarCornerRadius: CGFloat {
+        selectedTab == .ordering ? BottomBarLayout.orderingCornerRadius : BottomBarLayout.collapsedCornerRadius
     }
 
     private var orderingChatBottomInset: CGFloat {
@@ -83,8 +93,18 @@ struct ContentView: View {
                 .animation(nil, value: selectedTab)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
-            BottomMorphingTabBar(selectedTab: $selectedTab, expandedMaxHeight: orderingExpandedHeight) {
-                OrderingComposerPanel(viewModel: orderingViewModel)
+            BottomMorphingTabBar(
+                selectedTab: $selectedTab,
+                expandedMaxHeight: orderingExpandedHeight,
+                collapsedCornerRadius: BottomBarLayout.collapsedCornerRadius,
+                expandedCornerRadius: BottomBarLayout.orderingCornerRadius,
+                expandedContentInset: BottomBarLayout.expandedContentInset
+            ) {
+                OrderingComposerPanel(
+                    viewModel: orderingViewModel,
+                    outerContainerCornerRadius: orderingBarCornerRadius,
+                    contentInsetFromOuterCard: BottomBarLayout.expandedContentInset
+                )
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
@@ -97,6 +117,9 @@ struct ContentView: View {
 struct BottomMorphingTabBar<ExpandedContent: View>: View {
     @Binding var selectedTab: AppTab
     let expandedMaxHeight: CGFloat
+    let collapsedCornerRadius: CGFloat
+    let expandedCornerRadius: CGFloat
+    let expandedContentInset: CGFloat
     @ViewBuilder var expandedContent: () -> ExpandedContent
 
     private var expandProgress: CGFloat {
@@ -104,7 +127,7 @@ struct BottomMorphingTabBar<ExpandedContent: View>: View {
     }
 
     private var containerRadius: CGFloat {
-        30 - (4 * expandProgress)
+        collapsedCornerRadius - ((collapsedCornerRadius - expandedCornerRadius) * expandProgress)
     }
 
     private var visibleExpandedHeight: CGFloat {
@@ -114,9 +137,9 @@ struct BottomMorphingTabBar<ExpandedContent: View>: View {
     var body: some View {
         VStack(spacing: 0) {
             expandedContent()
-                .padding(.horizontal, 12)
-                .padding(.top, 12)
-                .padding(.bottom, 12)
+                .padding(.horizontal, expandedContentInset)
+                .padding(.top, expandedContentInset)
+                .padding(.bottom, expandedContentInset)
                 .frame(height: visibleExpandedHeight, alignment: .top)
                 .opacity(expandProgress)
                 .clipped()
