@@ -239,7 +239,7 @@ struct OrderingComposerPanel: View {
                 .buttonStyle(.plain)
                 .disabled(viewModel.isSending || viewModel.remainingAttachmentSlots <= 0)
 
-                TextField("Ask anything...", text: $viewModel.draftText, axis: .vertical)
+                TextField("发送菜单推荐菜品...", text: $viewModel.draftText, axis: .vertical)
                     .lineLimit(1...4)
                     .focused($isComposerFocused)
                     .textInputAutocapitalization(.never)
