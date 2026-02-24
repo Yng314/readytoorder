@@ -13,6 +13,7 @@ import Combine
 struct OrderingChatView: View {
     @Binding var selectedTab: AppTab
     @ObservedObject var viewModel: OrderingChatViewModel
+    let composerReservedBottomInset: CGFloat
     @State private var isShowingParams = false
     @State private var isShowingClearChatConfirm = false
 
@@ -42,6 +43,7 @@ struct OrderingChatView: View {
                     }
 
                     chatList
+                        .padding(.bottom, composerReservedBottomInset)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -169,9 +171,14 @@ struct OrderingChatView: View {
         }
     }
 
-    init(selectedTab: Binding<AppTab>, viewModel: OrderingChatViewModel) {
+    init(
+        selectedTab: Binding<AppTab>,
+        viewModel: OrderingChatViewModel,
+        composerReservedBottomInset: CGFloat
+    ) {
         _selectedTab = selectedTab
         _viewModel = ObservedObject(wrappedValue: viewModel)
+        self.composerReservedBottomInset = composerReservedBottomInset
     }
 }
 
@@ -210,31 +217,15 @@ struct OrderingComposerPanel: View {
                 attachmentStrip
             }
 
-            HStack(alignment: .bottom, spacing: 10) {
+            HStack(alignment: .center, spacing: 10) {
                 Button {
                     isComposerFocused = false
                     isShowingAttachmentSourcePicker = true
                 } label: {
                     Image(systemName: "plus")
-                        .font(.subheadline.weight(.bold))
+                        .font(.title3.weight(.bold))
                         .foregroundStyle(Color(red: 0.33, green: 0.22, blue: 0.52))
-                        .frame(width: 44, height: 44)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0.89, green: 0.84, blue: 0.96),
-                                    .white.opacity(0.95)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            in: Circle()
-                        )
-                        .overlay(
-                            Circle()
-                                .stroke(.white.opacity(0.90), lineWidth: 1)
-                        )
-                        .shadow(color: Color(red: 0.63, green: 0.53, blue: 0.78).opacity(0.45), radius: 12, x: 0, y: 4)
+                        .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
                 .disabled(viewModel.isSending || viewModel.remainingAttachmentSlots <= 0)
@@ -257,25 +248,9 @@ struct OrderingComposerPanel: View {
                     sendPrimaryAction()
                 } label: {
                     Image(systemName: "arrow.up")
-                        .font(.subheadline.weight(.bold))
+                        .font(.title3.weight(.bold))
                         .foregroundStyle(Color(red: 0.33, green: 0.22, blue: 0.52))
-                        .frame(width: 44, height: 44)
-                        .background(
-                            LinearGradient(
-                                colors: [
-                                    Color(red: 0.89, green: 0.84, blue: 0.96),
-                                    .white.opacity(0.95)
-                                ],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            ),
-                            in: Circle()
-                        )
-                        .overlay(
-                            Circle()
-                                .stroke(.white.opacity(0.90), lineWidth: 1)
-                        )
-                        .shadow(color: Color(red: 0.63, green: 0.53, blue: 0.78).opacity(0.45), radius: 12, x: 0, y: 4)
+                        .frame(width: 24, height: 24)
                 }
                 .buttonStyle(.plain)
                 .disabled(!canSendNow)
@@ -375,41 +350,24 @@ private struct OrderingMessageBubble: View {
     var body: some View {
         Group {
             if message.role == .user {
-                userPromptBubble
+                if shouldHideAutoRecommendPromptBubble {
+                    EmptyView()
+                } else {
+                    userPromptBubble
+                }
             } else {
                 assistantDigest
             }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: message.role == .user ? .trailing : .leading)
     }
 
     private var userPromptBubble: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                Circle()
-                    .fill(.white.opacity(0.58))
-                Circle()
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color(red: 0.56, green: 0.60, blue: 0.74).opacity(0.95),
-                                Color(red: 0.75, green: 0.73, blue: 0.84).opacity(0.95)
-                            ],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                    .frame(width: 19, height: 19)
-                    .blur(radius: 1.2)
-            }
-            .frame(width: 30, height: 30)
-
-            Text(userPromptText)
-                .font(.title3.weight(.medium))
-                .foregroundStyle(headlineColor.opacity(0.98))
-                .lineLimit(3)
-                .fixedSize(horizontal: false, vertical: true)
-        }
+        Text(userPromptText)
+            .font(.title3.weight(.medium))
+            .foregroundStyle(headlineColor.opacity(0.98))
+            .lineLimit(4)
+            .fixedSize(horizontal: false, vertical: true)
         .padding(.horizontal, 14)
         .padding(.vertical, 12)
         .background(.white.opacity(0.44), in: RoundedRectangle(cornerRadius: 28, style: .continuous))
@@ -421,11 +379,11 @@ private struct OrderingMessageBubble: View {
 
     private var assistantDigest: some View {
         VStack(alignment: .leading, spacing: 16) {
-            if !message.images.isEmpty || !message.recommendations.isEmpty {
+            if !message.images.isEmpty {
                 HStack(spacing: 8) {
                     Image(systemName: "sparkles")
                         .font(.caption.weight(.bold))
-                    Text("Created in seconds")
+                    Text("菜单缩略图")
                         .font(.caption.weight(.medium))
                 }
                 .foregroundStyle(bodyColor.opacity(0.52))
@@ -434,15 +392,10 @@ private struct OrderingMessageBubble: View {
             }
 
             if !message.recommendations.isEmpty {
-                Text("Quick concept starters\nfor your next shoot")
-                    .font(.system(size: 47, weight: .bold, design: .rounded))
+                Text(recommendationIntroText)
+                    .font(.system(size: 25, weight: .bold, design: .rounded))
                     .foregroundStyle(headlineColor)
                     .lineSpacing(3)
-                    .fixedSize(horizontal: false, vertical: true)
-
-                Text(assistantSummary)
-                    .font(.body)
-                    .foregroundStyle(bodyColor.opacity(0.86))
                     .fixedSize(horizontal: false, vertical: true)
 
                 VStack(alignment: .leading, spacing: 14) {
@@ -451,16 +404,20 @@ private struct OrderingMessageBubble: View {
                     }
                 }
             } else if !message.trimmedText.isEmpty {
-                Text(message.text)
-                    .font(.body)
-                    .foregroundStyle(bodyColor.opacity(0.92))
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 14)
-                    .background(.white.opacity(0.40), in: RoundedRectangle(cornerRadius: 24, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 24, style: .continuous)
-                            .stroke(.white.opacity(0.55), lineWidth: 1)
-                    )
+                if message.isIntroGuideText {
+                    Text(message.text)
+                        .font(.body)
+                        .foregroundStyle(bodyColor.opacity(0.82))
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                } else {
+                    Text(message.text)
+                        .font(.body)
+                        .foregroundStyle(bodyColor.opacity(0.92))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
         .padding(.horizontal, 2)
@@ -469,14 +426,8 @@ private struct OrderingMessageBubble: View {
     private var recommendationVisualStrip: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 12) {
-                if !message.images.isEmpty {
-                    ForEach(message.images) { image in
-                        previewTile(for: image)
-                    }
-                } else {
-                    ForEach(Array(message.recommendations.prefix(6).enumerated()), id: \.element.id) { index, item in
-                        placeholderTile(for: item, index: index)
-                    }
+                ForEach(message.images) { image in
+                    previewTile(for: image)
                 }
             }
             .padding(.horizontal, 1)
@@ -533,38 +484,6 @@ private struct OrderingMessageBubble: View {
             )
     }
 
-    private func placeholderTile(for item: MenuRecommendationItem, index: Int) -> some View {
-        ZStack(alignment: .bottomLeading) {
-            Image("dish_placeholder")
-                .resizable()
-                .scaledToFill()
-                .frame(width: 180, height: 180)
-                .hueRotation(.degrees(Double(index) * 12))
-                .saturation(0.80 + Double(index) * 0.05)
-
-            LinearGradient(
-                colors: [
-                    .clear,
-                    .black.opacity(0.48)
-                ],
-                startPoint: .center,
-                endPoint: .bottom
-            )
-
-            Text(item.name)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.white)
-                .lineLimit(2)
-                .padding(10)
-        }
-        .frame(width: 180, height: 180)
-        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 28, style: .continuous)
-                .stroke(.white.opacity(0.52), lineWidth: 1)
-        )
-    }
-
     private var userPromptText: String {
         if !message.trimmedText.isEmpty {
             return message.text
@@ -575,19 +494,27 @@ private struct OrderingMessageBubble: View {
         return "继续这个点菜话题。"
     }
 
-    private var assistantSummary: String {
-        let trimmed = message.trimmedText
-            .replacingOccurrences(of: "\n", with: " ")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
+    private var shouldHideAutoRecommendPromptBubble: Bool {
+        message.role == .user &&
+        !message.images.isEmpty &&
+        message.recommendations.isEmpty &&
+        message.trimmedText.hasPrefix("请根据菜单图片推荐")
+    }
+
+    private var recommendationIntroText: String {
+        let trimmed = message.trimmedText.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else {
             return "结合你的口味画像和菜单内容，先给你一组可直接下单的建议。"
         }
-        return String(trimmed.prefix(120))
+        return message.text
     }
 }
 
 @MainActor
 final class OrderingChatViewModel: ObservableObject {
+    // Temporary debug switch: bypass menu LLM and return fixed templates.
+    private static let menuChatDebugModeEnabled = true
+
     @Published var draftText: String = ""
     @Published var detailParams = OrderingDetailParams()
     @Published private(set) var messages: [OrderingChatMessage] = []
@@ -724,6 +651,21 @@ final class OrderingChatViewModel: ObservableObject {
         attachments = []
         errorBanner = nil
 
+        if Self.menuChatDebugModeEnabled {
+            let mock = Self.mockMenuTemplate(for: mode)
+            messages.append(
+                OrderingChatMessage(
+                    role: .assistant,
+                    text: mock.reply,
+                    recommendations: mock.recommendations,
+                    images: messageImages
+                )
+            )
+            trimMessagesIfNeeded()
+            persistSnapshot()
+            return
+        }
+
         isSending = true
         trimMessagesIfNeeded()
         persistSnapshot()
@@ -744,12 +686,12 @@ final class OrderingChatViewModel: ObservableObject {
                         role: .assistant,
                         text: result.reply,
                         recommendations: result.recommendations,
-                        images: []
+                        images: messageImages
                     )
                 )
             } catch {
                 let failure = "请求失败：\(error.localizedDescription)"
-                messages.append(OrderingChatMessage(role: .assistant, text: failure, recommendations: [], images: []))
+                messages.append(OrderingChatMessage(role: .assistant, text: failure, recommendations: [], images: messageImages))
                 errorBanner = failure
             }
 
@@ -834,6 +776,45 @@ final class OrderingChatViewModel: ObservableObject {
         )
     }
 
+    private static func mockMenuTemplate(for mode: MenuChatMode) -> (reply: String, recommendations: [MenuRecommendationItem]) {
+        switch mode {
+        case .chat:
+            return (
+                reply: "【调试模式】聊天接口已替换为固定回复。当前不调用 LLM，用于联调输入与消息流。",
+                recommendations: []
+            )
+        case .recommend:
+            let items = [
+                MenuRecommendationItem(name: "宫保鸡丁", originalName: "", reason: "口味均衡，先作为保守备选。", matchScore: 86, style: "保守备选"),
+                MenuRecommendationItem(name: "清炒时蔬", originalName: "", reason: "清淡解腻，和主菜搭配稳定。", matchScore: 82, style: "清爽搭配"),
+                MenuRecommendationItem(name: "黑椒牛柳", originalName: "", reason: "香气和口感更突出，适合作为主力菜。", matchScore: 84, style: "均衡"),
+                MenuRecommendationItem(name: "蒜蓉粉丝虾", originalName: "", reason: "鲜味明显，适合多人分食。", matchScore: 80, style: "分享菜"),
+                MenuRecommendationItem(name: "麻辣水煮鱼", originalName: "", reason: "风味更激进，作为冒险尝试。", matchScore: 76, style: "冒险尝试")
+            ]
+            return (
+                reply: "【调试模式】推荐接口已替换为固定模板。以下为 5 道固定示例菜品（含 1 个保守备选 + 1 个冒险尝试）。",
+                recommendations: items
+            )
+        }
+    }
+
+    private static func makeStoredSnapshotImage(from image: OrderingChatImage) -> OrderingChatSnapshot.StoredImage? {
+        let resized = image.previewImage.scaledDown(maxDimension: 320)
+        guard let jpeg = resized.jpegData(compressionQuality: 0.68) else { return nil }
+        return OrderingChatSnapshot.StoredImage(
+            id: image.id,
+            dataBase64: jpeg.base64EncodedString()
+        )
+    }
+
+    private static func makeSnapshotChatImage(from image: OrderingChatSnapshot.StoredImage) -> OrderingChatImage? {
+        guard let raw = Data(base64Encoded: image.dataBase64),
+              let preview = UIImage(data: raw) else {
+            return nil
+        }
+        return OrderingChatImage(id: image.id, previewImage: preview)
+    }
+
     private func trimMessagesIfNeeded() {
         guard messages.count > maxPersistedMessages else { return }
         messages = Array(messages.suffix(maxPersistedMessages))
@@ -846,7 +827,8 @@ final class OrderingChatViewModel: ObservableObject {
                     id: message.id,
                     role: message.role,
                     text: message.text,
-                    recommendations: message.recommendations
+                    recommendations: message.recommendations,
+                    images: message.images.compactMap(Self.makeStoredSnapshotImage(from:))
                 )
             },
             detailParams: detailParams,
@@ -868,7 +850,7 @@ final class OrderingChatViewModel: ObservableObject {
                 role: item.role,
                 text: item.text,
                 recommendations: item.recommendations,
-                images: []
+                images: item.images.compactMap(Self.makeSnapshotChatImage(from:))
             )
         }
         detailParams = snapshot.detailParams
@@ -878,11 +860,48 @@ final class OrderingChatViewModel: ObservableObject {
 }
 
 private struct OrderingChatSnapshot: Codable {
+    struct StoredImage: Codable {
+        let id: UUID
+        let dataBase64: String
+    }
+
     struct StoredMessage: Codable {
         let id: UUID
         let role: OrderingChatMessage.Role
         let text: String
         let recommendations: [MenuRecommendationItem]
+        let images: [StoredImage]
+
+        private enum CodingKeys: String, CodingKey {
+            case id
+            case role
+            case text
+            case recommendations
+            case images
+        }
+
+        init(
+            id: UUID,
+            role: OrderingChatMessage.Role,
+            text: String,
+            recommendations: [MenuRecommendationItem],
+            images: [StoredImage]
+        ) {
+            self.id = id
+            self.role = role
+            self.text = text
+            self.recommendations = recommendations
+            self.images = images
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: CodingKeys.self)
+            id = try container.decode(UUID.self, forKey: .id)
+            role = try container.decode(OrderingChatMessage.Role.self, forKey: .role)
+            text = try container.decode(String.self, forKey: .text)
+            recommendations = try container.decodeIfPresent([MenuRecommendationItem].self, forKey: .recommendations) ?? []
+            images = try container.decodeIfPresent([StoredImage].self, forKey: .images) ?? []
+        }
     }
 
     let messages: [StoredMessage]
@@ -953,6 +972,13 @@ struct OrderingChatMessage: Identifiable {
             return String("推荐结果：\(names)".prefix(300))
         }
         return ""
+    }
+
+    var isIntroGuideText: Bool {
+        role == .assistant &&
+        images.isEmpty &&
+        recommendations.isEmpty &&
+        text.hasPrefix("先上传菜单图片")
     }
 }
 
@@ -1131,6 +1157,7 @@ private extension UIImage {
 #Preview {
     OrderingChatView(
         selectedTab: .constant(.ordering),
-        viewModel: OrderingChatViewModel()
+        viewModel: OrderingChatViewModel(),
+        composerReservedBottomInset: 180
     )
 }

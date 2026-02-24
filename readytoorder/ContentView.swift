@@ -43,6 +43,11 @@ struct ContentView: View {
         orderingViewModel.attachments.isEmpty ? 80 : 200
     }
 
+    private var orderingChatBottomInset: CGFloat {
+        // Keep the latest chat bubble above the whole morphing bottom bar.
+        orderingExpandedHeight + 74
+    }
+
     var body: some View {
         ZStack {
             LinearGradient(
@@ -59,16 +64,23 @@ struct ContentView: View {
                 .opacity(selectedTab == .tasteLearning ? 1 : 0)
                 .allowsHitTesting(selectedTab == .tasteLearning)
                 .zIndex(selectedTab == .tasteLearning ? 1 : 0)
+                .animation(nil, value: selectedTab)
 
-            OrderingChatView(selectedTab: $selectedTab, viewModel: orderingViewModel)
+            OrderingChatView(
+                selectedTab: $selectedTab,
+                viewModel: orderingViewModel,
+                composerReservedBottomInset: orderingChatBottomInset
+            )
                 .opacity(selectedTab == .ordering ? 1 : 0)
                 .allowsHitTesting(selectedTab == .ordering)
                 .zIndex(selectedTab == .ordering ? 1 : 0)
+                .animation(nil, value: selectedTab)
 
             SettingsView()
                 .opacity(selectedTab == .settings ? 1 : 0)
                 .allowsHitTesting(selectedTab == .settings)
                 .zIndex(selectedTab == .settings ? 1 : 0)
+                .animation(nil, value: selectedTab)
         }
         .safeAreaInset(edge: .bottom, spacing: 0) {
             BottomMorphingTabBar(selectedTab: $selectedTab, expandedMaxHeight: orderingExpandedHeight) {
