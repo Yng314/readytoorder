@@ -29,19 +29,24 @@ struct TasteLearningView: View {
                 .ignoresSafeArea()
 
                 GeometryReader { proxy in
-                    let actionBottomPadding = max(80, proxy.safeAreaInsets.bottom + 50)
+                    let cardLift: CGFloat = 100
                     let availableWidth = max(0, proxy.size.width - 36)
                     let maxCardWidth = min(availableWidth, 360)
-                    let maxCardHeight = max(360, proxy.size.height - actionBottomPadding - 120)
+                    let maxCardHeight = max(360, proxy.size.height - 200)
                     let cardHeight = max(0, min(maxCardHeight, maxCardWidth * 1.5))
                     let cardWidth = cardHeight * (2.0 / 3.0)
+                    let cardBottomY = (proxy.size.height / 2.0) - (cardLift / 2.0) + (cardHeight / 2.0)
+                    let actionBottomPadding = max(
+                        18,
+                        (proxy.size.height - cardBottomY) / 2.0
+                    )
 
                     ZStack {
                         cardDeckSection(cardHeight: cardHeight)
                             .frame(width: cardWidth, height: cardHeight, alignment: .center)
                             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
                             .padding(.top, 0)
-                            .padding(.bottom, 100)
+                            .padding(.bottom, cardLift)
 
                         VStack(spacing: 0) {
                             HStack(spacing: 10) {

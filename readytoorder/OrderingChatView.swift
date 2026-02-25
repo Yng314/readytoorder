@@ -17,6 +17,7 @@ struct OrderingChatView: View {
     @State private var isShowingParams = false
     @State private var isShowingClearChatConfirm = false
     @State private var previewImageItem: OrderingPreviewImageItem?
+    private let edgeFadeHeight: CGFloat = 44
 
     var body: some View {
         NavigationStack {
@@ -165,6 +166,22 @@ struct OrderingChatView: View {
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 18)
+            }
+            .mask(alignment: .center) {
+                GeometryReader { proxy in
+                    let totalHeight = max(proxy.size.height, 1)
+                    let fade = min(edgeFadeHeight / totalHeight, 0.20)
+                    LinearGradient(
+                        stops: [
+                            .init(color: .clear, location: 0.0),
+                            .init(color: .black, location: fade),
+                            .init(color: .black, location: max(fade, 1.0 - fade)),
+                            .init(color: .clear, location: 1.0)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                }
             }
             .scrollDismissesKeyboard(.interactively)
             .onAppear {
