@@ -390,7 +390,7 @@ private struct OrderingMessageBubble: View {
 
     private var userPromptBubble: some View {
         Text(userPromptText)
-            .font(.title3.weight(.medium))
+            .font(.body.weight(.medium))
             .foregroundStyle(headlineColor.opacity(0.98))
             .lineLimit(4)
             .fixedSize(horizontal: false, vertical: true)
@@ -419,7 +419,7 @@ private struct OrderingMessageBubble: View {
 
             if !message.recommendations.isEmpty {
                 Text(recommendationIntroText)
-                    .font(.system(size: 25, weight: .bold, design: .rounded))
+                    .font(.body.weight(.bold))
                     .foregroundStyle(headlineColor)
                     .lineSpacing(3)
                     .fixedSize(horizontal: false, vertical: true)
