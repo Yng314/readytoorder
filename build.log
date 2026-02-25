@@ -1,191 +1,60 @@
-2026-02-24 18:33:13.883 xcodebuild[93712:7887673]  DVTFilePathFSEvents: Failed to start fs event stream.
-2026-02-24 18:33:14.619 xcodebuild[93712:7887670] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
-2026-02-24 18:33:15.087 xcodebuild[93712:7887674] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
-2026-02-24 18:33:15.087 xcodebuild[93712:7887674] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f4e303d0> { count = 1, transaction: 0, voucher = 0x0, contents =
+2026-02-25 18:29:04.876 xcodebuild[30405:8310280]  DVTFilePathFSEvents: Failed to start fs event stream.
+2026-02-25 18:29:05.115 xcodebuild[30405:8310273] [MT] DVTDeveloperPaths: Failed to get length of DARWIN_USER_CACHE_DIR from confstr(3), error = Error Domain=NSPOSIXErrorDomain Code=5 "Input/output error". Using NSCachesDirectory instead.
+2026-02-25 18:29:05.515 xcodebuild[30405:8310281] CoreSimulatorService connection became invalid.  Simulator services will no longer be available.
+2026-02-25 18:29:05.515 xcodebuild[30405:8310281] Logging connecton invalid: <OS_xpc_error: <dictionary: 0x1f4e303d0> { count = 1, transaction: 0, voucher = 0x0, contents =
 	"XPCErrorDescription" => <string: 0x1f4e30518> { string cache = 0x0, length = 18, contents = "Connection invalid" }
 }>
-2026-02-24 18:33:15.088 xcodebuild[93712:7887674] Error opening log file (/Users/young/Library/Logs/CoreSimulator/CoreSimulator.com.apple.dt.xcodebuild.log): Operation not permitted
+2026-02-25 18:29:05.516 xcodebuild[30405:8310281] Error opening log file (/Users/young/Library/Logs/CoreSimulator/CoreSimulator.com.apple.dt.xcodebuild.log): Operation not permitted
 [-[SimServiceContext sendRequest:]:1743] ERROR : Unable to deliver request ({
     "developer_dir" = "/Applications/Xcode.app/Contents/Developer";
     request = "set_developer_dir";
 }) because we are not connected to CoreSimulatorService.
 Command line invocation:
-    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme readytoorder -destination "generic/platform=iOS Simulator" -derivedDataPath /tmp/readytoorder_dd CODE_SIGNING_ALLOWED=NO build
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -scheme readytoorder -destination "generic/platform=iOS Simulator" build
 
-Build settings from command line:
-    CODE_SIGNING_ALLOWED = NO
-
-2026-02-24 18:33:15.154 xcodebuild[93712:7887670] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
+2026-02-25 18:29:05.574 xcodebuild[30405:8310273] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
 Details:  detectedTypeIdentifier (com.apple.binary-property-list) does not conform to matchedTypeIdentifier in MagicFileDataTypeDetector extenson com.apple.property-list. When both are specified, this conformance is required unless overridden by setting allowNonInheritance. extension.identifier:Xcode.MagicFileDataTypeDetector.BinaryPlist
-Object:   <DVTFileDataTypeDetectionMagicCache: 0x972fde2b0>
+Object:   <DVTFileDataTypeDetectionMagicCache: 0xa0a08f210>
 Method:   -initWithExtension:
-Thread:   <_NSMainThread: 0x104d76350>{number = 1, name = main}
+Thread:   <_NSMainThread: 0x10176a3d0>{number = 1, name = main}
 Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
-2026-02-24 18:33:15.156 xcodebuild[93712:7887670] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
+2026-02-25 18:29:05.576 xcodebuild[30405:8310273] [MT] DVTAssertions: Warning in DVTFrameworks/DVTFoundation/FileTypes/DVTFileDataTypeDetection.m:79
 Details:  detectedTypeIdentifier (com.apple.xml-property-list) does not conform to matchedTypeIdentifier in MagicFileDataTypeDetector extenson com.apple.property-list. When both are specified, this conformance is required unless overridden by setting allowNonInheritance. extension.identifier:Xcode.MagicFileDataTypeDetector.XMLPlist
-Object:   <DVTFileDataTypeDetectionMagicCache: 0x972fdf870>
+Object:   <DVTFileDataTypeDetectionMagicCache: 0xa0abd1440>
 Method:   -initWithExtension:
-Thread:   <_NSMainThread: 0x104d76350>{number = 1, name = main}
+Thread:   <_NSMainThread: 0x10176a3d0>{number = 1, name = main}
 Please file a bug at https://feedbackassistant.apple.com with this warning message and any useful information you can provide.
 [-[SimServiceContext initWithDeveloperDir:connectionType:error:]:450] WARN  : Unable to discover any Simulator runtimes. Developer Directory is /Applications/Xcode.app/Contents/Developer.
 [-[SimDiskImageManager init]:175] ERROR : Could not kickstart simdiskimaged; SimDiskImageManager services will not be available: Error Domain=NSPOSIXErrorDomain Code=53 "Software caused connection abort" UserInfo={NSLocalizedDescription=Error returned in reply from CoreSimulatorService: Connection invalid}
 [-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
-[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:486] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=410 "The service used to manage runtime disk images (simdiskimaged) crashed or is not responding" UserInfo={NSLocalizedDescription=The service used to manage runtime disk images (simdiskimaged) crashed or is not responding}
-[-[SimDiskImageManager _onQueue_checkConnection:]:239] ERROR : simdiskimaged returned error (invalid), marking disconnected.
+[-[SimDiskImageManager _onQueue_checkConnection:]:219] ERROR : simdiskimaged connection is currently unavailable because connection became invalid
+[-[SimServiceContext initWithDeveloperDir:connectionType:error:]_block_invoke:486] ERROR : Could not get list of trusted mount directories: Error Domain=com.apple.CoreSimulator.SimError Code=409 "Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded" UserInfo={NSLocalizedDescription=Cannot talk to the service used to manage runtime disk images (simdiskimaged) because its launchd job is not registered or was unloaded}
 [-[SimServiceContext sendRequest:reply:error:]:1763] ERROR : Unable to deliver request ({
     request = "notification_subscription";
     "set_path" = "/Users/young/Library/Developer/CoreSimulator/Devices";
 }) because we are not connected to CoreSimulatorService.
-2026-02-24 18:33:15.172 xcodebuild[93712:7887673] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+2026-02-25 18:29:05.639 xcodebuild[30405:8310280] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
 [-[SimServiceContext sendRequest:reply:error:]:1763] ERROR : Unable to deliver request ({
     request = "notification_subscription";
     "set_path" = "/Users/young/Library/Developer/CoreSimulator/Devices";
 }) because we are not connected to CoreSimulatorService.
-2026-02-24 18:33:15.174 xcodebuild[93712:7887673]  IDESimulatorAvailability: startObservingSimulatorUpdates() FAILED to register SimDeviceSet observer
-2026-02-24 18:33:15.174 xcodebuild[93712:7888562] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
-2026-02-24 18:33:15.175 xcodebuild[93712:7888562]  iOSSimulator: [SimServiceContext defaultDeviceSetWithError:] returned nil (Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0x972ff5ce0 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}). Simulator device support disabled.
-2026-02-24 18:33:15.240 xcodebuild[93712:7887674]  DVTProvisioningProfileManager: Failed to load profile "/Users/young/Library/Developer/Xcode/UserData/Provisioning Profiles/56a48496-b44a-45f2-9f28-0ad9c3408827.mobileprovision" (Error Domain=DVTProvisioningProfileProviderErrorDomain Code=1 "Failed to load profile." UserInfo={NSLocalizedDescription=Failed to load profile., NSLocalizedRecoverySuggestion=Profile is missing the required UUID property.})
-2026-02-24 18:33:15.439 xcodebuild[93712:7887670] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
-ComputePackagePrebuildTargetDependencyGraph
-
-Prepare packages
-
-CreateBuildRequest
-
-SendProjectDescription
-
-CreateBuildOperation
-
-ComputeTargetDependencyGraph
-note: Building targets in dependency order
-note: Target dependency graph (1 target)
-    Target 'readytoorder' in project 'readytoorder' (no dependencies)
-
-GatherProvisioningInputs
-
-CreateBuildDescription
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -x c -c /dev/null
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/young/Coding/development/readytoorder/readytoorder/Assets.xcassets
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
-
-ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
-
-Build description signature: 69d9aaeee88ffc2d171df612702d05b6
-Build description path: /tmp/readytoorder_dd/Build/Intermediates.noindex/XCBuildData/69d9aaeee88ffc2d171df612702d05b6.xcbuilddata
-ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
-    cd /Users/young/Coding/development/readytoorder/readytoorder.xcodeproj
-    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -o /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache
-Failed to create FS event stream. Considering the cache up-to-date.
-
-CompileAssetCatalogVariant thinned /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/readytoorder.app /Users/young/Coding/development/readytoorder/readytoorder/Assets.xcassets (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    /Applications/Xcode.app/Contents/Developer/usr/bin/actool /Users/young/Coding/development/readytoorder/readytoorder/Assets.xcassets --compile /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/assetcatalog_output/thinned --output-format human-readable-text --notices --warnings --export-dependency-info /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/assetcatalog_dependencies_thinned --output-partial-info-plist /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/assetcatalog_generated_info.plist_thinned --app-icon AppIcon --accent-color AccentColor --compress-pngs --enable-on-demand-resources YES --development-region en --target-device iphone --target-device ipad --minimum-deployment-target 26.2 --platform iphonesimulator
-
-SwiftDriver readytoorder normal x86_64 com.apple.xcode.tools.swift.compiler (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name readytoorder -Onone -enforce-exclusivity\=checked @/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target x86_64-apple-ios26.2-simulator -g -module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/readytoorder_dd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -F /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/readytoorder_dd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -sdk-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/readytoorder_dd/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-generated-files.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-own-target-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-project-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources-normal/x86_64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/x86_64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/x86_64/readytoorder-Swift.h -working-directory /Users/young/Coding/development/readytoorder -experimental-emit-module-separately -disable-cmo
-
-SwiftDriver readytoorder normal arm64 com.apple.xcode.tools.swift.compiler (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name readytoorder -Onone -enforce-exclusivity\=checked @/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -target arm64-apple-ios26.2-simulator -g -module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -Xfrontend -serialize-debugging-options -enable-testing -index-store-path /tmp/readytoorder_dd/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -F /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64 -c -j10 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -output-file-map /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /tmp/readytoorder_dd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -sdk-module-cache-path /tmp/readytoorder_dd/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.swiftmodule -validate-clang-modules-once -clang-build-session-file /tmp/readytoorder_dd/ModuleCache.noindex/Session.modulevalidation -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder_const_extract_protocols.json -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-generated-files.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-own-target-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-project-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources-normal/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-Swift.h -working-directory /Users/young/Coding/development/readytoorder -experimental-emit-module-separately -disable-cmo
-
-SwiftCompile normal arm64 Compiling\ readytoorderApp.swift /Users/young/Coding/development/readytoorder/readytoorder/readytoorderApp.swift (in target 'readytoorder' from project 'readytoorder')
-
-SwiftCompile normal arm64 /Users/young/Coding/development/readytoorder/readytoorder/readytoorderApp.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftCompile normal arm64 Compiling\ PillBarTestView.swift /Users/young/Coding/development/readytoorder/readytoorder/PillBarTestView.swift (in target 'readytoorder' from project 'readytoorder')
-sandbox-exec: sandbox_apply: Operation not permitted
-
-SwiftCompile normal arm64 /Users/young/Coding/development/readytoorder/readytoorder/PillBarTestView.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftCompile normal arm64 Compiling\ ContentView.swift /Users/young/Coding/development/readytoorder/readytoorder/ContentView.swift (in target 'readytoorder' from project 'readytoorder')
-sandbox-exec: sandbox_apply: Operation not permitted
-
-SwiftCompile normal arm64 /Users/young/Coding/development/readytoorder/readytoorder/ContentView.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftCompile normal arm64 Compiling\ TasteLearningView.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteLearningView.swift (in target 'readytoorder' from project 'readytoorder')
-sandbox-exec: sandbox_apply: Operation not permitted
-
-SwiftCompile normal arm64 /Users/young/Coding/development/readytoorder/readytoorder/TasteLearningView.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftCompile normal arm64 Compiling\ GeneratedAssetSymbols.swift /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'readytoorder' from project 'readytoorder')
-
-SwiftCompile normal arm64 /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftCompile normal arm64 Compiling\ TasteTrainerViewModel.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteTrainerViewModel.swift (in target 'readytoorder' from project 'readytoorder')
-
-SwiftCompile normal arm64 /Users/young/Coding/development/readytoorder/readytoorder/TasteTrainerViewModel.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftEmitModule normal arm64 Emitting\ module\ for\ readytoorder (in target 'readytoorder' from project 'readytoorder')
-sandbox-exec: sandbox_apply: Operation not permitted
-Failed frontend command:
-/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -emit-module -experimental-skip-non-inlinable-function-bodies-without-types /Users/young/Coding/development/readytoorder/readytoorder/ContentView.swift /Users/young/Coding/development/readytoorder/readytoorder/OrderingChatView.swift /Users/young/Coding/development/readytoorder/readytoorder/PillBarTestView.swift /Users/young/Coding/development/readytoorder/readytoorder/readytoorderApp.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteBackendClient.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteLearningView.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteModels.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteTrainerViewModel.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteTrainingEngine.swift /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/GeneratedAssetSymbols.swift -target arm64-apple-ios26.2-simulator -module-can-import-version DeveloperToolsSupport 23.0.4 23.0.4 -module-can-import-version SwiftUI 7.2.5.1 7.2.5 -module-can-import-version UIKit 9126.2.4.1 9126.2.4 -disable-cross-import-overlay-search -swift-module-cross-import PhotosUI /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/PhotosUI.framework/Modules/PhotosUI.swiftcrossimport/SwiftUI.swiftoverlay -swift-module-cross-import PhotosUI /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator.sdk/System/Library/Frameworks/PhotosUI.framework/Modules/PhotosUI.swiftcrossimport/WidgetKit.swiftoverlay -swift-module-cross-import PhotosUI /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/System/Library/Frameworks/PhotosUI.framework/Modules/PhotosUI.swiftcrossimport/SwiftUI.swiftoverlay -swift-module-cross-import PhotosUI /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk/System/Library/Frameworks/PhotosUI.framework/Modules/PhotosUI.swiftcrossimport/WidgetKit.swiftoverlay -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-dependencies-2.json -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.2.sdk -I /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -F /tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=5 -module-cache-path /tmp/readytoorder_dd/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder_const_extract_protocols.json -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -default-isolation\=MainActor -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /tmp/readytoorder_dd/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/young/Coding/development/readytoorder -enable-anonymous-context-mangled-names -file-compilation-dir /Users/young/Coding/development/readytoorder -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /tmp/readytoorder_dd/SDKStatCaches.noindex/iphonesimulator26.2-23C53-7d00a8b37fbd7999ea79df8ebc024bf0.sdkstatcache -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/swift-overrides.hmap -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-generated-files.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-own-target-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-all-target-headers.hmap -Xcc -iquote -Xcc /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/readytoorder-project-headers.hmap -Xcc -I/tmp/readytoorder_dd/Build/Products/Debug-iphonesimulator/include -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources-normal/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources/arm64 -Xcc -I/tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name readytoorder -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.2 -target-sdk-name iphonesimulator26.2 -clang-target arm64-apple-ios26.2-simulator -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -emit-module-doc-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.swiftdoc -emit-module-source-info-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.swiftsourceinfo -emit-objc-header-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-Swift.h -serialize-diagnostics-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-primary-emit-module.dia -emit-dependencies-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder-primary-emit-module.d -o /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.swiftmodule -emit-abi-descriptor-path /tmp/readytoorder_dd/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorder.build/Objects-normal/arm64/readytoorder.abi.json
-
-EmitSwiftModule normal arm64 (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-/Users/young/Coding/development/readytoorder/readytoorder/ContentView.swift:623:1: error: external macro implementation type 'PreviewsMacros.SwiftUIView' could not be found for macro 'Preview(_:body:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
-#Preview {
-^
-SwiftUI.Preview:2:41: note: 'Preview(_:body:)' declared here
-@freestanding(declaration) public macro Preview(_ name: String? = nil, @ViewBuilder body: @escaping @MainActor () -> any View) = #externalMacro(module: "PreviewsMacros", type: "SwiftUIView")
-                                        ^
-/Users/young/Coding/development/readytoorder/readytoorder/OrderingChatView.swift:1215:1: error: external macro implementation type 'PreviewsMacros.SwiftUIView' could not be found for macro 'Preview(_:body:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
-#Preview {
-^
-SwiftUI.Preview:2:41: note: 'Preview(_:body:)' declared here
-@freestanding(declaration) public macro Preview(_ name: String? = nil, @ViewBuilder body: @escaping @MainActor () -> any View) = #externalMacro(module: "PreviewsMacros", type: "SwiftUIView")
-                                        ^
-/Users/young/Coding/development/readytoorder/readytoorder/PillBarTestView.swift:286:1: error: external macro implementation type 'PreviewsMacros.SwiftUIView' could not be found for macro 'Preview(_:body:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
-#Preview {
-^
-SwiftUI.Preview:2:41: note: 'Preview(_:body:)' declared here
-@freestanding(declaration) public macro Preview(_ name: String? = nil, @ViewBuilder body: @escaping @MainActor () -> any View) = #externalMacro(module: "PreviewsMacros", type: "SwiftUIView")
-                                        ^
-/Users/young/Coding/development/readytoorder/readytoorder/TasteLearningView.swift:763:1: error: external macro implementation type 'PreviewsMacros.SwiftUIView' could not be found for macro 'Preview(_:body:)'; '/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server' produced malformed response
-#Preview {
-^
-SwiftUI.Preview:2:41: note: 'Preview(_:body:)' declared here
-@freestanding(declaration) public macro Preview(_ name: String? = nil, @ViewBuilder body: @escaping @MainActor () -> any View) = #externalMacro(module: "PreviewsMacros", type: "SwiftUIView")
-                                        ^
-
-SwiftCompile normal arm64 Compiling\ OrderingChatView.swift /Users/young/Coding/development/readytoorder/readytoorder/OrderingChatView.swift (in target 'readytoorder' from project 'readytoorder')
-sandbox-exec: sandbox_apply: Operation not permitted
-
-SwiftCompile normal arm64 /Users/young/Coding/development/readytoorder/readytoorder/OrderingChatView.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftCompile normal arm64 Compiling\ TasteModels.swift /Users/young/Coding/development/readytoorder/readytoorder/TasteModels.swift (in target 'readytoorder' from project 'readytoorder')
-
-SwiftCompile normal arm64 /Users/young/Coding/development/readytoorder/readytoorder/TasteModels.swift (in target 'readytoorder' from project 'readytoorder')
-    cd /Users/young/Coding/development/readytoorder
-    
-
-SwiftEmitModule normal x86_64 Emitting\ module\ for\ readytoorder (in target 'readytoorder' from project 'readytoorder')
+2026-02-25 18:29:05.641 xcodebuild[30405:8310321] Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}
+2026-02-25 18:29:05.641 xcodebuild[30405:8310280]  IDESimulatorAvailability: startObservingSimulatorUpdates() FAILED to register SimDeviceSet observer
+2026-02-25 18:29:05.641 xcodebuild[30405:8310321]  iOSSimulator: [SimServiceContext defaultDeviceSetWithError:] returned nil (Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedFailureReason=Failed to subscribe to notifications from CoreSimulatorService., NSLocalizedDescription=Failed to initialize simulator device set., NSUnderlyingError=0xa0a6f67f0 {Error Domain=NSPOSIXErrorDomain Code=61 "Connection refused" UserInfo={NSLocalizedDescription=CoreSimulatorService connection became invalid.  Simulator services will no longer be available.}}}). Simulator device support disabled.
+2026-02-25 18:29:05.648 xcodebuild[30405:8310322]  DVTProvisioningProfileManager: Failed to load profile "/Users/young/Library/Developer/Xcode/UserData/Provisioning Profiles/56a48496-b44a-45f2-9f28-0ad9c3408827.mobileprovision" (Error Domain=DVTProvisioningProfileProviderErrorDomain Code=1 "Failed to load profile." UserInfo={NSLocalizedDescription=Failed to load profile., NSLocalizedRecoverySuggestion=Profile is missing the required UUID property.})
+2026-02-25 18:29:05.680 xcodebuild[30405:8310321]  IDELogStore: Unable to remove item at path /Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq/Logs/Launch/Run-readytoorder-2026.02.25_18-11-45-+0000.xcresult: Error Domain=NSCocoaErrorDomain Code=513 "“Run-readytoorder-2026.02.25_18-11-45-+0000.xcresult” couldn’t be removed because you don’t have permission to access it." UserInfo={NSUserStringVariant=(
+    Remove
+), NSFilePath=/Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq/Logs/Launch/Run-readytoorder-2026.02.25_18-11-45-+0000.xcresult, NSURL=file:///Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq/Logs/Launch/Run-readytoorder-2026.02.25_18-11-45-+0000.xcresult, NSUnderlyingError=0xa09ce9ce0 {Error Domain=NSPOSIXErrorDomain Code=1 "Operation not permitted"}}
+2026-02-25 18:29:05.681 xcodebuild[30405:8310321]  IDELogStore: Unable to remove item at path /Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq/Logs/Launch/Run-readytoorder-2026.02.24_03-00-02-+0100.xcresult: Error Domain=NSCocoaErrorDomain Code=513 "“Run-readytoorder-2026.02.24_03-00-02-+0100.xcresult” couldn’t be removed because you don’t have permission to access it." UserInfo={NSUserStringVariant=(
+    Remove
+), NSFilePath=/Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq/Logs/Launch/Run-readytoorder-2026.02.24_03-00-02-+0100.xcresult, NSURL=file:///Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq/Logs/Launch/Run-readytoorder-2026.02.24_03-00-02-+0100.xcresult, NSUnderlyingError=0xa09ce9f80 {Error Domain=NSPOSIXErrorDomain Code=1 "Operation not permitted"}}
+2026-02-25 18:29:05.815 xcodebuild[30405:8310273] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+Build Preparation
+Couldn't create workspace arena folder '/Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq': Unable to write to info file '<DVTFilePath:0xa0a7cad00:'/Users/young/Library/Developer/Xcode/DerivedData/readytoorder-cjeonfgvyvwicdfkficscndmjuhq/info.plist'>'.
 
 ** BUILD FAILED **
 
 
 The following build commands failed:
-	SwiftEmitModule normal arm64 Emitting\ module\ for\ readytoorder (in target 'readytoorder' from project 'readytoorder')
-	EmitSwiftModule normal arm64 (in target 'readytoorder' from project 'readytoorder')
 	Building project readytoorder with scheme readytoorder
-(3 failures)
+(1 failure)

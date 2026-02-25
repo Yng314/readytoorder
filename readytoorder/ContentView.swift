@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Photos
+import PhotosUI
 import UIKit
 import Combine
 
@@ -51,9 +52,11 @@ struct ContentView: View {
     @StateObject private var recentPhotosModel = OrderingRecentPhotosModel()
     @State private var isShowingDrawerCamera = false
     @State private var isShowingDrawerCameraUnavailableAlert = false
+    @State private var drawerPhotoPickerItems: [PhotosPickerItem] = []
+    @State private var isShowingDrawerPhotoPicker = false
 
     private var orderingExpandedHeight: CGFloat {
-        orderingViewModel.attachments.isEmpty ? 80 : 112
+        orderingViewModel.attachments.isEmpty ? 80.0 : 112.0
     }
 
     private var orderingBarCornerRadius: CGFloat {
@@ -84,6 +87,10 @@ struct ContentView: View {
                 }
             }
         }
+    }
+
+    private func openAllPhotosPicker() {
+        isShowingDrawerPhotoPicker = true
     }
 
     var body: some View {
@@ -156,7 +163,8 @@ struct ContentView: View {
                         isLoading: recentPhotosModel.isLoading,
                         canAddMore: orderingViewModel.remainingAttachmentSlots > 0,
                         onTapCamera: openDrawerCamera,
-                        onTapRecentPhoto: addRecentPhoto
+                        onTapRecentPhoto: addRecentPhoto,
+                        onTapAllPhotos: openAllPhotosPicker
                     )
                         .offset(y: isAttachmentDrawerPresented ? 0 : 340)
                         .opacity(isAttachmentDrawerPresented ? 1.0 : 0.001)
@@ -181,6 +189,24 @@ struct ContentView: View {
         } message: {
             Text("请改用相册上传菜单图片。")
         }
+        .photosPicker(
+            isPresented: $isShowingDrawerPhotoPicker,
+            selection: $drawerPhotoPickerItems,
+            maxSelectionCount: max(1, orderingViewModel.remainingAttachmentSlots),
+            matching: .images
+        )
+        .onChange(of: drawerPhotoPickerItems) { _, newItems in
+            guard !newItems.isEmpty else { return }
+            Task {
+                await orderingViewModel.ingestPhotoPickerItems(newItems)
+                await MainActor.run {
+                    drawerPhotoPickerItems = []
+                    withAnimation(.spring(response: 0.30, dampingFraction: 0.86)) {
+                        isAttachmentDrawerPresented = false
+                    }
+                }
+            }
+        }
         .onChange(of: isAttachmentDrawerPresented) { _, isPresented in
             guard selectedTab == .ordering else { return }
             if isPresented {
@@ -202,8 +228,9 @@ private struct OrderingAttachmentDrawerCard: View {
     let canAddMore: Bool
     let onTapCamera: () -> Void
     let onTapRecentPhoto: (OrderingRecentPhotoTile) -> Void
+    let onTapAllPhotos: () -> Void
 
-    private let squareSize: CGFloat = 72
+    private let squareSize: CGFloat = 90
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -215,10 +242,22 @@ private struct OrderingAttachmentDrawerCard: View {
             .frame(maxWidth: .infinity)
             .padding(.top, 8)
 
-            Text("添加菜单图片")
+            HStack(spacing: 10) {
+                Text("添加菜单图片")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+
+                Spacer()
+
+                Button("全部照片") {
+                    onTapAllPhotos()
+                }
+                .buttonStyle(.plain)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
-                .padding(.top, 2)
+                .foregroundStyle(Color.blue)
+                .disabled(!canAddMore)
+            }
+            .padding(.top, 8)
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
@@ -248,6 +287,7 @@ private struct OrderingAttachmentDrawerCard: View {
                 }
                 .padding(.horizontal, 2)
             }
+            .padding(.top, 10)
         }
         .padding(.horizontal, 18)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -459,7 +499,7 @@ struct BottomMorphingTabBar<ExpandedContent: View>: View {
     @ViewBuilder var expandedContent: () -> ExpandedContent
 
     private var expandProgress: CGFloat {
-        selectedTab == .ordering ? 1 : 0
+        selectedTab == .ordering ? 1.0 : 0.0
     }
 
     private var containerRadius: CGFloat {
