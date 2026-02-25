@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+import Photos
+import UIKit
+import Combine
 
 private enum BottomBarLayout {
     static let collapsedCornerRadius: CGFloat = 30
@@ -45,6 +48,9 @@ struct ContentView: View {
     @State private var selectedTab: AppTab = .tasteLearning
     @StateObject private var orderingViewModel = OrderingChatViewModel()
     @State private var isAttachmentDrawerPresented = false
+    @StateObject private var recentPhotosModel = OrderingRecentPhotosModel()
+    @State private var isShowingDrawerCamera = false
+    @State private var isShowingDrawerCameraUnavailableAlert = false
 
     private var orderingExpandedHeight: CGFloat {
         orderingViewModel.attachments.isEmpty ? 80 : 112
@@ -57,6 +63,27 @@ struct ContentView: View {
     private var orderingChatBottomInset: CGFloat {
         // Keep the latest chat bubble above the whole morphing bottom bar.
         orderingExpandedHeight + 74
+    }
+
+    private func openDrawerCamera() {
+        if UIImagePickerController.isSourceTypeAvailable(.camera) {
+            isShowingDrawerCamera = true
+        } else {
+            isShowingDrawerCameraUnavailableAlert = true
+        }
+    }
+
+    private func addRecentPhoto(_ tile: OrderingRecentPhotoTile) {
+        guard orderingViewModel.remainingAttachmentSlots > 0 else { return }
+        Task {
+            guard let data = await recentPhotosModel.loadImageData(for: tile.asset) else { return }
+            await MainActor.run {
+                orderingViewModel.ingestPhotoLibraryData(data)
+                withAnimation(.spring(response: 0.30, dampingFraction: 0.86)) {
+                    isAttachmentDrawerPresented = false
+                }
+            }
+        }
     }
 
     var body: some View {
@@ -124,7 +151,13 @@ struct ContentView: View {
                             }
                         }
 
-                    OrderingAttachmentDrawerCard()
+                    OrderingAttachmentDrawerCard(
+                        tiles: recentPhotosModel.tiles,
+                        isLoading: recentPhotosModel.isLoading,
+                        canAddMore: orderingViewModel.remainingAttachmentSlots > 0,
+                        onTapCamera: openDrawerCamera,
+                        onTapRecentPhoto: addRecentPhoto
+                    )
                         .offset(y: isAttachmentDrawerPresented ? 0 : 340)
                         .opacity(isAttachmentDrawerPresented ? 1.0 : 0.001)
                         .allowsHitTesting(isAttachmentDrawerPresented)
@@ -132,6 +165,28 @@ struct ContentView: View {
                 .ignoresSafeArea(edges: .bottom)
                 .zIndex(40)
                 .animation(.spring(response: 0.34, dampingFraction: 0.86), value: isAttachmentDrawerPresented)
+            }
+        }
+        .sheet(isPresented: $isShowingDrawerCamera) {
+            OrderingDrawerCameraCaptureSheet { image in
+                orderingViewModel.ingestCameraImage(image)
+                withAnimation(.spring(response: 0.30, dampingFraction: 0.86)) {
+                    isAttachmentDrawerPresented = false
+                }
+            }
+            .ignoresSafeArea()
+        }
+        .alert("当前设备不支持拍照", isPresented: $isShowingDrawerCameraUnavailableAlert) {
+            Button("知道了", role: .cancel) {}
+        } message: {
+            Text("请改用相册上传菜单图片。")
+        }
+        .onChange(of: isAttachmentDrawerPresented) { _, isPresented in
+            guard selectedTab == .ordering else { return }
+            if isPresented {
+                Task {
+                    await recentPhotosModel.loadRecentTiles(limit: 18)
+                }
             }
         }
         .onChange(of: selectedTab) { _, _ in
@@ -142,8 +197,16 @@ struct ContentView: View {
 }
 
 private struct OrderingAttachmentDrawerCard: View {
+    let tiles: [OrderingRecentPhotoTile]
+    let isLoading: Bool
+    let canAddMore: Bool
+    let onTapCamera: () -> Void
+    let onTapRecentPhoto: (OrderingRecentPhotoTile) -> Void
+
+    private let squareSize: CGFloat = 72
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 10) {
             HStack {
                 Capsule(style: .continuous)
                     .fill(.white.opacity(0.70))
@@ -156,6 +219,35 @@ private struct OrderingAttachmentDrawerCard: View {
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
                 .padding(.top, 2)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 10) {
+                    cameraTile
+
+                    if isLoading && tiles.isEmpty {
+                        loadingTile
+                    } else {
+                        ForEach(tiles) { tile in
+                            Button {
+                                onTapRecentPhoto(tile)
+                            } label: {
+                                Image(uiImage: tile.thumbnail)
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: squareSize, height: squareSize)
+                                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                            .stroke(.white.opacity(0.72), lineWidth: 1)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(!canAddMore)
+                        }
+                    }
+                }
+                .padding(.horizontal, 2)
+            }
         }
         .padding(.horizontal, 18)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -174,6 +266,187 @@ private struct OrderingAttachmentDrawerCard: View {
             )
             .stroke(.white.opacity(0.76), lineWidth: 1)
         )
+    }
+
+    private var cameraTile: some View {
+        Button(action: onTapCamera) {
+            VStack(spacing: 6) {
+                Image(systemName: "camera.fill")
+                    .font(.system(size: 20, weight: .semibold))
+                Text("拍照")
+                    .font(.caption2.weight(.semibold))
+            }
+            .foregroundStyle(Color(red: 0.30, green: 0.29, blue: 0.36))
+            .frame(width: squareSize, height: squareSize)
+            .background(.white.opacity(0.66), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(.white.opacity(0.76), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+    }
+
+    private var loadingTile: some View {
+        VStack(spacing: 6) {
+            ProgressView()
+                .controlSize(.small)
+            Text("读取中")
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+        }
+        .frame(width: squareSize, height: squareSize)
+        .background(.white.opacity(0.66), in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(.white.opacity(0.76), lineWidth: 1)
+        )
+    }
+}
+
+private struct OrderingRecentPhotoTile: Identifiable {
+    let id: String
+    let asset: PHAsset
+    let thumbnail: UIImage
+}
+
+@MainActor
+private final class OrderingRecentPhotosModel: ObservableObject {
+    @Published private(set) var tiles: [OrderingRecentPhotoTile] = []
+    @Published private(set) var isLoading = false
+
+    private let imageManager = PHCachingImageManager()
+    private let isRunningInPreview = ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == "1"
+
+    func loadRecentTiles(limit: Int) async {
+        if isRunningInPreview {
+            tiles = []
+            return
+        }
+
+        let status = await resolveAuthorizationStatus()
+        guard status == .authorized || status == .limited else {
+            tiles = []
+            return
+        }
+
+        isLoading = true
+        defer { isLoading = false }
+
+        let assets = fetchRecentAssets(limit: limit)
+        var loaded: [OrderingRecentPhotoTile] = []
+        loaded.reserveCapacity(assets.count)
+
+        for asset in assets {
+            if let thumbnail = await requestThumbnail(for: asset, targetSize: CGSize(width: 220, height: 220)) {
+                loaded.append(OrderingRecentPhotoTile(id: asset.localIdentifier, asset: asset, thumbnail: thumbnail))
+            }
+        }
+        tiles = loaded
+    }
+
+    func loadImageData(for asset: PHAsset) async -> Data? {
+        if isRunningInPreview {
+            return nil
+        }
+        return await withCheckedContinuation { continuation in
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .highQualityFormat
+            options.resizeMode = .none
+            options.isNetworkAccessAllowed = true
+            options.isSynchronous = false
+
+            imageManager.requestImageDataAndOrientation(for: asset, options: options) { data, _, _, _ in
+                continuation.resume(returning: data)
+            }
+        }
+    }
+
+    private func resolveAuthorizationStatus() async -> PHAuthorizationStatus {
+        let current = PHPhotoLibrary.authorizationStatus(for: .readWrite)
+        if current != .notDetermined {
+            return current
+        }
+        return await withCheckedContinuation { continuation in
+            PHPhotoLibrary.requestAuthorization(for: .readWrite) { status in
+                continuation.resume(returning: status)
+            }
+        }
+    }
+
+    private func fetchRecentAssets(limit: Int) -> [PHAsset] {
+        let options = PHFetchOptions()
+        options.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+        options.fetchLimit = max(1, limit)
+
+        let fetchResult = PHAsset.fetchAssets(with: .image, options: options)
+        var assets: [PHAsset] = []
+        assets.reserveCapacity(fetchResult.count)
+        fetchResult.enumerateObjects { asset, _, _ in
+            assets.append(asset)
+        }
+        return assets
+    }
+
+    private func requestThumbnail(for asset: PHAsset, targetSize: CGSize) async -> UIImage? {
+        await withCheckedContinuation { continuation in
+            let options = PHImageRequestOptions()
+            options.deliveryMode = .fastFormat
+            options.resizeMode = .fast
+            options.isNetworkAccessAllowed = true
+            options.isSynchronous = false
+
+            imageManager.requestImage(
+                for: asset,
+                targetSize: targetSize,
+                contentMode: .aspectFill,
+                options: options
+            ) { image, _ in
+                continuation.resume(returning: image)
+            }
+        }
+    }
+}
+
+private struct OrderingDrawerCameraCaptureSheet: UIViewControllerRepresentable {
+    let onCapture: (UIImage) -> Void
+    @Environment(\.dismiss) private var dismiss
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(parent: self)
+    }
+
+    func makeUIViewController(context: Context) -> UIImagePickerController {
+        let picker = UIImagePickerController()
+        picker.sourceType = .camera
+        picker.cameraCaptureMode = .photo
+        picker.delegate = context.coordinator
+        picker.allowsEditing = false
+        return picker
+    }
+
+    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
+
+    final class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
+        private let parent: OrderingDrawerCameraCaptureSheet
+
+        init(parent: OrderingDrawerCameraCaptureSheet) {
+            self.parent = parent
+        }
+
+        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+            parent.dismiss()
+        }
+
+        func imagePickerController(
+            _ picker: UIImagePickerController,
+            didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
+        ) {
+            if let image = info[.originalImage] as? UIImage {
+                parent.onCapture(image)
+            }
+            parent.dismiss()
+        }
     }
 }
 

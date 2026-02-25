@@ -646,6 +646,10 @@ final class OrderingChatViewModel: ObservableObject {
         ingestRawImageData(data)
     }
 
+    func ingestPhotoLibraryData(_ data: Data) {
+        ingestRawImageData(data)
+    }
+
     func removeAttachment(id: UUID) {
         attachments.removeAll { $0.id == id }
         persistSnapshot()
