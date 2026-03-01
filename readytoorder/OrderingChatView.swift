@@ -341,7 +341,7 @@ struct OrderingComposerPanel: View {
                         Image(uiImage: attachment.previewImage)
                             .resizable()
                             .scaledToFill()
-                            .frame(width: 84, height: 200)
+                            .frame(width: 84, height: 84)
                             .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 22, style: .continuous)

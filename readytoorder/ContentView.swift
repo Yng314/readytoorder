@@ -55,8 +55,22 @@ struct ContentView: View {
     @State private var drawerPhotoPickerItems: [PhotosPickerItem] = []
     @State private var isShowingDrawerPhotoPicker = false
 
+    private var composerLineCount: Int {
+        let normalized = orderingViewModel.draftText.replacingOccurrences(of: "\r\n", with: "\n")
+        guard !normalized.isEmpty else { return 1 }
+
+        let explicitLines = normalized.split(separator: "\n", omittingEmptySubsequences: false).count
+        let wrappedApproxLines = Int(ceil(Double(normalized.count) / 20.0))
+        return min(4, max(1, max(explicitLines, wrappedApproxLines)))
+    }
+
+    private var composerExtraHeight: CGFloat {
+        CGFloat(max(0, composerLineCount - 1) * 18)
+    }
+
     private var orderingExpandedHeight: CGFloat {
-        orderingViewModel.attachments.isEmpty ? 80.0 : 112.0
+        let baseHeight: CGFloat = orderingViewModel.attachments.isEmpty ? 84.0 : 176.0
+        return baseHeight + composerExtraHeight
     }
 
     private var orderingBarCornerRadius: CGFloat {
