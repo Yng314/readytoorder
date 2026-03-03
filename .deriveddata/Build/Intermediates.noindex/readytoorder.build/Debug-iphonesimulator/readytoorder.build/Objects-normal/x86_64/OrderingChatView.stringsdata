@@ -1,0 +1,288 @@
+{
+  "source": "/Users/young/Coding/development/readytoorder/readytoorder/OrderingChatView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "确定清空当前对话？",
+        "location": {
+          "startingColumn": 13,
+          "startingLine": 65
+        }
+      },
+      {
+        "comment": "",
+        "key": "清空",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 69
+        }
+      },
+      {
+        "comment": "",
+        "key": "取消",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 72
+        }
+      },
+      {
+        "comment": "",
+        "key": "会清空当前聊天内容与待发送图片。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 74
+        }
+      },
+      {
+        "comment": "",
+        "key": "清空",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 113
+        }
+      },
+      {
+        "comment": "",
+        "key": "详细参数",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 128
+        }
+      },
+      {
+        "comment": "",
+        "key": "Generating in progress...",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 159
+        }
+      },
+      {
+        "comment": "",
+        "key": "当前设备不支持拍照",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 323
+        }
+      },
+      {
+        "comment": "",
+        "key": "发送菜单推荐菜品...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 275
+        }
+      },
+      {
+        "comment": "",
+        "key": "知道了",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 324
+        }
+      },
+      {
+        "comment": "",
+        "key": "请改用相册上传菜单图片。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 326
+        }
+      },
+      {
+        "comment": "",
+        "key": "菜单缩略图",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 412
+        }
+      },
+      {
+        "comment": "",
+        "key": "%lld.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 465
+        }
+      },
+      {
+        "comment": "",
+        "key": "匹配度 %lld%%",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 488
+        }
+      },
+      {
+        "comment": "",
+        "key": "详细参数",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1158
+        }
+      },
+      {
+        "comment": "",
+        "key": "用餐人数（可选）",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1116
+        }
+      },
+      {
+        "comment": "",
+        "key": "人均预算 CNY（可选）",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1118
+        }
+      },
+      {
+        "comment": "",
+        "key": "人数与预算",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1121
+        }
+      },
+      {
+        "comment": "",
+        "key": "默认：人数不限制，预算不限。",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1123
+        }
+      },
+      {
+        "comment": "",
+        "key": "辣度",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1127
+        }
+      },
+      {
+        "comment": "",
+        "key": "默认",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1128
+        }
+      },
+      {
+        "comment": "",
+        "key": "不辣",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1129
+        }
+      },
+      {
+        "comment": "",
+        "key": "微辣",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1130
+        }
+      },
+      {
+        "comment": "",
+        "key": "中辣",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1131
+        }
+      },
+      {
+        "comment": "",
+        "key": "重辣",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 1132
+        }
+      },
+      {
+        "comment": "",
+        "key": "辣度偏好",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1135
+        }
+      },
+      {
+        "comment": "",
+        "key": "默认：跟随你的口味画像与菜单信息自动判断。",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1137
+        }
+      },
+      {
+        "comment": "",
+        "key": "用逗号分隔，例如：花生, 海鲜",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1141
+        }
+      },
+      {
+        "comment": "",
+        "key": "过敏/忌口（可选）",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1144
+        }
+      },
+      {
+        "comment": "",
+        "key": "默认：无过敏/忌口限制。",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1146
+        }
+      },
+      {
+        "comment": "",
+        "key": "例如：想吃清淡一点，尽量少油",
+        "location": {
+          "startingColumn": 31,
+          "startingLine": 1150
+        }
+      },
+      {
+        "comment": "",
+        "key": "补充说明（可选）",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1153
+        }
+      },
+      {
+        "comment": "",
+        "key": "默认：无额外偏好说明。",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 1155
+        }
+      },
+      {
+        "comment": "",
+        "key": "恢复默认",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1162
+        }
+      },
+      {
+        "comment": "",
+        "key": "完成",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 1167
+        }
+      }
+    ]
+  },
+  "version": 1
+}

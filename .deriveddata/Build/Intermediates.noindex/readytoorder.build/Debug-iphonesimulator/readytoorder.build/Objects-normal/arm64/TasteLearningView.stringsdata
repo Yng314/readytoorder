@@ -1,0 +1,72 @@
+{
+  "source": "/Users/young/Coding/development/readytoorder/readytoorder/TasteLearningView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "最近喜欢：%@",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 382
+        }
+      },
+      {
+        "comment": "",
+        "key": "你的口味画像",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 332
+        }
+      },
+      {
+        "comment": "",
+        "key": "更新分析",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 349
+        }
+      },
+      {
+        "comment": "",
+        "key": "重置",
+        "location": {
+          "startingColumn": 28,
+          "startingLine": 355
+        }
+      },
+      {
+        "comment": "",
+        "key": "避雷建议：%@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 419
+        }
+      },
+      {
+        "comment": "",
+        "key": "点菜策略：%@",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 424
+        }
+      },
+      {
+        "comment": "",
+        "key": "Gemini 口味总结",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 405
+        }
+      },
+      {
+        "comment": "",
+        "key": "%@ %lld%%",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 456
+        }
+      }
+    ]
+  },
+  "version": 1
+}

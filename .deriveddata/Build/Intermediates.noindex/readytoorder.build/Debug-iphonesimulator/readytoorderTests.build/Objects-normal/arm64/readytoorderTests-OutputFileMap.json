@@ -1,0 +1,19 @@
+{
+  "" : {
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/readytoorderTests-primary.dia",
+    "emit-module-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/readytoorderTests-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/readytoorderTests-primary-emit-module.dia",
+    "pch" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/readytoorderTests-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/readytoorderTests-primary.swiftdeps"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorderTests/ReadytoorderCoreTests.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphonesimulator/readytoorderTests.build/Objects-normal/arm64/ReadytoorderCoreTests~partial.swiftmodule"
+  }
+}

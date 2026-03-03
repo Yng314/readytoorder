@@ -1,0 +1,32 @@
+{
+  "source": "/Users/young/Coding/development/readytoorder/readytoorder/PillBarTestView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "%lld/6",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 198
+        }
+      },
+      {
+        "comment": "",
+        "key": "推荐菜品",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 211
+        }
+      },
+      {
+        "comment": "",
+        "key": "Ask anything...",
+        "location": {
+          "startingColumn": 27,
+          "startingLine": 239
+        }
+      }
+    ]
+  },
+  "version": 1
+}

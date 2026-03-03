@@ -1,0 +1,136 @@
+{
+  "source": "/Users/young/Coding/development/readytoorder/readytoorder/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "当前设备不支持拍照",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 201
+        }
+      },
+      {
+        "comment": "",
+        "key": "知道了",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 202
+        }
+      },
+      {
+        "comment": "",
+        "key": "请改用相册上传菜单图片。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 204
+        }
+      },
+      {
+        "comment": "",
+        "key": "添加菜单图片",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 260
+        }
+      },
+      {
+        "comment": "",
+        "key": "全部照片",
+        "location": {
+          "startingColumn": 24,
+          "startingLine": 266
+        }
+      },
+      {
+        "comment": "",
+        "key": "拍照",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 330
+        }
+      },
+      {
+        "comment": "",
+        "key": "读取中",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 348
+        }
+      },
+      {
+        "comment": "",
+        "key": "设置",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 633
+        }
+      },
+      {
+        "comment": "",
+        "key": "数据与账号",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 640
+        }
+      },
+      {
+        "comment": "",
+        "key": "当前版本为匿名模式：口味画像和聊天记录仅保存在本机，不会创建账号。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 642
+        }
+      },
+      {
+        "comment": "",
+        "key": "后续可升级到账号同步版本。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 646
+        }
+      },
+      {
+        "comment": "",
+        "key": "后端连接",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 656
+        }
+      },
+      {
+        "comment": "",
+        "key": "Debug 构建可修改后端地址与 API Key；Release 将固定使用生产地址。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 674
+        }
+      },
+      {
+        "comment": "",
+        "key": "所有请求会自动携带设备标识与客户端版本头。",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 688
+        }
+      },
+      {
+        "comment": "",
+        "key": "https://readytoorder-production.up.railway.app",
+        "location": {
+          "startingColumn": 23,
+          "startingLine": 659
+        }
+      },
+      {
+        "comment": "",
+        "key": "可选：X-API-Key",
+        "location": {
+          "startingColumn": 25,
+          "startingLine": 667
+        }
+      }
+    ]
+  },
+  "version": 1
+}

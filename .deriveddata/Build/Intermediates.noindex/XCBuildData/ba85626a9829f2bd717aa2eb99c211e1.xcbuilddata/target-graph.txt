@@ -1,0 +1,4 @@
+Target dependency graph (2 targets)
+Target 'readytoorderTests' in project 'readytoorder'
+➜ Explicit dependency on target 'readytoorder' in project 'readytoorder'
+Target 'readytoorder' in project 'readytoorder' (no dependencies)

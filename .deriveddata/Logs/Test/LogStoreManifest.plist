@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>logFormatVersion</key>
+	<integer>12</integer>
+	<key>logs</key>
+	<dict>
+		<key>F867C09F-D682-4C44-B8D6-2D74A2B458AB</key>
+		<dict>
+			<key>auxiliaryLogUniqueIdentifier</key>
+			<string>D6D648E2-4BE6-4141-B3E7-304D02D3AF11</string>
+			<key>auxiliaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>className</key>
+			<string>IDESchemeActionsInvocationRecord</string>
+			<key>documentTypeString</key>
+			<string>&lt;nil&gt;</string>
+			<key>domainType</key>
+			<string>com.apple.dt.unit.cocoaUnitTest</string>
+			<key>fileName</key>
+			<string>Test-readytoorder-2026.03.03_15-02-13-+0000.xcresult</string>
+			<key>hasAuxiliaryLog</key>
+			<true/>
+			<key>hasCoverageData</key>
+			<true/>
+			<key>hasPrimaryLog</key>
+			<true/>
+			<key>primaryObservable</key>
+			<dict>
+				<key>highLevelStatus</key>
+				<string>S</string>
+				<key>totalCodeCoverage</key>
+				<real>0.32979037496309416</real>
+				<key>totalNumberOfAnalyzerIssues</key>
+				<integer>0</integer>
+				<key>totalNumberOfErrors</key>
+				<integer>0</integer>
+				<key>totalNumberOfTestFailures</key>
+				<integer>0</integer>
+				<key>totalNumberOfWarnings</key>
+				<integer>0</integer>
+			</dict>
+			<key>schemeIdentifier-containerName</key>
+			<string>readytoorder project</string>
+			<key>schemeIdentifier-schemeName</key>
+			<string>readytoorder</string>
+			<key>schemeIdentifier-sharedScheme</key>
+			<integer>1</integer>
+			<key>signature</key>
+			<string>Test readytoorder</string>
+			<key>timeStartedRecording</key>
+			<real>794242933.40651202</real>
+			<key>timeStoppedRecording</key>
+			<real>794243036.77122295</real>
+			<key>title</key>
+			<string>Test readytoorder</string>
+			<key>uniqueIdentifier</key>
+			<string>F867C09F-D682-4C44-B8D6-2D74A2B458AB</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
