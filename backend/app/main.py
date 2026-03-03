@@ -5,18 +5,27 @@ import logging
 import os
 import random
 import re
-from datetime import datetime, timezone
-from typing import Dict, List, Literal, Sequence
+import uuid
+from collections import defaultdict, deque
+from datetime import datetime, timedelta, timezone
+from typing import Deque, Dict, List, Literal, Sequence
 
 import httpx
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from .db import SessionLocal, init_db
-from .models import Dish, DishImage, GenerationJob
+from .models import ClientErrorEvent, Dish, DishImage, GenerationJob
+
+try:
+    import sentry_sdk
+except Exception:  # pragma: no cover - optional dependency
+    sentry_sdk = None
 
 FEATURE_IDS = [
     "chuanStyle", "cantoneseStyle", "japaneseStyle", "thaiStyle",
@@ -58,8 +67,26 @@ BOOTSTRAP_MIN_READY = int(os.getenv("BOOTSTRAP_MIN_READY", "8"))
 MENU_MAX_IMAGES = int(os.getenv("MENU_MAX_IMAGES", "6"))
 MENU_MAX_IMAGE_BYTES = int(os.getenv("MENU_MAX_IMAGE_BYTES", "3145728"))
 MENU_CHAT_HISTORY_LIMIT = int(os.getenv("MENU_CHAT_HISTORY_LIMIT", "16"))
+APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
+REQUEST_ID_HEADER = "x-request-id"
+DEVICE_ID_HEADER = "x-device-id"
+CLIENT_VERSION_HEADER = "x-client-version"
+API_KEY_HEADER = "x-api-key"
+RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "60"))
+RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
+GENERATION_JOB_RETENTION_DAYS = int(os.getenv("GENERATION_JOB_RETENTION_DAYS", "14"))
+ORPHAN_IMAGE_RETENTION_DAYS = int(os.getenv("ORPHAN_IMAGE_RETENTION_DAYS", "7"))
+CLIENT_ERROR_RETENTION_DAYS = int(os.getenv("CLIENT_ERROR_RETENTION_DAYS", "30"))
+CLEANUP_INTERVAL_SECONDS = int(os.getenv("CLEANUP_INTERVAL_SECONDS", "3600"))
+CORS_ALLOW_ORIGINS = [item.strip() for item in os.getenv("CORS_ALLOW_ORIGINS", "").split(",") if item.strip()]
+BACKEND_API_KEY = os.getenv("READYTOORDER_API_KEY", "").strip()
+SENTRY_DSN = os.getenv("SENTRY_DSN", "").strip()
+SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+([\-+][0-9A-Za-z\.-]+)?$")
 
 REFILL_LOCK = asyncio.Lock()
+CLEANUP_TASK: asyncio.Task | None = None
+RATE_LIMIT_LOCK = asyncio.Lock()
+RATE_LIMIT_BUCKETS: Dict[str, Deque[float]] = defaultdict(deque)
 logger = logging.getLogger("readytoorder.backend")
 
 
@@ -163,19 +190,229 @@ class MenuChatResponse(BaseModel):
     source: str = "gemini"
 
 
-app = FastAPI(title="readytoorder-backend", version="0.3.0")
+class ClientErrorEventRequest(BaseModel):
+    scope: str = ""
+    code: str = ""
+    message: str = ""
+    status_code: int | None = None
+    request_id: str = ""
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=False,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+
+app = FastAPI(title="readytoorder-backend", version="0.4.0")
+
+if CORS_ALLOW_ORIGINS:
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=CORS_ALLOW_ORIGINS,
+        allow_credentials=False,
+        allow_methods=["GET", "POST"],
+        allow_headers=["*"],
+    )
 
 
 def utc_now() -> datetime:
     return datetime.now(timezone.utc)
+
+
+def _request_id_from_request(request: Request) -> str:
+    value = getattr(request.state, "request_id", "")
+    return value if isinstance(value, str) and value else "unknown"
+
+
+def _status_code_to_error_code(status_code: int) -> str:
+    if status_code == 400:
+        return "bad_request"
+    if status_code == 401:
+        return "unauthorized"
+    if status_code == 403:
+        return "forbidden"
+    if status_code == 404:
+        return "not_found"
+    if status_code == 405:
+        return "method_not_allowed"
+    if status_code == 409:
+        return "conflict"
+    if status_code == 422:
+        return "validation_error"
+    if status_code == 429:
+        return "rate_limited"
+    if status_code == 502:
+        return "upstream_error"
+    if status_code == 503:
+        return "service_unavailable"
+    return "internal_error" if status_code >= 500 else "request_error"
+
+
+def _error_response(*, request: Request, status_code: int, code: str, message: str) -> JSONResponse:
+    request_id = _request_id_from_request(request)
+    body = {
+        "code": code,
+        "message": message,
+        "request_id": request_id,
+    }
+    return JSONResponse(
+        status_code=status_code,
+        content=body,
+        headers={REQUEST_ID_HEADER: request_id},
+    )
+
+
+def _client_ip(request: Request) -> str:
+    forwarded = request.headers.get("x-forwarded-for", "")
+    if forwarded:
+        first = forwarded.split(",")[0].strip()
+        if first:
+            return first
+    if request.client and request.client.host:
+        return request.client.host
+    return "unknown"
+
+
+def _is_valid_uuid(value: str) -> bool:
+    try:
+        parsed = uuid.UUID(value)
+    except Exception:
+        return False
+    return str(parsed) == value.lower()
+
+
+def _validate_client_headers(request: Request) -> tuple[int, str, str] | None:
+    device_id = request.headers.get(DEVICE_ID_HEADER, "").strip()
+    client_version = request.headers.get(CLIENT_VERSION_HEADER, "").strip()
+
+    if not device_id:
+        return 400, "invalid_header", f"Missing required header: {DEVICE_ID_HEADER}"
+    if not _is_valid_uuid(device_id):
+        return 400, "invalid_header", f"Invalid {DEVICE_ID_HEADER}; expected UUID format"
+
+    if not client_version:
+        return 400, "invalid_header", f"Missing required header: {CLIENT_VERSION_HEADER}"
+    if not SEMVER_PATTERN.match(client_version):
+        return 400, "invalid_header", f"Invalid {CLIENT_VERSION_HEADER}; expected semantic version"
+
+    if BACKEND_API_KEY:
+        provided = request.headers.get(API_KEY_HEADER, "").strip()
+        if not provided or provided != BACKEND_API_KEY:
+            return 401, "unauthorized", "Missing or invalid API key"
+
+    return None
+
+
+def _rate_limit_key(request: Request) -> str:
+    device_id = request.headers.get(DEVICE_ID_HEADER, "").strip()
+    ip = _client_ip(request)
+    return f"{request.url.path}:{ip}:{device_id}"
+
+
+async def _consume_rate_limit(key: str) -> bool:
+    now_ts = utc_now().timestamp()
+    window_start = now_ts - RATE_LIMIT_WINDOW_SECONDS
+
+    async with RATE_LIMIT_LOCK:
+        bucket = RATE_LIMIT_BUCKETS[key]
+        while bucket and bucket[0] < window_start:
+            bucket.popleft()
+
+        if len(bucket) >= RATE_LIMIT_REQUESTS:
+            return False
+
+        bucket.append(now_ts)
+        return True
+
+
+def _init_monitoring() -> None:
+    if not SENTRY_DSN or sentry_sdk is None:
+        return
+    try:
+        sentry_sdk.init(
+            dsn=SENTRY_DSN,
+            traces_sample_rate=0.05,
+            environment=APP_ENV or "development",
+        )
+    except Exception:
+        logger.exception("Sentry init failed")
+
+
+@app.middleware("http")
+async def request_context_middleware(request: Request, call_next):
+    request_id = request.headers.get(REQUEST_ID_HEADER, "").strip() or str(uuid.uuid4())
+    request.state.request_id = request_id
+
+    if request.url.path.startswith("/v1/"):
+        validation_error = _validate_client_headers(request)
+        if validation_error is not None:
+            status_code, code, message = validation_error
+            return _error_response(
+                request=request,
+                status_code=status_code,
+                code=code,
+                message=message,
+            )
+
+        key = _rate_limit_key(request)
+        allowed = await _consume_rate_limit(key)
+        if not allowed:
+            return _error_response(
+                request=request,
+                status_code=429,
+                code="rate_limited",
+                message="Too many requests. Please retry in a moment.",
+            )
+
+    response = await call_next(request)
+    response.headers[REQUEST_ID_HEADER] = request_id
+    return response
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+    status_code = int(exc.status_code)
+    default_code = _status_code_to_error_code(status_code)
+    message = "Request failed"
+    code = default_code
+
+    if isinstance(exc.detail, dict):
+        code = str(exc.detail.get("code") or default_code)
+        message = str(exc.detail.get("message") or exc.detail.get("detail") or message)
+    elif exc.detail:
+        message = str(exc.detail)
+
+    return _error_response(
+        request=request,
+        status_code=status_code,
+        code=code,
+        message=message,
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def request_validation_exception_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+    first_error = exc.errors()[0] if exc.errors() else None
+    default_message = "Invalid request payload."
+    if isinstance(first_error, dict):
+        default_message = str(first_error.get("msg") or default_message)
+    return _error_response(
+        request=request,
+        status_code=422,
+        code="validation_error",
+        message=default_message,
+    )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONResponse:
+    logger.exception("Unhandled backend exception")
+    if sentry_sdk is not None:
+        try:
+            sentry_sdk.capture_exception(exc)
+        except Exception:
+            logger.exception("Sentry capture failed")
+    return _error_response(
+        request=request,
+        status_code=500,
+        code="internal_error",
+        message="Internal server error.",
+    )
 
 
 def _normalized_avoid_names(items: Sequence[str]) -> set[str]:
@@ -1056,6 +1293,53 @@ async def _trigger_background_refill_if_needed(req: DeckRequest) -> None:
     asyncio.create_task(_run_refill_job(refill_request, target_count=DECK_REFILL_BATCH))
 
 
+async def _cleanup_database_once() -> None:
+    with SessionLocal() as session:
+        now = utc_now()
+        jobs_cutoff = now - timedelta(days=max(1, GENERATION_JOB_RETENTION_DAYS))
+        errors_cutoff = now - timedelta(days=max(1, CLIENT_ERROR_RETENTION_DAYS))
+        images_cutoff = now - timedelta(days=max(1, ORPHAN_IMAGE_RETENTION_DAYS))
+
+        old_job_ids = session.scalars(
+            select(GenerationJob.id).where(GenerationJob.created_at < jobs_cutoff)
+        ).all()
+        if old_job_ids:
+            session.execute(delete(GenerationJob).where(GenerationJob.id.in_(old_job_ids)))
+
+        old_client_error_ids = session.scalars(
+            select(ClientErrorEvent.id).where(ClientErrorEvent.created_at < errors_cutoff)
+        ).all()
+        if old_client_error_ids:
+            session.execute(delete(ClientErrorEvent).where(ClientErrorEvent.id.in_(old_client_error_ids)))
+
+        orphan_image_ids = session.scalars(
+            select(DishImage.id)
+            .outerjoin(Dish, Dish.image_id == DishImage.id)
+            .where(Dish.id.is_(None), DishImage.created_at < images_cutoff)
+        ).all()
+        if orphan_image_ids:
+            session.execute(delete(DishImage).where(DishImage.id.in_(orphan_image_ids)))
+
+        session.commit()
+
+        if old_job_ids or old_client_error_ids or orphan_image_ids:
+            logger.info(
+                "cleanup done jobs=%s client_errors=%s orphan_images=%s",
+                len(old_job_ids),
+                len(old_client_error_ids),
+                len(orphan_image_ids),
+            )
+
+
+async def _cleanup_loop() -> None:
+    while True:
+        try:
+            await _cleanup_database_once()
+        except Exception:
+            logger.exception("cleanup loop failed")
+        await asyncio.sleep(max(300, CLEANUP_INTERVAL_SECONDS))
+
+
 async def _analyze_with_gemini(req: AnalyzeRequest) -> AnalyzeResponse:
     event_lines = []
     for event in req.recent_events[:18]:
@@ -1097,8 +1381,14 @@ async def _analyze_with_gemini(req: AnalyzeRequest) -> AnalyzeResponse:
 
 @app.on_event("startup")
 async def startup() -> None:
+    _init_monitoring()
     init_db()
     logger.info("database initialized")
+
+    global CLEANUP_TASK
+    if CLEANUP_TASK is None or CLEANUP_TASK.done():
+        CLEANUP_TASK = asyncio.create_task(_cleanup_loop())
+
     with SessionLocal() as session:
         ready_count = _count_ready_dishes(session)
     if ready_count < BOOTSTRAP_MIN_READY and not REFILL_LOCK.locked():
@@ -1111,6 +1401,19 @@ async def startup() -> None:
         )
 
 
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    global CLEANUP_TASK
+    if CLEANUP_TASK is None:
+        return
+    CLEANUP_TASK.cancel()
+    try:
+        await CLEANUP_TASK
+    except asyncio.CancelledError:
+        pass
+    CLEANUP_TASK = None
+
+
 @app.get("/health")
 async def health() -> dict:
     with SessionLocal() as session:
@@ -1119,9 +1422,40 @@ async def health() -> dict:
         "ok": True,
         "model": GEMINI_MODEL,
         "image_model": GEMINI_IMAGE_MODEL,
-        "gemini_configured": bool(GEMINI_API_KEY),
         "ready_dishes": ready_count,
+        "environment": APP_ENV,
     }
+
+
+@app.post("/v1/client/error")
+async def ingest_client_error_event(req: ClientErrorEventRequest, request: Request) -> dict:
+    device_id = request.headers.get(DEVICE_ID_HEADER, "").strip()
+    client_version = request.headers.get(CLIENT_VERSION_HEADER, "").strip()
+    req_id = _request_id_from_request(request)
+
+    with SessionLocal() as session:
+        event = ClientErrorEvent(
+            device_id=device_id,
+            client_version=client_version,
+            scope=_safe_text(req.scope, max_len=60, fallback="unknown"),
+            code=_safe_text(req.code, max_len=60, fallback="unknown"),
+            message=_safe_text(req.message, max_len=600, fallback=""),
+            status_code=req.status_code,
+            request_id=_safe_text(req.request_id, max_len=80, fallback=req_id),
+            created_at=utc_now(),
+        )
+        session.add(event)
+        session.commit()
+
+    logger.warning(
+        "client_error scope=%s status=%s code=%s request_id=%s device_id=%s",
+        event.scope,
+        event.status_code,
+        event.code,
+        event.request_id,
+        event.device_id,
+    )
+    return {"ok": True, "request_id": req_id}
 
 
 @app.post("/v1/taste/deck", response_model=DeckResponse)

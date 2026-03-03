@@ -1,6 +1,9 @@
 import os
+from pathlib import Path
 
-from sqlalchemy import create_engine, inspect, text
+from alembic import command
+from alembic.config import Config
+from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 
@@ -12,9 +15,19 @@ def _normalize_database_url(raw: str) -> str:
     return raw
 
 
-DATABASE_URL = _normalize_database_url(
-    os.getenv("DATABASE_URL", "sqlite:///./readytoorder.db")
-)
+APP_ENV = os.getenv("APP_ENV", "development").strip().lower()
+RAW_DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+if APP_ENV == "production" and not RAW_DATABASE_URL:
+    raise RuntimeError("DATABASE_URL is required when APP_ENV=production")
+
+if not RAW_DATABASE_URL:
+    RAW_DATABASE_URL = "sqlite:///./readytoorder.db"
+
+DATABASE_URL = _normalize_database_url(RAW_DATABASE_URL)
+
+if APP_ENV == "production" and not DATABASE_URL.startswith("postgresql+psycopg://"):
+    raise RuntimeError("Production environment requires a PostgreSQL DATABASE_URL")
 
 engine = create_engine(
     DATABASE_URL,
@@ -35,19 +48,20 @@ class Base(DeclarativeBase):
 
 
 def init_db() -> None:
-    from . import models  # noqa: F401
-
-    Base.metadata.create_all(bind=engine)
-    _ensure_schema_compatibility()
+    _run_migrations()
 
 
-def _ensure_schema_compatibility() -> None:
-    inspector = inspect(engine)
-    try:
-        dish_columns = {column["name"] for column in inspector.get_columns("dishes")}
-    except Exception:
-        return
+def _run_migrations() -> None:
+    backend_root = Path(__file__).resolve().parents[1]
+    alembic_ini = backend_root / "alembic.ini"
+    alembic_script_dir = backend_root / "alembic"
 
-    if "category_tags" not in dish_columns:
-        with engine.begin() as conn:
-            conn.execute(text("ALTER TABLE dishes ADD COLUMN category_tags JSON"))
+    if not alembic_ini.exists():
+        raise RuntimeError(f"Alembic config not found: {alembic_ini}")
+    if not alembic_script_dir.exists():
+        raise RuntimeError(f"Alembic script directory not found: {alembic_script_dir}")
+
+    config = Config(str(alembic_ini))
+    config.set_main_option("sqlalchemy.url", DATABASE_URL)
+    config.set_main_option("script_location", str(alembic_script_dir))
+    command.upgrade(config, "head")

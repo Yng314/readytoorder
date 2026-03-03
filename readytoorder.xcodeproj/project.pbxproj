@@ -8,6 +8,7 @@
 
 /* Begin PBXFileReference section */
 		6F43F9072F477464000F8649 /* readytoorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = readytoorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		7A1B2C3D4E5F600000000001 /* readytoorderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = readytoorderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +17,22 @@
 			path = readytoorder;
 			sourceTree = "<group>";
 		};
+		7A1B2C3D4E5F600000000002 /* readytoorderTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = readytoorderTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		6F43F9042F477464000F8649 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A1B2C3D4E5F600000000003 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +46,7 @@
 			isa = PBXGroup;
 			children = (
 				6F43F9092F477464000F8649 /* readytoorder */,
+				7A1B2C3D4E5F600000000002 /* readytoorderTests */,
 				6F43F9082F477464000F8649 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,11 +55,22 @@
 			isa = PBXGroup;
 			children = (
 				6F43F9072F477464000F8649 /* readytoorder.app */,
+				7A1B2C3D4E5F600000000001 /* readytoorderTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
+
+/* Begin PBXContainerItemProxy section */
+		7A1B2C3D4E5F600000000009 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F43F8FF2F477464000F8649 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6F43F9062F477464000F8649;
+			remoteInfo = readytoorder;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXNativeTarget section */
 		6F43F9062F477464000F8649 /* readytoorder */ = {
@@ -70,7 +95,38 @@
 			productReference = 6F43F9072F477464000F8649 /* readytoorder.app */;
 			productType = "com.apple.product-type.application";
 		};
+		7A1B2C3D4E5F600000000005 /* readytoorderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 7A1B2C3D4E5F600000000006 /* Build configuration list for PBXNativeTarget "readytoorderTests" */;
+			buildPhases = (
+				7A1B2C3D4E5F600000000004 /* Sources */,
+				7A1B2C3D4E5F600000000003 /* Frameworks */,
+				7A1B2C3D4E5F60000000000B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				7A1B2C3D4E5F60000000000A /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7A1B2C3D4E5F600000000002 /* readytoorderTests */,
+			);
+			name = readytoorderTests;
+			packageProductDependencies = (
+			);
+			productName = readytoorderTests;
+			productReference = 7A1B2C3D4E5F600000000001 /* readytoorderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
+
+/* Begin PBXTargetDependency section */
+		7A1B2C3D4E5F60000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6F43F9062F477464000F8649 /* readytoorder */;
+			targetProxy = 7A1B2C3D4E5F600000000009 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXProject section */
 		6F43F8FF2F477464000F8649 /* Project object */ = {
@@ -82,6 +138,10 @@
 				TargetAttributes = {
 					6F43F9062F477464000F8649 = {
 						CreatedOnToolsVersion = 26.2;
+					};
+					7A1B2C3D4E5F600000000005 = {
+						CreatedOnToolsVersion = 26.2;
+						TestTargetID = 6F43F9062F477464000F8649;
 					};
 				};
 			};
@@ -100,6 +160,7 @@
 			projectRoot = "";
 			targets = (
 				6F43F9062F477464000F8649 /* readytoorder */,
+				7A1B2C3D4E5F600000000005 /* readytoorderTests */,
 			);
 		};
 /* End PBXProject section */
@@ -112,10 +173,24 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		7A1B2C3D4E5F60000000000B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6F43F9032F477464000F8649 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		7A1B2C3D4E5F600000000004 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -178,7 +253,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -236,7 +311,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -267,7 +342,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = yng314.readytoorder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -305,7 +380,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = yng314.readytoorder;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -319,6 +394,58 @@
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		7A1B2C3D4E5F600000000007 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3CU4469WB6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = yng314.readytoorderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/readytoorder.app/readytoorder";
+				TEST_TARGET_NAME = readytoorder;
+			};
+			name = Debug;
+		};
+		7A1B2C3D4E5F600000000008 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 3CU4469WB6;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = yng314.readytoorderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/readytoorder.app/readytoorder";
+				TEST_TARGET_NAME = readytoorder;
 			};
 			name = Release;
 		};
@@ -339,6 +466,15 @@
 			buildConfigurations = (
 				6F43F9132F477465000F8649 /* Debug */,
 				6F43F9142F477465000F8649 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		7A1B2C3D4E5F600000000006 /* Build configuration list for PBXNativeTarget "readytoorderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				7A1B2C3D4E5F600000000007 /* Debug */,
+				7A1B2C3D4E5F600000000008 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

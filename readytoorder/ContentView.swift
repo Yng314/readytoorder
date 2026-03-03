@@ -598,9 +598,10 @@ struct BottomPillTabBar: View {
 }
 
 private struct SettingsView: View {
-    @AppStorage("readytoorder.setting.haptics") private var hapticsEnabled = true
-    @AppStorage("readytoorder.setting.autoRefill") private var autoRefillEnabled = true
+#if DEBUG
     @AppStorage("readytoorder.setting.backendURL") private var backendURL = "https://readytoorder-production.up.railway.app"
+    @AppStorage("readytoorder.setting.backendApiKey") private var backendApiKey = ""
+#endif
 
     var body: some View {
         NavigationStack {
@@ -616,9 +617,8 @@ private struct SettingsView: View {
                 .ignoresSafeArea()
 
                 VStack(spacing: 14) {
-                    settingRow(title: "滑卡触感反馈", subtitle: "左右滑动时震动提示", isOn: $hapticsEnabled)
-                    settingRow(title: "卡池自动补充", subtitle: "训练卡片低于阈值时自动生成", isOn: $autoRefillEnabled)
-                    backendURLRow
+                    appInfoRow
+                    backendConfigRow
                 }
                 .padding(18)
                 .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 26, style: .continuous))
@@ -635,27 +635,27 @@ private struct SettingsView: View {
         }
     }
 
-    private func settingRow(title: String, subtitle: String, isOn: Binding<Bool>) -> some View {
-        HStack(spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text(title)
-                    .font(.subheadline.weight(.semibold))
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-            Spacer()
-            Toggle("", isOn: isOn)
-                .labelsHidden()
+    private var appInfoRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("数据与账号")
+                .font(.subheadline.weight(.semibold))
+            Text("当前版本为匿名模式：口味画像和聊天记录仅保存在本机，不会创建账号。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+            Text("后续可升级到账号同步版本。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
         }
         .padding(12)
         .background(.white.opacity(0.55), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
     }
 
-    private var backendURLRow: some View {
+    private var backendConfigRow: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("Gemini 后端 URL")
+            Text("后端连接")
                 .font(.subheadline.weight(.semibold))
+#if DEBUG
             TextField("https://readytoorder-production.up.railway.app", text: $backendURL)
                 .textInputAutocapitalization(.never)
                 .keyboardType(.URL)
@@ -664,9 +664,31 @@ private struct SettingsView: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 10)
                 .background(.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
-            Text("默认使用 Railway 云端地址；本地调试时可改成局域网 IP。")
+            SecureField("可选：X-API-Key", text: $backendApiKey)
+                .textInputAutocapitalization(.never)
+                .autocorrectionDisabled(true)
+                .font(.subheadline.monospaced())
+                .padding(.horizontal, 10)
+                .padding(.vertical, 10)
+                .background(.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            Text("Debug 构建可修改后端地址与 API Key；Release 将固定使用生产地址。")
+#else
+            Text("生产环境后端地址：")
                 .font(.caption)
                 .foregroundStyle(.secondary)
+            Text("https://readytoorder-production.up.railway.app")
+                .font(.caption.monospaced())
+                .foregroundStyle(.primary)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 10)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(.white.opacity(0.72), in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+            Text("Release 构建下不开放手动修改，避免错误指向测试环境。")
+#endif
+            Text("所有请求会自动携带设备标识与客户端版本头。")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(12)
         .frame(maxWidth: .infinity, alignment: .leading)

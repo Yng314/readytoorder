@@ -64,5 +64,24 @@ class GenerationJob(Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
 
+class ClientErrorEvent(Base):
+    __tablename__ = "client_error_events"
+
+    id: Mapped[str] = mapped_column(
+        String(36),
+        primary_key=True,
+        default=lambda: str(uuid.uuid4()),
+    )
+    device_id: Mapped[str] = mapped_column(String(36), nullable=False, index=True)
+    client_version: Mapped[str] = mapped_column(String(40), nullable=False, default="")
+    scope: Mapped[str] = mapped_column(String(60), nullable=False, default="unknown")
+    code: Mapped[str] = mapped_column(String(60), nullable=False, default="unknown")
+    message: Mapped[str] = mapped_column(Text, nullable=False, default="")
+    status_code: Mapped[int | None] = mapped_column(nullable=True)
+    request_id: Mapped[str] = mapped_column(String(80), nullable=False, default="")
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, default=utc_now)
+
+
 Index("ix_dishes_status_created_at", Dish.status, Dish.created_at)
 Index("ix_generation_jobs_kind_created_at", GenerationJob.kind, GenerationJob.created_at)
+Index("ix_client_error_events_created_at", ClientErrorEvent.created_at)
