@@ -90,3 +90,4 @@ curl http://127.0.0.1:8000/health
   - `生成一个[菜品名]的图片，俯视角，图像比例2:3，食物主体在下方2/3区域内`
 - If `GEMINI_API_KEY` is missing or Gemini fails and cache is empty, endpoints return `5xx`.
 - A periodic cleanup job removes expired generation jobs, stale client error events and orphaned dish images.
+- iOS can forward MetricKit diagnostics to `POST /v1/client/error` (scope `ios_diagnostic`) for crash/hang trend monitoring.

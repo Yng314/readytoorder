@@ -381,27 +381,22 @@ final class TasteBackendClient {
         }
     }
 
-    private func reportClientError(scope: String, error: Error) {
+    func reportClientEvent(
+        scope: String,
+        code: String,
+        message: String,
+        statusCode: Int? = nil,
+        requestID: String = ""
+    ) {
         guard let baseURL else { return }
 
-        let payload: BackendClientErrorEventPayload
-        if let backendError = error as? BackendAPIError {
-            payload = BackendClientErrorEventPayload(
-                scope: scope,
-                code: backendError.code,
-                message: backendError.message,
-                status_code: backendError.statusCode,
-                request_id: backendError.requestID ?? ""
-            )
-        } else {
-            payload = BackendClientErrorEventPayload(
-                scope: scope,
-                code: "network_error",
-                message: error.localizedDescription,
-                status_code: nil,
-                request_id: ""
-            )
-        }
+        let payload = BackendClientErrorEventPayload(
+            scope: scope,
+            code: code,
+            message: message,
+            status_code: statusCode,
+            request_id: requestID
+        )
 
         guard let data = try? encoder.encode(payload) else { return }
 
@@ -415,6 +410,32 @@ final class TasteBackendClient {
         Task(priority: .background) {
             _ = try? await session.data(for: request)
         }
+    }
+
+    private func reportClientError(scope: String, error: Error) {
+        let code: String
+        let message: String
+        let statusCode: Int?
+        let requestID: String
+        if let backendError = error as? BackendAPIError {
+            code = backendError.code
+            message = backendError.message
+            statusCode = backendError.statusCode
+            requestID = backendError.requestID ?? ""
+        } else {
+            code = "network_error"
+            message = error.localizedDescription
+            statusCode = nil
+            requestID = ""
+        }
+
+        reportClientEvent(
+            scope: scope,
+            code: code,
+            message: message,
+            statusCode: statusCode,
+            requestID: requestID
+        )
     }
 
     private func normalizedCategoryTags(_ payload: DeckResponsePayload.DishPayload.CategoryTagsPayload?) -> DishCategoryTags? {
