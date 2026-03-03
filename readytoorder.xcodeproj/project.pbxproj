@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXContainerItemProxy section */
+		7A1B2C3D4E5F600000000009 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 6F43F8FF2F477464000F8649 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 6F43F9062F477464000F8649;
+			remoteInfo = readytoorder;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		6F43F9072F477464000F8649 /* readytoorder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = readytoorder.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7A1B2C3D4E5F600000000001 /* readytoorderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = readytoorderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -62,16 +72,6 @@
 		};
 /* End PBXGroup section */
 
-/* Begin PBXContainerItemProxy section */
-		7A1B2C3D4E5F600000000009 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 6F43F8FF2F477464000F8649 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 6F43F9062F477464000F8649;
-			remoteInfo = readytoorder;
-		};
-/* End PBXContainerItemProxy section */
-
 /* Begin PBXNativeTarget section */
 		6F43F9062F477464000F8649 /* readytoorder */ = {
 			isa = PBXNativeTarget;
@@ -120,21 +120,13 @@
 		};
 /* End PBXNativeTarget section */
 
-/* Begin PBXTargetDependency section */
-		7A1B2C3D4E5F60000000000A /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 6F43F9062F477464000F8649 /* readytoorder */;
-			targetProxy = 7A1B2C3D4E5F600000000009 /* PBXContainerItemProxy */;
-		};
-/* End PBXTargetDependency section */
-
 /* Begin PBXProject section */
 		6F43F8FF2F477464000F8649 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 2620;
-				LastUpgradeCheck = 2620;
+				LastUpgradeCheck = 2630;
 				TargetAttributes = {
 					6F43F9062F477464000F8649 = {
 						CreatedOnToolsVersion = 26.2;
@@ -199,6 +191,14 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		7A1B2C3D4E5F60000000000A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 6F43F9062F477464000F8649 /* readytoorder */;
+			targetProxy = 7A1B2C3D4E5F600000000009 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
 		6F43F9102F477465000F8649 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -259,6 +259,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -316,6 +317,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
