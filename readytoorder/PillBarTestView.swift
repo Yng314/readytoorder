@@ -133,13 +133,14 @@ private struct PillBarMorphBar: View {
 
             HStack(spacing: 8) {
                 ForEach(PillBarTestTab.allCases, id: \.self) { tab in
+                    let title = tab.title
                     Button {
                         selectedTab = tab
                     } label: {
                         HStack(spacing: 6) {
                             Image(systemName: tab.icon)
                                 .font(.subheadline.weight(.semibold))
-                            Text(tab.title)
+                            Text(title)
                                 .font(.subheadline.weight(.semibold))
                         }
                         .frame(maxWidth: .infinity)

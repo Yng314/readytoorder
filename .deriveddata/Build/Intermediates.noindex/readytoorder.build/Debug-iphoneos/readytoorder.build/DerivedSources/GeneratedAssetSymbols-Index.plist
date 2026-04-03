@@ -5,18 +5,7 @@
 	<key>colors</key>
 	<array/>
 	<key>images</key>
-	<array>
-		<dict>
-			<key>catalogPath</key>
-			<string>/Users/young/Coding/development/readytoorder/readytoorder/Assets.xcassets</string>
-			<key>objcSymbol</key>
-			<string>ACImageNameDishPlaceholder</string>
-			<key>relativePath</key>
-			<string>./dish_placeholder.imageset</string>
-			<key>swiftSymbol</key>
-			<string>dishPlaceholder</string>
-		</dict>
-	</array>
+	<array/>
 	<key>symbols</key>
 	<array/>
 </dict>

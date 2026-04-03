@@ -12,10 +12,12 @@ private enum BackendClientConstants {
     static let backendURLKey = "readytoorder.setting.backendURL"
     static let backendAPIKeyKey = "readytoorder.setting.backendApiKey"
     static let deviceIDKey = "readytoorder.device.id"
+    static let sessionTokenKey = "readytoorder.auth.sessionToken"
     static let deviceIDHeader = "X-Device-ID"
     static let clientVersionHeader = "X-Client-Version"
     static let apiKeyHeader = "X-API-Key"
     static let requestIDHeader = "X-Request-ID"
+    static let authorizationHeader = "Authorization"
 }
 
 struct BackendAPIError: LocalizedError {
@@ -113,21 +115,258 @@ struct MenuChatResult: Codable, Hashable {
     let source: String
 }
 
+enum JSONValue: Codable, Hashable {
+    case string(String)
+    case number(Double)
+    case bool(Bool)
+    case object([String: JSONValue])
+    case array([JSONValue])
+    case null
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        if container.decodeNil() {
+            self = .null
+        } else if let value = try? container.decode(Bool.self) {
+            self = .bool(value)
+        } else if let value = try? container.decode(Double.self) {
+            self = .number(value)
+        } else if let value = try? container.decode(String.self) {
+            self = .string(value)
+        } else if let value = try? container.decode([String: JSONValue].self) {
+            self = .object(value)
+        } else if let value = try? container.decode([JSONValue].self) {
+            self = .array(value)
+        } else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unsupported JSON value")
+        }
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .string(let value):
+            try container.encode(value)
+        case .number(let value):
+            try container.encode(value)
+        case .bool(let value):
+            try container.encode(value)
+        case .object(let value):
+            try container.encode(value)
+        case .array(let value):
+            try container.encode(value)
+        case .null:
+            try container.encodeNil()
+        }
+    }
+}
+
+struct BackendAccountUser: Codable, Hashable {
+    let id: String
+    let apple_user_id: String
+    let email: String?
+    let display_name: String?
+    let created_at: Date
+    let last_login_at: Date
+}
+
+struct BackendAuthSession: Codable, Hashable {
+    let session_token: String
+    let user: BackendAccountUser
+}
+
+struct BackendSwipeEventPayload: Codable, Hashable {
+    struct DishSnapshot: Codable, Hashable {
+        let name: String
+        let subtitle: String
+        let tags: DishTags
+    }
+
+    let id: String
+    let dish_name: String
+    let action: String
+    let dish_snapshot_json: DishSnapshot
+    let created_at: Date
+}
+
+struct BackendProfileSnapshot: Codable {
+    let taste_profile_json: TasteProfile
+    let analysis_json: TasteAnalysisResult?
+    let preferences_json: [String: JSONValue]
+    let swipe_events: [BackendSwipeEventPayload]
+    let updated_at: Date
+}
+
 final class TasteBackendClient {
     static let shared = TasteBackendClient()
 
     private let session: URLSession
-    private let decoder = JSONDecoder()
-    private let encoder = JSONEncoder()
+    private let decoder: JSONDecoder
+    private let encoder: JSONEncoder
     private let defaults: UserDefaults
 
     init(session: URLSession = .shared, defaults: UserDefaults = .standard) {
         self.session = session
         self.defaults = defaults
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        self.decoder = decoder
+
+        let encoder = JSONEncoder()
+        encoder.dateEncodingStrategy = .iso8601
+        self.encoder = encoder
     }
 
     var isConfigured: Bool {
         baseURL != nil
+    }
+
+    var hasSessionToken: Bool {
+        sessionToken != nil
+    }
+
+    func signInWithApple(_ payload: AppleSignInPayload) async throws -> BackendAuthSession {
+        do {
+            guard let baseURL else { throw URLError(.badURL) }
+            guard let identityToken = payload.identityToken, !identityToken.isEmpty else {
+                throw BackendAPIError(statusCode: 400, code: "missing_identity_token", message: "Apple identity token is missing.", requestID: nil)
+            }
+            let requestPayload = AppleSignInRequestPayload(
+                identity_token: identityToken,
+                authorization_code: payload.authorizationCode,
+                email: payload.email,
+                display_name: payload.displayName
+            )
+
+            var request = URLRequest(url: baseURL.appendingPathComponent("v1/auth/apple/sign-in"))
+            request.httpMethod = "POST"
+            request.timeoutInterval = 60
+            applyCommonHeaders(to: &request)
+            request.httpBody = try encoder.encode(requestPayload)
+
+            let (data, response) = try await session.data(for: request)
+            try ensureSuccess(response: response, data: data)
+
+            let authSession = try decoder.decode(BackendAuthSession.self, from: data)
+            defaults.set(authSession.session_token, forKey: BackendClientConstants.sessionTokenKey)
+            return authSession
+        } catch {
+            reportClientError(scope: "auth_sign_in", error: error)
+            throw error
+        }
+    }
+
+    func clearSession() {
+        defaults.removeObject(forKey: BackendClientConstants.sessionTokenKey)
+    }
+
+    func fetchUserProfile() async throws -> BackendProfileSnapshot {
+        do {
+            guard let baseURL else { throw URLError(.badURL) }
+            var request = URLRequest(url: baseURL.appendingPathComponent("v1/me/profile"))
+            request.httpMethod = "GET"
+            request.timeoutInterval = 60
+            applyCommonHeaders(to: &request)
+
+            let (data, response) = try await session.data(for: request)
+            try ensureSuccess(response: response, data: data)
+            return try decoder.decode(BackendProfileSnapshot.self, from: data)
+        } catch {
+            reportClientError(scope: "profile_fetch", error: error)
+            throw error
+        }
+    }
+
+    func updateUserProfile(snapshot: TasteTrainingSnapshot) async throws {
+        do {
+            guard let baseURL else { throw URLError(.badURL) }
+            let payload = ProfileUpdatePayload(
+                taste_profile_json: snapshot.profile,
+                analysis_json: snapshot.latestAnalysis,
+                preferences_json: [:]
+            )
+
+            var request = URLRequest(url: baseURL.appendingPathComponent("v1/me/profile"))
+            request.httpMethod = "PUT"
+            request.timeoutInterval = 60
+            applyCommonHeaders(to: &request)
+            request.httpBody = try encoder.encode(payload)
+
+            let (data, response) = try await session.data(for: request)
+            try ensureSuccess(response: response, data: data)
+            _ = try decoder.decode(BackendProfileSnapshot.self, from: data)
+        } catch {
+            reportClientError(scope: "profile_update", error: error)
+            throw error
+        }
+    }
+
+    func uploadSwipeEvents(_ history: [SwipeEvent]) async throws {
+        do {
+            guard let baseURL else { throw URLError(.badURL) }
+            let payload = SwipeBatchUploadPayload(
+                events: history.map {
+                    SwipeEventUploadPayload(
+                        id: $0.id.uuidString.lowercased(),
+                        dish_name: $0.dish.name,
+                        action: $0.action.rawValue,
+                        dish_snapshot_json: BackendSwipeEventPayload.DishSnapshot(
+                            name: $0.dish.name,
+                            subtitle: $0.dish.subtitle,
+                            tags: $0.dish.tags
+                        ),
+                        created_at: $0.createdAt
+                    )
+                }
+            )
+
+            var request = URLRequest(url: baseURL.appendingPathComponent("v1/me/swipes/batch"))
+            request.httpMethod = "POST"
+            request.timeoutInterval = 60
+            applyCommonHeaders(to: &request)
+            request.httpBody = try encoder.encode(payload)
+
+            let (data, response) = try await session.data(for: request)
+            try ensureSuccess(response: response, data: data)
+            _ = try decoder.decode(SwipeBatchUploadResponse.self, from: data)
+        } catch {
+            reportClientError(scope: "swipe_upload", error: error)
+            throw error
+        }
+    }
+
+    func syncTasteSnapshot(_ snapshot: TasteTrainingSnapshot) async throws {
+        try await updateUserProfile(snapshot: snapshot)
+        try await uploadSwipeEvents(snapshot.history)
+    }
+
+    func hasRemoteProfileData(_ snapshot: BackendProfileSnapshot) -> Bool {
+        snapshot.taste_profile_json.totalSwipes > 0
+            || snapshot.analysis_json != nil
+            || !snapshot.swipe_events.isEmpty
+    }
+
+    func localSnapshot(from remote: BackendProfileSnapshot) -> TasteTrainingSnapshot {
+        let history = remote.swipe_events.map { event in
+            SwipeEvent(
+                id: UUID(uuidString: event.id) ?? UUID(),
+                dish: DishCandidate(
+                    name: event.dish_snapshot_json.name,
+                    subtitle: event.dish_snapshot_json.subtitle,
+                    tags: event.dish_snapshot_json.tags,
+                    imageDataURL: nil
+                ),
+                action: SwipeAction(rawValue: event.action) ?? .neutral,
+                createdAt: event.created_at
+            )
+        }
+
+        return TasteTrainingSnapshot(
+            profile: remote.taste_profile_json,
+            deck: [],
+            history: history,
+            latestAnalysis: remote.analysis_json
+        )
     }
 
     func fetchDeck(
@@ -143,9 +382,9 @@ final class TasteBackendClient {
             let payload = DeckRequestPayload(
                 count: count,
                 feature_scores: [:],
-                top_positive: positive.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
-                top_negative: negative.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
-                recent_likes: recentLikes,
+                top_positive: [],
+                top_negative: [],
+                recent_likes: [],
                 avoid_names: avoidNames,
                 locale: "zh-CN"
             )
@@ -161,26 +400,14 @@ final class TasteBackendClient {
 
             let decoded = try decoder.decode(DeckResponsePayload.self, from: data)
             let dishes: [DishCandidate] = decoded.dishes.compactMap { item in
-                let signals = item.signals.compactMapValues { value -> Double? in
-                    guard value.isFinite else { return nil }
-                    return max(0, min(1, value))
-                }
-
-                var normalized: [TasteFeatureID: Double] = [:]
-                for entry in signals {
-                    let (key, value) = entry
-                    guard let feature = TasteFeatureID(rawValue: key) else { continue }
-                    normalized[feature] = value
-                }
-
-                guard !item.name.isEmpty, normalized.count >= 2 else {
+                let tags = normalizedTags(item.tags)
+                guard !item.name.isEmpty, !tags.storageKeys.isEmpty else {
                     return nil
                 }
                 return DishCandidate(
                     name: item.name,
                     subtitle: item.subtitle,
-                    signals: normalized,
-                    categoryTags: normalizedCategoryTags(item.category_tags),
+                    tags: tags,
                     imageDataURL: item.image_data_url
                 )
             }
@@ -203,13 +430,13 @@ final class TasteBackendClient {
 
             let payload = AnalyzeRequestPayload(
                 total_swipes: totalSwipes,
-                top_positive: positive.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
-                top_negative: negative.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
+                top_positive: positive.map { .init(id: $0.tag.storageKey, score: $0.score) },
+                top_negative: negative.map { .init(id: $0.tag.storageKey, score: $0.score) },
                 recent_events: recentEvents.prefix(20).map {
                     AnalyzeRequestPayload.RecentEventPayload(
                         dish_name: $0.dish.name,
                         action: $0.action.rawValue,
-                        features: Array($0.dish.signals.keys.map(\.rawValue).prefix(5))
+                        features: Array($0.dish.tagStorageKeys.prefix(8))
                     )
                 }
             )
@@ -247,8 +474,8 @@ final class TasteBackendClient {
                 images: images.map { .init(mime_type: $0.mimeType, data_base64: $0.dataBase64) },
                 chat_history: history.map { .init(role: $0.role.rawValue, text: $0.text) },
                 total_swipes: tasteContext.totalSwipes,
-                top_positive: tasteContext.topPositive.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
-                top_negative: tasteContext.topNegative.map { .init(id: $0.feature.id.rawValue, score: $0.score) },
+                top_positive: tasteContext.topPositive.map { .init(id: $0.tag.storageKey, score: $0.score) },
+                top_negative: tasteContext.topNegative.map { .init(id: $0.tag.storageKey, score: $0.score) },
                 recent_likes: tasteContext.recentLikes,
                 params: params.map {
                     .init(
@@ -317,6 +544,13 @@ final class TasteBackendClient {
 #endif
     }
 
+    private var sessionToken: String? {
+        let raw = defaults.string(forKey: BackendClientConstants.sessionTokenKey)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let raw, !raw.isEmpty else { return nil }
+        return raw
+    }
+
     private var deviceID: String {
         if let existing = defaults.string(forKey: BackendClientConstants.deviceIDKey),
            UUID(uuidString: existing.lowercased()) != nil {
@@ -354,6 +588,9 @@ final class TasteBackendClient {
         request.setValue(clientVersion, forHTTPHeaderField: BackendClientConstants.clientVersionHeader)
         if let apiKey = backendAPIKey {
             request.setValue(apiKey, forHTTPHeaderField: BackendClientConstants.apiKeyHeader)
+        }
+        if let sessionToken {
+            request.setValue("Bearer \(sessionToken)", forHTTPHeaderField: BackendClientConstants.authorizationHeader)
         }
     }
 
@@ -438,23 +675,25 @@ final class TasteBackendClient {
         )
     }
 
-    private func normalizedCategoryTags(_ payload: DeckResponsePayload.DishPayload.CategoryTagsPayload?) -> DishCategoryTags? {
-        guard let payload else { return nil }
+    private func normalizedTags(_ payload: DeckResponsePayload.DishPayload.TagsPayload?) -> DishTags {
+        guard let payload else { return DishTags() }
+        return DishTags(
+            flavor: payload.flavor.map(normalizeTagKey),
+            ingredient: payload.ingredient.map(normalizeTagKey),
+            texture: payload.texture.map(normalizeTagKey),
+            cookingMethod: payload.cooking_method.map(normalizeTagKey),
+            cuisine: payload.cuisine.map(normalizeTagKey),
+            course: payload.course.map(normalizeTagKey),
+            allergen: payload.allergen.map(normalizeTagKey)
+        )
+    }
 
-        let cuisine = payload.cuisine
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-        let flavor = payload.flavor
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-        let ingredient = payload.ingredient
-            .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
-            .filter { !$0.isEmpty }
-
-        guard !cuisine.isEmpty || !flavor.isEmpty || !ingredient.isEmpty else {
-            return nil
-        }
-        return DishCategoryTags(cuisine: cuisine, flavor: flavor, ingredient: ingredient)
+    private func normalizeTagKey(_ raw: String) -> String {
+        raw
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+            .replacingOccurrences(of: "-", with: "_")
+            .replacingOccurrences(of: " ", with: "_")
     }
 }
 
@@ -475,29 +714,40 @@ private struct DeckRequestPayload: Codable {
 
 private struct DeckResponsePayload: Decodable {
     struct DishPayload: Decodable {
-        struct CategoryTagsPayload: Decodable {
-            let cuisine: [String]
+        struct TagsPayload: Decodable {
             let flavor: [String]
             let ingredient: [String]
+            let texture: [String]
+            let cooking_method: [String]
+            let cuisine: [String]
+            let course: [String]
+            let allergen: [String]
 
             private enum CodingKeys: String, CodingKey {
-                case cuisine
                 case flavor
                 case ingredient
+                case texture
+                case cooking_method
+                case cuisine
+                case course
+                case allergen
             }
 
             init(from decoder: Decoder) throws {
                 let container = try decoder.container(keyedBy: CodingKeys.self)
-                cuisine = try container.decodeIfPresent([String].self, forKey: .cuisine) ?? []
                 flavor = try container.decodeIfPresent([String].self, forKey: .flavor) ?? []
                 ingredient = try container.decodeIfPresent([String].self, forKey: .ingredient) ?? []
+                texture = try container.decodeIfPresent([String].self, forKey: .texture) ?? []
+                cooking_method = try container.decodeIfPresent([String].self, forKey: .cooking_method) ?? []
+                cuisine = try container.decodeIfPresent([String].self, forKey: .cuisine) ?? []
+                course = try container.decodeIfPresent([String].self, forKey: .course) ?? []
+                allergen = try container.decodeIfPresent([String].self, forKey: .allergen) ?? []
             }
         }
 
         let name: String
         let subtitle: String
-        let signals: [String: Double]
-        let category_tags: CategoryTagsPayload?
+        let tags: TagsPayload?
         let image_data_url: String?
     }
 
@@ -516,6 +766,36 @@ private struct AnalyzeRequestPayload: Codable {
     let top_positive: [FeatureScorePayload]
     let top_negative: [FeatureScorePayload]
     let recent_events: [RecentEventPayload]
+}
+
+private struct AppleSignInRequestPayload: Codable {
+    let identity_token: String
+    let authorization_code: String?
+    let email: String?
+    let display_name: String?
+}
+
+private struct ProfileUpdatePayload: Codable {
+    let taste_profile_json: TasteProfile
+    let analysis_json: TasteAnalysisResult?
+    let preferences_json: [String: JSONValue]
+}
+
+private struct SwipeEventUploadPayload: Codable {
+    let id: String
+    let dish_name: String
+    let action: String
+    let dish_snapshot_json: BackendSwipeEventPayload.DishSnapshot
+    let created_at: Date
+}
+
+private struct SwipeBatchUploadPayload: Codable {
+    let events: [SwipeEventUploadPayload]
+}
+
+private struct SwipeBatchUploadResponse: Codable {
+    let inserted_count: Int
+    let total_count: Int
 }
 
 private struct MenuChatRequestPayload: Codable {

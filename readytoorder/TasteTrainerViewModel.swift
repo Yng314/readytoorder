@@ -6,22 +6,25 @@
 //
 
 import Foundation
-import Combine
+import Observation
 
 @MainActor
-final class TasteTrainerViewModel: ObservableObject {
-    @Published private(set) var deck: [DishCandidate] = []
-    @Published private(set) var profile = TasteProfile()
-    @Published private(set) var history: [SwipeEvent] = []
-    @Published private(set) var latestAnalysis: TasteAnalysisResult?
-    @Published private(set) var isAnalyzingTaste = false
-    @Published private(set) var deckErrorMessage: String?
-    @Published private(set) var analysisErrorMessage: String?
-    @Published private(set) var isFetchingDeck = false
+@Observable
+final class TasteTrainerViewModel {
+    private(set) var deck: [DishCandidate] = []
+    private(set) var profile = TasteProfile()
+    private(set) var history: [SwipeEvent] = []
+    private(set) var latestAnalysis: TasteAnalysisResult?
+    private(set) var isAnalyzingTaste = false
+    private(set) var deckErrorMessage: String?
+    private(set) var analysisErrorMessage: String?
+    private(set) var isFetchingDeck = false
 
     private let store: TasteProfileStore
     private let backendClient: TasteBackendClient
     private var queuedRefillTarget: Int?
+    private var syncTask: Task<Void, Never>?
+    private var syncedUserID: String?
 
     private let initialDeckSize = 30
     private let refillDeckSize = 30
@@ -69,7 +72,7 @@ final class TasteTrainerViewModel: ObservableObject {
     }
 
     var signalCoverage: Int {
-        TasteFeatureCatalog.features.filter { profile.normalizedScore(for: $0.id) != 0 }.count
+        profile.coveredTagCount
     }
 
     var isGeneratingDeck: Bool {
@@ -144,6 +147,7 @@ final class TasteTrainerViewModel: ObservableObject {
         }
 
         persist()
+        scheduleCloudSync()
         triggerAnalysisIfNeeded()
     }
 
@@ -153,6 +157,7 @@ final class TasteTrainerViewModel: ObservableObject {
         profile.revert(event: last)
         deck.insert(last.dish, at: 0)
         persist()
+        scheduleCloudSync()
     }
 
     func resetAll() {
@@ -164,12 +169,42 @@ final class TasteTrainerViewModel: ObservableObject {
         analysisErrorMessage = nil
         store.clear()
         persist()
+        scheduleCloudSync()
         refillDeckIfNeeded(targetCount: initialDeckSize)
     }
 
     func refreshAnalysisNow() {
         guard canRefreshAnalysis else { return }
         triggerTasteAnalysis()
+    }
+
+    func handleSessionChange(userID: String?) async {
+        guard userID != syncedUserID else { return }
+        syncedUserID = userID
+        syncTask?.cancel()
+
+        guard userID != nil else { return }
+
+        let localSnapshot = currentSnapshot()
+        do {
+            let remoteSnapshot = try await backendClient.fetchUserProfile()
+            if backendClient.hasRemoteProfileData(remoteSnapshot) {
+                apply(snapshot: backendClient.localSnapshot(from: remoteSnapshot))
+            } else {
+                try await backendClient.syncTasteSnapshot(localSnapshot)
+            }
+        } catch {
+            // Keep local usage unblocked even when cloud bootstrap is temporarily unavailable.
+        }
+    }
+
+    func syncToCloudNowIfPossible() async {
+        guard backendClient.hasSessionToken else { return }
+        do {
+            try await backendClient.syncTasteSnapshot(currentSnapshot())
+        } catch {
+            // Cloud sync should stay best-effort and never block local interactions.
+        }
     }
 
     private func bootstrap() {
@@ -188,17 +223,42 @@ final class TasteTrainerViewModel: ObservableObject {
     }
 
     private func persist() {
+        store.save(currentSnapshot())
+    }
+
+    private func currentSnapshot() -> TasteTrainingSnapshot {
         let persistableDeck = deck.map { $0.withoutImagePayload() }
         let persistableHistory = history.map {
             SwipeEvent(id: $0.id, dish: $0.dish.withoutImagePayload(), action: $0.action, createdAt: $0.createdAt)
         }
-        let snapshot = TasteTrainingSnapshot(
+        return TasteTrainingSnapshot(
             profile: profile,
             deck: persistableDeck,
             history: persistableHistory,
             latestAnalysis: latestAnalysis
         )
-        store.save(snapshot)
+    }
+
+    private func apply(snapshot: TasteTrainingSnapshot) {
+        profile = snapshot.profile
+        history = snapshot.history
+        latestAnalysis = snapshot.latestAnalysis
+        deck = snapshot.deck
+        deckErrorMessage = nil
+        analysisErrorMessage = nil
+        persist()
+        refillDeckIfNeeded(targetCount: initialDeckSize)
+    }
+
+    private func scheduleCloudSync() {
+        guard backendClient.hasSessionToken else { return }
+
+        let snapshot = currentSnapshot()
+        syncTask?.cancel()
+        syncTask = Task {
+            try? await Task.sleep(for: .milliseconds(700))
+            try? await backendClient.syncTasteSnapshot(snapshot)
+        }
     }
 
     private func refillDeckIfNeeded(targetCount: Int) {
@@ -243,7 +303,7 @@ final class TasteTrainerViewModel: ObservableObject {
                     let uniqueDishes = result.dishes.filter { !existingNames.contains($0.name) }
                     if uniqueDishes.isEmpty {
                         if deck.isEmpty {
-                            deckErrorMessage = "暂无可用菜品，请稍后重试。"
+                            deckErrorMessage = "菜品库里暂时没有更多菜了。"
                         }
                     } else {
                         deck.append(contentsOf: uniqueDishes)
@@ -292,6 +352,7 @@ final class TasteTrainerViewModel: ObservableObject {
                     analysisErrorMessage = nil
                     isAnalyzingTaste = false
                     persist()
+                    scheduleCloudSync()
                 }
             } catch {
                 await MainActor.run {

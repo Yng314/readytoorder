@@ -8,9 +8,10 @@ import re
 import uuid
 from collections import defaultdict, deque
 from datetime import datetime, timedelta, timezone
-from typing import Deque, Dict, List, Literal, Sequence
+from typing import Any, Deque, Dict, List, Literal, Sequence
 
 import httpx
+import jwt
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +21,28 @@ from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session
 
 from .db import SessionLocal, init_db
-from .models import ClientErrorEvent, Dish, DishImage, GenerationJob
+from .models import (
+    ClientErrorEvent,
+    Dish,
+    DishImage,
+    GenerationJob,
+    User,
+    UserProfile,
+    UserSwipeEvent,
+)
+from .tagging import (
+    TAGGING_VERSION,
+    CandidateTag,
+    DishTags,
+    build_subtitle,
+    build_tagging_prompt,
+    display_label_for_tag,
+    legacy_category_tags_from_tags,
+    normalize_tag_key,
+    normalize_tags_payload,
+    parse_tag_id,
+    tags_from_legacy_fields,
+)
 
 try:
     import sentry_sdk
@@ -61,9 +83,6 @@ GEMINI_MAX_RETRIES = int(os.getenv("GEMINI_MAX_RETRIES", "3"))
 GEMINI_IMAGE_MAX_BYTES = int(os.getenv("GEMINI_IMAGE_MAX_BYTES", "5242880"))
 IMAGE_GENERATION_CONCURRENCY = int(os.getenv("IMAGE_GENERATION_CONCURRENCY", "4"))
 
-DECK_LOW_WATERMARK = int(os.getenv("DECK_LOW_WATERMARK", "50"))
-DECK_REFILL_BATCH = int(os.getenv("DECK_REFILL_BATCH", "20"))
-BOOTSTRAP_MIN_READY = int(os.getenv("BOOTSTRAP_MIN_READY", "8"))
 MENU_MAX_IMAGES = int(os.getenv("MENU_MAX_IMAGES", "6"))
 MENU_MAX_IMAGE_BYTES = int(os.getenv("MENU_MAX_IMAGE_BYTES", "3145728"))
 MENU_CHAT_HISTORY_LIMIT = int(os.getenv("MENU_CHAT_HISTORY_LIMIT", "16"))
@@ -72,6 +91,7 @@ REQUEST_ID_HEADER = "X-Request-ID"
 DEVICE_ID_HEADER = "X-Device-ID"
 CLIENT_VERSION_HEADER = "X-Client-Version"
 API_KEY_HEADER = "X-API-Key"
+AUTHORIZATION_HEADER = "Authorization"
 RATE_LIMIT_REQUESTS = int(os.getenv("RATE_LIMIT_REQUESTS", "60"))
 RATE_LIMIT_WINDOW_SECONDS = int(os.getenv("RATE_LIMIT_WINDOW_SECONDS", "60"))
 GENERATION_JOB_RETENTION_DAYS = int(os.getenv("GENERATION_JOB_RETENTION_DAYS", "14"))
@@ -81,13 +101,20 @@ CLEANUP_INTERVAL_SECONDS = int(os.getenv("CLEANUP_INTERVAL_SECONDS", "3600"))
 CORS_ALLOW_ORIGINS = [item.strip() for item in os.getenv("CORS_ALLOW_ORIGINS", "").split(",") if item.strip()]
 BACKEND_API_KEY = os.getenv("READYTOORDER_API_KEY", "").strip()
 SENTRY_DSN = os.getenv("SENTRY_DSN", "").strip()
+APPLE_KEYS_URL = os.getenv("APPLE_KEYS_URL", "https://appleid.apple.com/auth/keys").strip()
+APPLE_ISSUER = os.getenv("APPLE_ISSUER", "https://appleid.apple.com").strip()
+APPLE_CLIENT_ID = os.getenv("APPLE_CLIENT_ID", "yng314.readytoorder").strip()
+SESSION_SECRET = os.getenv("READYTOORDER_SESSION_SECRET", "readytoorder-dev-session-secret").strip()
+SESSION_TTL_DAYS = int(os.getenv("READYTOORDER_SESSION_TTL_DAYS", "30"))
+SESSION_ISSUER = os.getenv("READYTOORDER_SESSION_ISSUER", "readytoorder-backend").strip()
+SESSION_AUDIENCE = os.getenv("READYTOORDER_SESSION_AUDIENCE", "readytoorder-ios").strip()
 SEMVER_PATTERN = re.compile(r"^\d+\.\d+\.\d+([\-+][0-9A-Za-z\.-]+)?$")
 
-REFILL_LOCK = asyncio.Lock()
 CLEANUP_TASK: asyncio.Task | None = None
 RATE_LIMIT_LOCK = asyncio.Lock()
 RATE_LIMIT_BUCKETS: Dict[str, Deque[float]] = defaultdict(deque)
 logger = logging.getLogger("readytoorder.backend")
+APPLE_JWKS_CLIENT = jwt.PyJWKClient(APPLE_KEYS_URL)
 
 
 class FeatureScore(BaseModel):
@@ -120,8 +147,7 @@ class DeckCategoryTags(BaseModel):
 class DeckDish(BaseModel):
     name: str
     subtitle: str
-    signals: Dict[str, float]
-    category_tags: DeckCategoryTags = Field(default_factory=DeckCategoryTags)
+    tags: DishTags = Field(default_factory=DishTags)
     image_data_url: str | None = None
 
 
@@ -198,6 +224,72 @@ class ClientErrorEventRequest(BaseModel):
     request_id: str = ""
 
 
+class AppleSignInRequest(BaseModel):
+    identity_token: str = Field(min_length=16)
+    authorization_code: str | None = None
+    email: str | None = None
+    display_name: str | None = None
+
+
+class AuthUserResponse(BaseModel):
+    id: str
+    apple_user_id: str
+    email: str | None = None
+    display_name: str | None = None
+    created_at: datetime
+    last_login_at: datetime
+
+
+class AuthSessionResponse(BaseModel):
+    session_token: str
+    user: AuthUserResponse
+
+
+class ProfileSnapshotRequest(BaseModel):
+    taste_profile_json: dict[str, Any] = Field(default_factory=dict)
+    analysis_json: dict[str, Any] | None = None
+    preferences_json: dict[str, Any] = Field(default_factory=dict)
+
+
+class SwipeEventDishSnapshotRequest(BaseModel):
+    name: str
+    subtitle: str = ""
+    tags: dict[str, Any] = Field(default_factory=dict)
+
+
+class SwipeEventUpsertRequest(BaseModel):
+    id: str
+    dish_name: str
+    action: Literal["like", "neutral", "dislike"]
+    dish_snapshot_json: dict[str, Any] | None = None
+    created_at: datetime
+
+
+class SwipeBatchRequest(BaseModel):
+    events: List[SwipeEventUpsertRequest] = Field(default_factory=list)
+
+
+class SwipeEventResponse(BaseModel):
+    id: str
+    dish_name: str
+    action: str
+    dish_snapshot_json: dict[str, Any]
+    created_at: datetime
+
+
+class ProfileSnapshotResponse(BaseModel):
+    taste_profile_json: dict[str, Any]
+    analysis_json: dict[str, Any] | None = None
+    preferences_json: dict[str, Any]
+    swipe_events: List[SwipeEventResponse] = Field(default_factory=list)
+    updated_at: datetime
+
+
+class SwipeBatchResponse(BaseModel):
+    inserted_count: int
+    total_count: int
+
+
 app = FastAPI(title="readytoorder-backend", version="0.4.0")
 
 if CORS_ALLOW_ORIGINS:
@@ -205,7 +297,7 @@ if CORS_ALLOW_ORIGINS:
         CORSMiddleware,
         allow_origins=CORS_ALLOW_ORIGINS,
         allow_credentials=False,
-        allow_methods=["GET", "POST"],
+        allow_methods=["GET", "POST", "PUT"],
         allow_headers=["*"],
     )
 
@@ -415,6 +507,148 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
     )
 
 
+class SessionAuthError(Exception):
+    def __init__(self, message: str, code: str = "unauthorized") -> None:
+        super().__init__(message)
+        self.message = message
+        self.code = code
+
+
+def _normalize_email(value: str | None) -> str | None:
+    if not value:
+        return None
+    normalized = value.strip().lower()
+    return normalized or None
+
+
+def _normalize_name(value: str | None) -> str | None:
+    if not value:
+        return None
+    normalized = value.strip()
+    return normalized or None
+
+
+def _verify_apple_identity_token(identity_token: str) -> dict[str, Any]:
+    try:
+        signing_key = APPLE_JWKS_CLIENT.get_signing_key_from_jwt(identity_token)
+        decoded = jwt.decode(
+            identity_token,
+            signing_key.key,
+            algorithms=["RS256"],
+            audience=APPLE_CLIENT_ID,
+            issuer=APPLE_ISSUER,
+            options={"require": ["iss", "aud", "exp", "iat", "sub"]},
+        )
+    except Exception as exc:  # pragma: no cover - exercised via tests with monkeypatch
+        raise HTTPException(status_code=401, detail={"code": "invalid_apple_token", "message": "Invalid Apple identity token"}) from exc
+
+    subject = str(decoded.get("sub") or "").strip()
+    if not subject:
+        raise HTTPException(status_code=401, detail={"code": "invalid_apple_token", "message": "Apple token missing subject"})
+    return decoded
+
+
+def _create_session_token(user: User) -> str:
+    now = utc_now()
+    expires_at = now + timedelta(days=max(1, SESSION_TTL_DAYS))
+    payload = {
+        "sub": user.id,
+        "apple_user_id": user.apple_user_id,
+        "iat": int(now.timestamp()),
+        "exp": int(expires_at.timestamp()),
+        "iss": SESSION_ISSUER,
+        "aud": SESSION_AUDIENCE,
+    }
+    return jwt.encode(payload, SESSION_SECRET, algorithm="HS256")
+
+
+def _decode_session_token(token: str) -> dict[str, Any]:
+    try:
+        decoded = jwt.decode(
+            token,
+            SESSION_SECRET,
+            algorithms=["HS256"],
+            audience=SESSION_AUDIENCE,
+            issuer=SESSION_ISSUER,
+            options={"require": ["sub", "iat", "exp", "iss", "aud"]},
+        )
+    except Exception as exc:
+        raise SessionAuthError("Invalid or expired session token") from exc
+
+    subject = str(decoded.get("sub") or "").strip()
+    if not subject:
+        raise SessionAuthError("Session token missing subject")
+    return decoded
+
+
+def _bearer_token_from_request(request: Request) -> str:
+    value = request.headers.get(AUTHORIZATION_HEADER, "").strip()
+    if not value:
+        raise SessionAuthError("Missing Authorization header")
+    prefix = "Bearer "
+    if not value.startswith(prefix):
+        raise SessionAuthError("Invalid Authorization header")
+    token = value[len(prefix):].strip()
+    if not token:
+        raise SessionAuthError("Missing bearer token")
+    return token
+
+
+def _current_user_from_request(request: Request, session: Session) -> User:
+    token = _bearer_token_from_request(request)
+    payload = _decode_session_token(token)
+    user_id = str(payload["sub"])
+    user = session.get(User, user_id)
+    if user is None:
+        raise SessionAuthError("User not found", code="invalid_session")
+    return user
+
+
+def _serialize_user(user: User) -> AuthUserResponse:
+    return AuthUserResponse(
+        id=user.id,
+        apple_user_id=user.apple_user_id,
+        email=user.email,
+        display_name=user.display_name,
+        created_at=user.created_at,
+        last_login_at=user.last_login_at,
+    )
+
+
+def _ensure_user_profile(session: Session, user_id: str) -> UserProfile:
+    profile = session.get(UserProfile, user_id)
+    if profile is None:
+        profile = UserProfile(
+            user_id=user_id,
+            taste_profile_json={},
+            analysis_json=None,
+            preferences_json={},
+            updated_at=utc_now(),
+        )
+        session.add(profile)
+        session.flush()
+    return profile
+
+
+def _serialize_profile(profile: UserProfile, swipe_events: Sequence[UserSwipeEvent]) -> ProfileSnapshotResponse:
+    return ProfileSnapshotResponse(
+        taste_profile_json=profile.taste_profile_json or {},
+        analysis_json=profile.analysis_json,
+        preferences_json=profile.preferences_json or {},
+        swipe_events=[
+            SwipeEventResponse(
+                id=event.id,
+                dish_name=event.dish_name,
+                action=event.action,
+                dish_snapshot_json=event.dish_snapshot_json or {},
+                created_at=event.created_at,
+            )
+            for event in swipe_events
+        ],
+        updated_at=profile.updated_at,
+    )
+
+
 def _normalized_avoid_names(items: Sequence[str]) -> set[str]:
     return {item.strip() for item in items if item and item.strip()}
 
@@ -452,6 +686,8 @@ def _normalize_cuisine_tags(raw_tags: object) -> List[str]:
         elif "泰" in value:
             result.append("泰式")
         elif value in CUISINE_OPTIONS:
+            result.append(value)
+        else:
             result.append(value)
     return _ordered_unique(result)[:2]
 
@@ -576,13 +812,17 @@ def _sanitize_category_tags(raw_tags: object, signals: Dict[str, float]) -> Deck
     )
 
 
-def _top_feature_pairs(items: List[FeatureScore], limit: int = 5) -> str:
+def _top_preference_pairs(items: List[FeatureScore], limit: int = 5) -> str:
     if not items:
         return "无"
     parts = []
     for feature in items[:limit]:
-        cname = FEATURE_NAME_MAP.get(feature.id, feature.id)
-        parts.append(f"{cname}({feature.score:.2f})")
+        dimension, key = parse_tag_id(feature.id)
+        if dimension and key:
+            label = display_label_for_tag(dimension, key)
+        else:
+            label = FEATURE_NAME_MAP.get(feature.id, feature.id)
+        parts.append(f"{label}({feature.score:.2f})")
     return "、".join(parts)
 
 
@@ -666,8 +906,8 @@ def _build_menu_prompt(req: MenuChatRequest) -> str:
     ]
     taste_block = [
         f"- total_swipes: {req.total_swipes}",
-        f"- top_positive: {_top_feature_pairs(req.top_positive, 8)}",
-        f"- top_negative: {_top_feature_pairs(req.top_negative, 8)}",
+        f"- top_positive: {_top_preference_pairs(req.top_positive, 8)}",
+        f"- top_negative: {_top_preference_pairs(req.top_negative, 8)}",
         f"- recent_likes: {'、'.join(req.recent_likes[:10]) if req.recent_likes else '无'}",
     ]
     user_message = _safe_text(req.message, max_len=400, fallback="请按当前模式处理。")
@@ -868,34 +1108,24 @@ def _sanitize_dishes(raw_dishes: list) -> List[DeckDish]:
             continue
         name = str(item.get("name", "")).strip()
         subtitle = str(item.get("subtitle", "")).strip()
+        raw_tags = item.get("tags")
         signal_map = item.get("signals", {})
         raw_category_tags = item.get("category_tags", {})
 
-        if not name or name in seen_names or not isinstance(signal_map, dict):
-            continue
-
-        normalized: Dict[str, float] = {}
-        for key, value in signal_map.items():
-            if key not in FEATURE_IDS:
-                continue
-            if not isinstance(value, (int, float)):
-                continue
-            score = abs(_clamp(float(value), -1.0, 1.0))
-            if score < 0.2:
-                continue
-            normalized[key] = round(score, 3)
-
-        if len(normalized) < 2:
+        if not name or name in seen_names:
             continue
 
         seen_names.add(name)
-        category_tags = _sanitize_category_tags(raw_category_tags, normalized)
+        if isinstance(raw_tags, dict):
+            tags, _, _ = normalize_tags_payload(raw_tags, raw_candidates=item.get("candidate_tags"))
+        else:
+            tags = tags_from_legacy_fields(raw_category_tags, signal_map)
+
         cleaned.append(
             DeckDish(
                 name=name,
                 subtitle=subtitle or "口味特征生成",
-                signals=normalized,
-                category_tags=category_tags,
+                tags=tags,
             )
         )
 
@@ -977,8 +1207,47 @@ async def _call_gemini_json(prompt: str, *, temperature: float = 0.4) -> dict:
     return await _call_gemini_api(payload, model=GEMINI_MODEL)
 
 
-async def _generate_dish_image_with_gemini(dish_name: str) -> tuple[str, str, str]:
-    prompt = f"生成一个{dish_name}的图片，俯视角，图像比例2:3，食物主体在下方2/3区域内"
+async def _generate_dish_tags_with_gemini(
+    dish_name: str,
+    *,
+    cuisine_hint: str = "",
+) -> tuple[str, DishTags, list[CandidateTag], dict, dict]:
+    prompt = build_tagging_prompt(dish_name, cuisine_hint=cuisine_hint)
+    raw = await _call_gemini_json(prompt, temperature=0.25)
+    text = _extract_first_text(raw)
+    data = _extract_json(text)
+    subtitle = _safe_text(
+        data.get("subtitle"),
+        max_len=40,
+        fallback="",
+    )
+    tags, candidate_tags, trace = normalize_tags_payload(
+        data.get("tags"),
+        raw_candidates=data.get("candidate_tags"),
+    )
+    if not subtitle:
+        subtitle = build_subtitle(dish_name=dish_name, tags=tags, cuisine_hint=cuisine_hint)
+    return subtitle, tags, candidate_tags, trace, data
+
+
+def _build_dish_image_prompt(dish_name: str, cuisine: str | None = None) -> str:
+    clean_name = str(dish_name).strip()
+    clean_cuisine = str(cuisine).strip() if cuisine else ""
+    if clean_cuisine:
+        subject = f"{clean_cuisine}料理中的{clean_name}"
+        plating_hint = f"器皿与{clean_cuisine}常见呈现方式一致"
+    else:
+        subject = clean_name
+        plating_hint = "器皿与菜品常见呈现方式一致"
+    return (
+        f"生成一张{subject}成品食物图片，真实餐厅菜品摄影风格，俯视角，图像比例2:3，"
+        f"食物主体位于画面下方2/3，单道成品，无人物，无手部，无文字，无logo，"
+        f"{plating_hint}，光线自然，细节清晰。"
+    )
+
+
+async def _generate_dish_image_with_gemini(dish_name: str, cuisine: str | None = None) -> tuple[str, str, str]:
+    prompt = _build_dish_image_prompt(dish_name, cuisine=cuisine)
     payload = {
         "contents": [{"role": "user", "parts": [{"text": prompt}]}],
         "generationConfig": {
@@ -1034,8 +1303,8 @@ def _build_deck_prompt(req: DeckRequest, needed: int, used_names: Sequence[str])
 - 结合用户偏好提高多样性，避免全是同一种菜系。
 
 用户画像输入：
-- top_positive: {_top_feature_pairs(req.top_positive)}
-- top_negative: {_top_feature_pairs(req.top_negative)}
+- top_positive: {_top_preference_pairs(req.top_positive)}
+- top_negative: {_top_preference_pairs(req.top_negative)}
 - recent_likes: {"、".join(req.recent_likes[:8]) if req.recent_likes else "无"}
 
 禁用菜名（不能重复生成）：
@@ -1107,23 +1376,15 @@ def _load_image_map(session: Session, dishes: Sequence[Dish]) -> Dict[str, DishI
 
 
 def _to_deck_dish(row: Dish, image: DishImage | None) -> DeckDish:
-    signal_map = row.signals if isinstance(row.signals, dict) else {}
-    raw_category_tags = row.category_tags if isinstance(row.category_tags, dict) else {}
-    normalized: Dict[str, float] = {}
-    for key, value in signal_map.items():
-        if key not in FEATURE_IDS:
-            continue
-        if not isinstance(value, (int, float)):
-            continue
-        normalized[key] = round(max(0.2, min(1.0, float(value))), 3)
-
-    category_tags = _sanitize_category_tags(raw_category_tags, normalized)
+    if isinstance(row.tags_json, dict) and row.tags_json:
+        tags, _, _ = normalize_tags_payload(row.tags_json, raw_candidates=row.candidate_tags_json)
+    else:
+        tags = tags_from_legacy_fields(row.category_tags, row.signals)
 
     return DeckDish(
         name=row.name,
         subtitle=row.subtitle,
-        signals=normalized,
-        category_tags=category_tags,
+        tags=tags,
         image_data_url=image.data_url if image else None,
     )
 
@@ -1183,12 +1444,16 @@ async def _generate_and_store_dishes(
     image_semaphore = asyncio.Semaphore(max(1, IMAGE_GENERATION_CONCURRENCY))
 
     async def _prepare_dish_with_image(dish: DeckDish) -> tuple[DeckDish, str, str, str | None]:
-        image_prompt = f"生成一个{dish.name}的图片，俯视角，图像比例2:3，食物主体在下方2/3区域内"
+        primary_cuisine = dish.tags.cuisine[0] if dish.tags.cuisine else None
+        image_prompt = _build_dish_image_prompt(dish.name, cuisine=primary_cuisine)
         image_mime = "image/png"
         image_data_url: str | None = None
         async with image_semaphore:
             try:
-                image_prompt, image_mime, image_data_url = await _generate_dish_image_with_gemini(dish.name)
+                image_prompt, image_mime, image_data_url = await _generate_dish_image_with_gemini(
+                    dish.name,
+                    cuisine=primary_cuisine,
+                )
             except Exception:
                 logger.exception("dish image generation failed dish=%s", dish.name)
         return (dish, image_prompt, image_mime, image_data_url)
@@ -1225,8 +1490,13 @@ async def _generate_and_store_dishes(
             db_dish = Dish(
                 name=dish.name,
                 subtitle=dish.subtitle,
-                signals=dish.signals,
-                category_tags=dish.category_tags.model_dump(),
+                signals={},
+                category_tags=legacy_category_tags_from_tags(dish.tags),
+                tags_json=dish.tags.by_dimension(),
+                raw_tagging_output=None,
+                candidate_tags_json=[],
+                tagging_trace_json={"source": "legacy_generator"},
+                tagging_version=TAGGING_VERSION,
                 status="ready",
                 source="gemini",
                 image_id=image_id,
@@ -1239,58 +1509,6 @@ async def _generate_and_store_dishes(
 
         session.commit()
     return created_count
-
-
-async def _run_refill_job(seed_request: DeckRequest, target_count: int) -> None:
-    if REFILL_LOCK.locked():
-        return
-
-    async with REFILL_LOCK:
-        job_id = _create_generation_job(kind="deck_refill", target_count=target_count)
-        produced = 0
-        error_message = ""
-        try:
-            with SessionLocal() as session:
-                existing_names = set(
-                    session.scalars(select(Dish.name).where(Dish.status == "ready")).all()
-                )
-            produced = await _generate_and_store_dishes(
-                seed_request,
-                needed=target_count,
-                extra_avoid_names=list(existing_names),
-            )
-        except Exception as exc:
-            error_message = str(exc)
-            logger.exception("deck refill job failed")
-        finally:
-            _finish_generation_job(
-                job_id=job_id,
-                produced_count=produced,
-                error=error_message,
-            )
-
-
-async def _trigger_background_refill_if_needed(req: DeckRequest) -> None:
-    if REFILL_LOCK.locked():
-        return
-
-    with SessionLocal() as session:
-        ready_count = _count_ready_dishes(session)
-
-    if ready_count > DECK_LOW_WATERMARK:
-        return
-
-    refill_request = DeckRequest(
-        count=DECK_REFILL_BATCH,
-        feature_scores=req.feature_scores,
-        top_positive=req.top_positive,
-        top_negative=req.top_negative,
-        recent_likes=req.recent_likes,
-        avoid_names=req.avoid_names,
-        locale=req.locale,
-    )
-    logger.info("inventory low ready=%s threshold=%s, scheduling refill=%s", ready_count, DECK_LOW_WATERMARK, DECK_REFILL_BATCH)
-    asyncio.create_task(_run_refill_job(refill_request, target_count=DECK_REFILL_BATCH))
 
 
 async def _cleanup_database_once() -> None:
@@ -1343,7 +1561,13 @@ async def _cleanup_loop() -> None:
 async def _analyze_with_gemini(req: AnalyzeRequest) -> AnalyzeResponse:
     event_lines = []
     for event in req.recent_events[:18]:
-        feature_names = [FEATURE_NAME_MAP.get(fid, fid) for fid in event.features[:4]]
+        feature_names = []
+        for fid in event.features[:6]:
+            dimension, key = parse_tag_id(fid)
+            if dimension and key:
+                feature_names.append(display_label_for_tag(dimension, key))
+            else:
+                feature_names.append(FEATURE_NAME_MAP.get(fid, fid))
         event_lines.append(f"- {event.action}: {event.dish_name} ({'、'.join(feature_names) if feature_names else '无'})")
 
     prompt = f"""
@@ -1358,8 +1582,8 @@ async def _analyze_with_gemini(req: AnalyzeRequest) -> AnalyzeResponse:
 
 输入：
 - total_swipes: {req.total_swipes}
-- top_positive: {_top_feature_pairs(req.top_positive, 6)}
-- top_negative: {_top_feature_pairs(req.top_negative, 6)}
+- top_positive: {_top_preference_pairs(req.top_positive, 6)}
+- top_negative: {_top_preference_pairs(req.top_negative, 6)}
 - recent_events:\n{chr(10).join(event_lines) if event_lines else "- 无"}
 
 要求：
@@ -1388,17 +1612,6 @@ async def startup() -> None:
     global CLEANUP_TASK
     if CLEANUP_TASK is None or CLEANUP_TASK.done():
         CLEANUP_TASK = asyncio.create_task(_cleanup_loop())
-
-    with SessionLocal() as session:
-        ready_count = _count_ready_dishes(session)
-    if ready_count < BOOTSTRAP_MIN_READY and not REFILL_LOCK.locked():
-        logger.info("bootstrap refill scheduled ready=%s min=%s", ready_count, BOOTSTRAP_MIN_READY)
-        asyncio.create_task(
-            _run_refill_job(
-                DeckRequest(count=max(6, DECK_REFILL_BATCH)),
-                target_count=max(6, DECK_REFILL_BATCH),
-            )
-        )
 
 
 @app.on_event("shutdown")
@@ -1458,10 +1671,143 @@ async def ingest_client_error_event(req: ClientErrorEventRequest, request: Reque
     return {"ok": True, "request_id": req_id}
 
 
+@app.post("/v1/auth/apple/sign-in", response_model=AuthSessionResponse)
+async def sign_in_with_apple(req: AppleSignInRequest) -> AuthSessionResponse:
+    claims = _verify_apple_identity_token(req.identity_token)
+    apple_user_id = str(claims.get("sub") or "").strip()
+    email = _normalize_email(claims.get("email") or req.email)
+    display_name = _normalize_name(req.display_name)
+    now = utc_now()
+
+    with SessionLocal() as session:
+        user = session.execute(
+            select(User).where(User.apple_user_id == apple_user_id)
+        ).scalar_one_or_none()
+
+        if user is None:
+            user = User(
+                apple_user_id=apple_user_id,
+                email=email,
+                display_name=display_name,
+                created_at=now,
+                last_login_at=now,
+            )
+            session.add(user)
+            session.flush()
+        else:
+            if email:
+                user.email = email
+            if display_name:
+                user.display_name = display_name
+            user.last_login_at = now
+
+        _ensure_user_profile(session, user.id)
+        session.commit()
+        session.refresh(user)
+
+    return AuthSessionResponse(
+        session_token=_create_session_token(user),
+        user=_serialize_user(user),
+    )
+
+
+@app.get("/v1/me/profile", response_model=ProfileSnapshotResponse)
+async def get_my_profile(request: Request) -> ProfileSnapshotResponse:
+    with SessionLocal() as session:
+        try:
+            user = _current_user_from_request(request, session)
+        except SessionAuthError as exc:
+            raise HTTPException(status_code=401, detail={"code": exc.code, "message": exc.message}) from exc
+
+        profile = _ensure_user_profile(session, user.id)
+        swipe_events = session.execute(
+            select(UserSwipeEvent)
+            .where(UserSwipeEvent.user_id == user.id)
+            .order_by(UserSwipeEvent.created_at.desc())
+            .limit(200)
+        ).scalars().all()
+        session.commit()
+        return _serialize_profile(profile, swipe_events)
+
+
+@app.put("/v1/me/profile", response_model=ProfileSnapshotResponse)
+async def put_my_profile(req: ProfileSnapshotRequest, request: Request) -> ProfileSnapshotResponse:
+    with SessionLocal() as session:
+        try:
+            user = _current_user_from_request(request, session)
+        except SessionAuthError as exc:
+            raise HTTPException(status_code=401, detail={"code": exc.code, "message": exc.message}) from exc
+
+        profile = _ensure_user_profile(session, user.id)
+        profile.taste_profile_json = req.taste_profile_json or {}
+        profile.analysis_json = req.analysis_json
+        profile.preferences_json = req.preferences_json or {}
+        profile.updated_at = utc_now()
+
+        swipe_events = session.execute(
+            select(UserSwipeEvent)
+            .where(UserSwipeEvent.user_id == user.id)
+            .order_by(UserSwipeEvent.created_at.desc())
+            .limit(200)
+        ).scalars().all()
+        session.commit()
+        return _serialize_profile(profile, swipe_events)
+
+
+@app.post("/v1/me/swipes/batch", response_model=SwipeBatchResponse)
+async def append_swipe_events(req: SwipeBatchRequest, request: Request) -> SwipeBatchResponse:
+    if len(req.events) > 200:
+        raise HTTPException(status_code=400, detail={"code": "too_many_events", "message": "Batch limit is 200 swipe events"})
+
+    with SessionLocal() as session:
+        try:
+            user = _current_user_from_request(request, session)
+        except SessionAuthError as exc:
+            raise HTTPException(status_code=401, detail={"code": exc.code, "message": exc.message}) from exc
+
+        event_ids = [event.id for event in req.events if event.id]
+        existing_ids = set(
+            session.execute(
+                select(UserSwipeEvent.id).where(
+                    UserSwipeEvent.user_id == user.id,
+                    UserSwipeEvent.id.in_(event_ids),
+                )
+            ).scalars()
+        ) if event_ids else set()
+
+        inserted_count = 0
+        for event in req.events:
+            if event.id in existing_ids:
+                continue
+
+            snapshot = event.dish_snapshot_json or {}
+            session.add(
+                UserSwipeEvent(
+                    id=event.id,
+                    user_id=user.id,
+                    dish_name=_safe_text(event.dish_name, max_len=120, fallback=""),
+                    action=event.action,
+                    dish_snapshot_json=snapshot,
+                    created_at=event.created_at,
+                )
+            )
+            inserted_count += 1
+
+        session.flush()
+        total_count = session.execute(
+            select(func.count()).select_from(UserSwipeEvent).where(UserSwipeEvent.user_id == user.id)
+        ).scalar_one()
+        session.commit()
+
+    return SwipeBatchResponse(
+        inserted_count=inserted_count,
+        total_count=int(total_count),
+    )
+
+
 @app.post("/v1/taste/deck", response_model=DeckResponse)
 async def generate_taste_deck(req: DeckRequest) -> DeckResponse:
     avoid_names = _normalized_avoid_names(req.avoid_names)
-    source_parts: List[str] = []
 
     with SessionLocal() as session:
         cached_rows = _load_ready_dishes(
@@ -1471,46 +1817,10 @@ async def generate_taste_deck(req: DeckRequest) -> DeckResponse:
         )
         image_map = _load_image_map(session, cached_rows)
     dishes = [_to_deck_dish(row, image_map.get(row.image_id or "")) for row in cached_rows]
-    if dishes:
-        source_parts.append("cache")
-
-    if len(dishes) < req.count:
-        missing = req.count - len(dishes)
-        try:
-            generated_count = await _generate_and_store_dishes(
-                req,
-                needed=missing,
-                extra_avoid_names=list(avoid_names.union({dish.name for dish in dishes})),
-            )
-            if generated_count > 0:
-                with SessionLocal() as session:
-                    refill_rows = _load_ready_dishes(
-                        session,
-                        count=missing,
-                        avoid_names=avoid_names.union({dish.name for dish in dishes}),
-                    )
-                    refill_images = _load_image_map(session, refill_rows)
-                dishes.extend(
-                    _to_deck_dish(row, refill_images.get(row.image_id or ""))
-                    for row in refill_rows
-                )
-                source_parts.append("gemini_fill")
-        except Exception as exc:
-            logger.exception("sync fill failed")
-            if not dishes:
-                raise HTTPException(status_code=502, detail=f"Deck sync fill failed: {exc}") from exc
-
-    await _trigger_background_refill_if_needed(req)
-
-    if len(dishes) < req.count:
-        raise HTTPException(
-            status_code=503,
-            detail=f"Not enough dishes available: {len(dishes)} < {req.count}",
-        )
 
     return DeckResponse(
         dishes=dishes[: req.count],
-        source="+".join(source_parts) if source_parts else "cache",
+        source="cache",
     )
 
 

@@ -16,6 +16,66 @@
     "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/GeneratedAssetSymbols.swiftdeps",
     "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/GeneratedAssetSymbols~partial.swiftmodule"
   },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Account/AccountAppearanceSection.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountAppearanceSection~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Account/AccountView.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AccountView~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Account/AppAppearanceMode.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceMode~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Account/AppAppearanceSettings.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppAppearanceSettings~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Account/AppSession.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppSession~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Account/BackendDebugSettingsSheet.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BackendDebugSettingsSheet~partial.swiftmodule"
+  },
   "/Users/young/Coding/development/readytoorder/readytoorder/AppTelemetryMonitor.swift" : {
     "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppTelemetryMonitor.swiftconstvalues",
     "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppTelemetryMonitor.d",
@@ -35,6 +95,96 @@
     "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/ContentView.o",
     "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/ContentView.swiftdeps",
     "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/ContentView~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingAttachmentDrawerOverlay.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingAttachmentDrawerOverlay~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingChatViewModel.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatViewModel~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingComposerDock.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerDock~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingComposerPanel.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingComposerPanel~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingDetailParamsSheet.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingDetailParamsSheet~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingFeatureModel.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingFeatureModel~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingImagePreviewScreen.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingImagePreviewScreen~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingMessageViews.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingMessageViews~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Ordering/OrderingModels.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingModels~partial.swiftmodule"
   },
   "/Users/young/Coding/development/readytoorder/readytoorder/OrderingChatView.swift" : {
     "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/OrderingChatView.swiftconstvalues",
@@ -56,6 +206,56 @@
     "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/PillBarTestView.swiftdeps",
     "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/PillBarTestView~partial.swiftmodule"
   },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Shared/AppBackgroundView.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/AppBackgroundView~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Shared/BottomPillTabBarRow.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomPillTabBarRow~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Shared/BottomTabBarGlassBackground.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/BottomTabBarGlassBackground~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Shared/CameraCaptureSheet.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/CameraCaptureSheet~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/Shared/TabSelectionHighlightView.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TabSelectionHighlightView~partial.swiftmodule"
+  },
   "/Users/young/Coding/development/readytoorder/readytoorder/TasteBackendClient.swift" : {
     "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteBackendClient.swiftconstvalues",
     "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteBackendClient.d",
@@ -65,6 +265,46 @@
     "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteBackendClient.o",
     "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteBackendClient.swiftdeps",
     "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteBackendClient~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/TasteLearning/TasteCardSupport.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteCardSupport~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/TasteLearning/TasteDeckSection.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteDeckSection~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/TasteLearning/TasteLearningControls.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningControls~partial.swiftmodule"
+  },
+  "/Users/young/Coding/development/readytoorder/readytoorder/TasteLearning/TasteProfilePopupOverlay.swift" : {
+    "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay.swiftconstvalues",
+    "dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay.d",
+    "diagnostics" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay.dia",
+    "index-unit-output-path" : "/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay.o",
+    "llvm-bc" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay.bc",
+    "object" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay.o",
+    "swift-dependencies" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay.swiftdeps",
+    "swiftmodule" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteProfilePopupOverlay~partial.swiftmodule"
   },
   "/Users/young/Coding/development/readytoorder/readytoorder/TasteLearningView.swift" : {
     "const-values" : "/Users/young/Coding/development/readytoorder/.deriveddata/Build/Intermediates.noindex/readytoorder.build/Debug-iphoneos/readytoorder.build/Objects-normal/arm64/TasteLearningView.swiftconstvalues",

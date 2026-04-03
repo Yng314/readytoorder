@@ -13,126 +13,253 @@ enum SwipeAction: String, Codable {
     case dislike
 }
 
-enum TasteFeatureGroup: String, Codable, CaseIterable {
-    case cuisine = "菜系"
-    case flavor = "味型"
-    case texture = "口感"
-    case technique = "做法"
-    case ingredient = "食材"
-    case nutrition = "健康倾向"
+enum DishTagDimension: String, Codable, CaseIterable, Hashable {
+    case flavor
+    case ingredient
+    case texture
+    case cookingMethod = "cooking_method"
+    case cuisine
+    case course
+    case allergen
+
+    var displayName: String {
+        switch self {
+        case .flavor:
+            return "味型"
+        case .ingredient:
+            return "食材"
+        case .texture:
+            return "口感"
+        case .cookingMethod:
+            return "做法"
+        case .cuisine:
+            return "菜系"
+        case .course:
+            return "餐类"
+        case .allergen:
+            return "过敏原"
+        }
+    }
 }
 
-enum TasteFeatureID: String, Codable, CaseIterable, Hashable {
-    case chuanStyle
-    case cantoneseStyle
-    case japaneseStyle
-    case thaiStyle
+struct DishTagRef: Codable, Hashable, Identifiable {
+    let dimension: DishTagDimension
+    let key: String
 
-    case spicy
-    case numbing
-    case sweet
-    case sour
-    case umami
-    case salty
-    case smoky
-    case herbal
-    case rich
-    case light
-    case fresh
+    var id: String { storageKey }
+    var storageKey: String { "\(dimension.rawValue):\(key)" }
+    var displayName: String { TasteTagCatalog.displayName(for: self) }
 
-    case crispy
-    case tender
-    case chewy
-    case juicy
-    case brothy
+    init(dimension: DishTagDimension, key: String) {
+        self.dimension = dimension
+        self.key = key
+    }
 
-    case stirFried
-    case grilled
-    case braised
-    case deepFried
-    case steamed
-    case raw
-
-    case noodle
-    case rice
-    case seafood
-    case beef
-    case pork
-    case chicken
-    case lamb
-    case duck
-    case tofu
-    case mushroom
-    case cheese
-    case cilantro
-    case garlic
-
-    case highProtein
-    case lowCarb
-    case veggieForward
+    init?(storageKey: String) {
+        let parts = storageKey.split(separator: ":", maxSplits: 1).map(String.init)
+        guard parts.count == 2,
+              let dimension = DishTagDimension(rawValue: parts[0]) else {
+            return nil
+        }
+        self.dimension = dimension
+        self.key = parts[1]
+    }
 }
 
-struct TasteFeature: Identifiable, Hashable, Codable {
-    let id: TasteFeatureID
-    let name: String
-    let group: TasteFeatureGroup
-}
-
-enum TasteFeatureCatalog {
-    static let features: [TasteFeature] = [
-        TasteFeature(id: .chuanStyle, name: "川味", group: .cuisine),
-        TasteFeature(id: .cantoneseStyle, name: "粤式", group: .cuisine),
-        TasteFeature(id: .japaneseStyle, name: "日式", group: .cuisine),
-        TasteFeature(id: .thaiStyle, name: "泰式", group: .cuisine),
-
-        TasteFeature(id: .spicy, name: "辛辣", group: .flavor),
-        TasteFeature(id: .numbing, name: "麻感", group: .flavor),
-        TasteFeature(id: .sweet, name: "偏甜", group: .flavor),
-        TasteFeature(id: .sour, name: "偏酸", group: .flavor),
-        TasteFeature(id: .umami, name: "鲜味", group: .flavor),
-        TasteFeature(id: .salty, name: "咸香", group: .flavor),
-        TasteFeature(id: .smoky, name: "烟火香", group: .flavor),
-        TasteFeature(id: .herbal, name: "香草香料", group: .flavor),
-        TasteFeature(id: .rich, name: "厚重浓郁", group: .flavor),
-        TasteFeature(id: .light, name: "清爽清淡", group: .flavor),
-        TasteFeature(id: .fresh, name: "清新感", group: .flavor),
-
-        TasteFeature(id: .crispy, name: "酥脆", group: .texture),
-        TasteFeature(id: .tender, name: "软嫩", group: .texture),
-        TasteFeature(id: .chewy, name: "筋道", group: .texture),
-        TasteFeature(id: .juicy, name: "多汁", group: .texture),
-        TasteFeature(id: .brothy, name: "汤感", group: .texture),
-
-        TasteFeature(id: .stirFried, name: "爆炒", group: .technique),
-        TasteFeature(id: .grilled, name: "炙烤", group: .technique),
-        TasteFeature(id: .braised, name: "红烧/炖煮", group: .technique),
-        TasteFeature(id: .deepFried, name: "油炸", group: .technique),
-        TasteFeature(id: .steamed, name: "清蒸", group: .technique),
-        TasteFeature(id: .raw, name: "冷食/生食", group: .technique),
-
-        TasteFeature(id: .noodle, name: "面食", group: .ingredient),
-        TasteFeature(id: .rice, name: "米饭搭配", group: .ingredient),
-        TasteFeature(id: .seafood, name: "海鲜", group: .ingredient),
-        TasteFeature(id: .beef, name: "牛肉", group: .ingredient),
-        TasteFeature(id: .pork, name: "猪肉", group: .ingredient),
-        TasteFeature(id: .chicken, name: "鸡肉", group: .ingredient),
-        TasteFeature(id: .lamb, name: "羊肉", group: .ingredient),
-        TasteFeature(id: .duck, name: "鸭肉", group: .ingredient),
-        TasteFeature(id: .tofu, name: "豆腐", group: .ingredient),
-        TasteFeature(id: .mushroom, name: "菌菇", group: .ingredient),
-        TasteFeature(id: .cheese, name: "芝士奶香", group: .ingredient),
-        TasteFeature(id: .cilantro, name: "香菜", group: .ingredient),
-        TasteFeature(id: .garlic, name: "蒜香", group: .ingredient),
-
-        TasteFeature(id: .highProtein, name: "高蛋白偏好", group: .nutrition),
-        TasteFeature(id: .lowCarb, name: "低碳倾向", group: .nutrition),
-        TasteFeature(id: .veggieForward, name: "蔬菜导向", group: .nutrition)
+enum TasteTagCatalog {
+    static let labels: [DishTagDimension: [String: String]] = [
+        .flavor: [
+            "spicy": "辣",
+            "numbing": "麻",
+            "sour": "酸",
+            "sweet": "甜",
+            "salty": "咸",
+            "bitter": "苦",
+            "umami": "鲜",
+            "savory": "咸香",
+            "herbal": "草本香",
+            "smoky": "烟熏香",
+            "creamy": "奶香",
+            "oily": "油润",
+            "refreshing": "清爽",
+            "rich": "浓郁"
+        ],
+        .ingredient: [
+            "chicken": "鸡肉",
+            "duck": "鸭肉",
+            "pork": "猪肉",
+            "beef": "牛肉",
+            "lamb": "羊肉",
+            "fish": "鱼类",
+            "shrimp": "虾",
+            "crab": "蟹",
+            "shellfish": "贝类海鲜",
+            "eel": "鳗鱼",
+            "seafood": "海鲜",
+            "tofu": "豆腐",
+            "egg": "鸡蛋",
+            "mushroom": "菌菇",
+            "vegetable": "蔬菜",
+            "seaweed": "海藻",
+            "rice": "米饭",
+            "noodle": "面食",
+            "bread": "面包",
+            "cheese": "芝士",
+            "milk": "奶制品",
+            "peanut": "花生",
+            "sesame": "芝麻",
+            "soy": "大豆",
+            "chili": "辣椒",
+            "garlic": "蒜"
+        ],
+        .texture: [
+            "crispy": "酥脆",
+            "crunchy": "脆爽",
+            "tender": "嫩",
+            "juicy": "多汁",
+            "chewy": "有嚼劲",
+            "bouncy": "弹牙",
+            "silky": "顺滑",
+            "soft": "软",
+            "sticky": "软糯",
+            "flaky": "酥松"
+        ],
+        .cookingMethod: [
+            "stir_fried": "炒",
+            "deep_fried": "油炸",
+            "pan_fried": "煎",
+            "grilled": "炙烤",
+            "roasted": "炉烤",
+            "braised": "焖烧",
+            "stewed": "炖煮",
+            "steamed": "清蒸",
+            "boiled": "水煮",
+            "poached": "白灼",
+            "baked": "烘焙",
+            "raw": "生食",
+            "cured": "腌制"
+        ],
+        .cuisine: [
+            "chinese": "中国菜",
+            "sichuan": "川菜",
+            "hunan": "湘菜",
+            "cantonese": "粤菜",
+            "beijing": "北京菜",
+            "shanghainese": "上海菜",
+            "shandong": "鲁菜",
+            "jiangsu": "苏菜",
+            "zhejiang": "浙菜",
+            "anhui": "徽菜",
+            "fujianese": "闽菜",
+            "hangzhou": "杭帮菜",
+            "japanese": "日本料理",
+            "thai": "泰国菜",
+            "vietnamese": "越南菜",
+            "korean": "韩国菜",
+            "indian": "印度菜",
+            "mexican": "墨西哥菜",
+            "french": "法国菜",
+            "italian": "意大利菜",
+            "spanish": "西班牙菜"
+        ],
+        .course: [
+            "appetizer": "前菜",
+            "main": "主菜",
+            "soup": "汤品",
+            "staple": "主食",
+            "dessert": "甜品",
+            "snack": "小吃",
+            "drink": "饮品"
+        ],
+        .allergen: [
+            "peanut": "花生",
+            "tree_nut": "树坚果",
+            "sesame": "芝麻",
+            "soy": "大豆",
+            "egg": "鸡蛋",
+            "milk": "奶制品",
+            "wheat": "小麦",
+            "shellfish": "甲壳/贝类",
+            "fish": "鱼类"
+        ]
     ]
 
-    static let byID: [TasteFeatureID: TasteFeature] = Dictionary(uniqueKeysWithValues: features.map { ($0.id, $0) })
+    static func displayName(for tag: DishTagRef) -> String {
+        if let label = labels[tag.dimension]?[tag.key] {
+            return label
+        }
+        return tag.key
+            .split(separator: "_")
+            .map { $0.capitalized }
+            .joined(separator: " ")
+    }
+}
 
-    static func feature(for id: TasteFeatureID) -> TasteFeature {
-        byID[id] ?? TasteFeature(id: id, name: id.rawValue, group: .flavor)
+struct DishTags: Codable, Hashable {
+    let flavor: [String]
+    let ingredient: [String]
+    let texture: [String]
+    let cookingMethod: [String]
+    let cuisine: [String]
+    let course: [String]
+    let allergen: [String]
+
+    init(
+        flavor: [String] = [],
+        ingredient: [String] = [],
+        texture: [String] = [],
+        cookingMethod: [String] = [],
+        cuisine: [String] = [],
+        course: [String] = [],
+        allergen: [String] = []
+    ) {
+        self.flavor = Self.orderedUnique(flavor)
+        self.ingredient = Self.orderedUnique(ingredient)
+        self.texture = Self.orderedUnique(texture)
+        self.cookingMethod = Self.orderedUnique(cookingMethod)
+        self.cuisine = Self.orderedUnique(cuisine)
+        self.course = Self.orderedUnique(course)
+        self.allergen = Self.orderedUnique(allergen)
+    }
+
+    var allRefs: [DishTagRef] {
+        var refs: [DishTagRef] = []
+        refs.append(contentsOf: cuisine.map { DishTagRef(dimension: .cuisine, key: $0) })
+        refs.append(contentsOf: flavor.map { DishTagRef(dimension: .flavor, key: $0) })
+        refs.append(contentsOf: texture.map { DishTagRef(dimension: .texture, key: $0) })
+        refs.append(contentsOf: cookingMethod.map { DishTagRef(dimension: .cookingMethod, key: $0) })
+        refs.append(contentsOf: ingredient.map { DishTagRef(dimension: .ingredient, key: $0) })
+        refs.append(contentsOf: course.map { DishTagRef(dimension: .course, key: $0) })
+        refs.append(contentsOf: allergen.map { DishTagRef(dimension: .allergen, key: $0) })
+        return refs
+    }
+
+    func displayRefs(limitPerDimension: Int = 2, maxTotal: Int = 8) -> [DishTagRef] {
+        var refs: [DishTagRef] = []
+        refs.append(contentsOf: cuisine.prefix(limitPerDimension).map { DishTagRef(dimension: .cuisine, key: $0) })
+        refs.append(contentsOf: flavor.prefix(limitPerDimension).map { DishTagRef(dimension: .flavor, key: $0) })
+        refs.append(contentsOf: texture.prefix(limitPerDimension).map { DishTagRef(dimension: .texture, key: $0) })
+        refs.append(contentsOf: cookingMethod.prefix(limitPerDimension).map { DishTagRef(dimension: .cookingMethod, key: $0) })
+        refs.append(contentsOf: ingredient.prefix(limitPerDimension).map { DishTagRef(dimension: .ingredient, key: $0) })
+        refs.append(contentsOf: course.prefix(limitPerDimension).map { DishTagRef(dimension: .course, key: $0) })
+        refs.append(contentsOf: allergen.prefix(limitPerDimension).map { DishTagRef(dimension: .allergen, key: $0) })
+        return Array(refs.prefix(maxTotal))
+    }
+
+    var storageKeys: [String] {
+        allRefs.map(\.storageKey)
+    }
+
+    private static func orderedUnique(_ values: [String]) -> [String] {
+        var seen = Set<String>()
+        var output: [String] = []
+        for raw in values {
+            let value = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+            guard !value.isEmpty, !seen.contains(value) else { continue }
+            seen.insert(value)
+            output.append(value)
+        }
+        return output
     }
 }
 
@@ -140,23 +267,20 @@ struct DishCandidate: Identifiable, Codable, Hashable {
     let id: UUID
     let name: String
     let subtitle: String
-    let signals: [TasteFeatureID: Double]
-    let categoryTags: DishCategoryTags?
+    let tags: DishTags
     let imageDataURL: String?
 
     init(
         id: UUID = UUID(),
         name: String,
         subtitle: String,
-        signals: [TasteFeatureID: Double],
-        categoryTags: DishCategoryTags? = nil,
+        tags: DishTags,
         imageDataURL: String? = nil
     ) {
         self.id = id
         self.name = name
         self.subtitle = subtitle
-        self.signals = signals
-        self.categoryTags = categoryTags
+        self.tags = tags
         self.imageDataURL = imageDataURL
     }
 
@@ -165,182 +289,17 @@ struct DishCandidate: Identifiable, Codable, Hashable {
             id: id,
             name: name,
             subtitle: subtitle,
-            signals: signals,
-            categoryTags: categoryTags,
+            tags: tags,
             imageDataURL: nil
         )
     }
 
-    var topTags: [TasteFeature] {
-        signals
-            .sorted { abs($0.value) > abs($1.value) }
-            .prefix(4)
-            .map { TasteFeatureCatalog.feature(for: $0.key) }
+    var displayTags: [DishTagRef] {
+        tags.displayRefs(limitPerDimension: 2, maxTotal: 8)
     }
 
-    var normalizedTags: [String] {
-        displayCategoryTags.displayValues
-    }
-
-    var displayCategoryTags: DishCategoryTags {
-        let cuisine = normalizedCuisineTags(raw: categoryTags?.cuisine ?? [])
-        let flavor = normalizedFlavorTags(raw: categoryTags?.flavor ?? [])
-        let ingredient = normalizedIngredientTags(raw: categoryTags?.ingredient ?? [])
-
-        return DishCategoryTags(
-            cuisine: cuisine.isEmpty ? inferredCuisineTags() : cuisine,
-            flavor: flavor.isEmpty ? inferredFlavorTags() : flavor,
-            ingredient: ingredient.isEmpty ? inferredIngredientTags() : ingredient
-        )
-    }
-
-    private func inferredCuisineTags() -> [String] {
-        let candidates: [(TasteFeatureID, String)] = [
-            (.chuanStyle, "川菜"),
-            (.cantoneseStyle, "粤菜"),
-            (.japaneseStyle, "日式"),
-            (.thaiStyle, "泰式")
-        ]
-        guard let top = candidates.max(by: { signals[$0.0, default: 0] < signals[$1.0, default: 0] }),
-              signals[top.0, default: 0] >= 0.45 else {
-            return []
-        }
-        return [top.1]
-    }
-
-    private func inferredFlavorTags() -> [String] {
-        let candidates: [(TasteFeatureID, String)] = [
-            (.sour, "酸"),
-            (.sweet, "甜"),
-            (.spicy, "辣"),
-            (.salty, "咸"),
-            (.numbing, "麻"),
-            (.umami, "鲜")
-        ]
-        let ranked = candidates
-            .compactMap { feature, label -> (String, Double)? in
-                let score = signals[feature, default: 0]
-                guard score >= 0.5 else { return nil }
-                return (label, score)
-            }
-            .sorted { $0.1 > $1.1 }
-            .map(\.0)
-        return orderedUnique(Array(ranked.prefix(3)))
-    }
-
-    private func inferredIngredientTags() -> [String] {
-        let candidates: [(TasteFeatureID, String)] = [
-            (.chicken, "鸡肉"),
-            (.duck, "鸭肉"),
-            (.pork, "猪肉"),
-            (.beef, "牛肉"),
-            (.lamb, "羊肉"),
-            (.seafood, "海鲜"),
-            (.tofu, "豆腐"),
-            (.mushroom, "菌菇")
-        ]
-        let ranked = candidates
-            .compactMap { feature, label -> (String, Double)? in
-                let score = signals[feature, default: 0]
-                guard score >= 0.54 else { return nil }
-                return (label, score)
-            }
-            .sorted { $0.1 > $1.1 }
-            .map(\.0)
-        return orderedUnique(Array(ranked.prefix(3)))
-    }
-
-    private func normalizedCuisineTags(raw: [String]) -> [String] {
-        var result: [String] = []
-        for item in raw {
-            let value = item.trimmingCharacters(in: .whitespacesAndNewlines)
-            if value.isEmpty { continue }
-            if value.contains("川") {
-                result.append("川菜")
-            } else if value.contains("粤") || value.contains("广") {
-                result.append("粤菜")
-            } else if value.contains("日") {
-                result.append("日式")
-            } else if value.contains("泰") {
-                result.append("泰式")
-            } else {
-                result.append(value)
-            }
-        }
-        return orderedUnique(result)
-    }
-
-    private func normalizedFlavorTags(raw: [String]) -> [String] {
-        let atomicFlavors = ["酸", "甜", "苦", "辣", "咸", "麻", "鲜"]
-        var result: [String] = []
-        for item in raw {
-            for flavor in atomicFlavors where item.contains(flavor) {
-                result.append(flavor)
-            }
-        }
-        return orderedUnique(result)
-    }
-
-    private func normalizedIngredientTags(raw: [String]) -> [String] {
-        var result: [String] = []
-        for item in raw {
-            let value = item.trimmingCharacters(in: .whitespacesAndNewlines)
-            if value.isEmpty { continue }
-            if value.contains("鸡") {
-                result.append("鸡肉")
-            } else if value.contains("鸭") {
-                result.append("鸭肉")
-            } else if value.contains("猪") {
-                result.append("猪肉")
-            } else if value.contains("牛") {
-                result.append("牛肉")
-            } else if value.contains("羊") {
-                result.append("羊肉")
-            } else if value.contains("虾") || value.contains("蟹") || value.contains("鱼") || value.contains("贝") {
-                result.append("海鲜")
-            } else if value.contains("豆腐") || value.contains("豆") {
-                result.append("豆腐")
-            } else if value.contains("菌") || value.contains("菇") {
-                result.append("菌菇")
-            } else {
-                result.append(value)
-            }
-        }
-        return orderedUnique(result)
-    }
-
-    private func orderedUnique(_ items: [String]) -> [String] {
-        var seen = Set<String>()
-        var output: [String] = []
-        for item in items where !item.isEmpty {
-            guard !seen.contains(item) else { continue }
-            seen.insert(item)
-            output.append(item)
-        }
-        return output
-    }
-}
-
-struct DishCategoryTags: Codable, Hashable {
-    let cuisine: [String]
-    let flavor: [String]
-    let ingredient: [String]
-
-    init(cuisine: [String] = [], flavor: [String] = [], ingredient: [String] = []) {
-        self.cuisine = cuisine
-        self.flavor = flavor
-        self.ingredient = ingredient
-    }
-
-    var displayValues: [String] {
-        var seen = Set<String>()
-        var output: [String] = []
-        for item in cuisine + flavor + ingredient where !item.isEmpty {
-            guard !seen.contains(item) else { continue }
-            seen.insert(item)
-            output.append(item)
-        }
-        return output
+    var tagStorageKeys: [String] {
+        tags.storageKeys
     }
 }
 
@@ -358,19 +317,18 @@ struct SwipeEvent: Identifiable, Codable, Hashable {
     }
 }
 
-struct TasteInsight: Identifiable, Hashable {
-    let feature: TasteFeature
+struct TasteInsight: Identifiable, Hashable, Codable {
+    let tag: DishTagRef
     let score: Double
     let confidence: Double
 
-    var id: TasteFeatureID {
-        feature.id
-    }
+    var id: String { tag.id }
 }
 
 struct TasteProfile: Codable, Hashable {
-    private(set) var scoreByFeature: [TasteFeatureID: Double] = [:]
-    private(set) var exposureByFeature: [TasteFeatureID: Double] = [:]
+    private(set) var likeCountByTag: [String: Double] = [:]
+    private(set) var dislikeCountByTag: [String: Double] = [:]
+    private(set) var exposureByTag: [String: Double] = [:]
     private(set) var totalSwipes: Int = 0
 
     mutating func apply(event: SwipeEvent) {
@@ -382,56 +340,65 @@ struct TasteProfile: Codable, Hashable {
     }
 
     private mutating func apply(action: SwipeAction, dish: DishCandidate, intensity: Double, adjustSwipeCount: Int) {
-        let direction: Double
-        switch action {
-        case .like:
-            direction = 1.0
-        case .neutral:
-            direction = -0.25
-        case .dislike:
-            direction = -1.0
-        }
+        for storageKey in dish.tagStorageKeys {
+            exposureByTag[storageKey, default: 0] += intensity
 
-        for (featureID, signal) in dish.signals {
-            scoreByFeature[featureID, default: 0] += direction * signal * intensity
-            exposureByFeature[featureID, default: 0] += abs(signal) * intensity
-
-            if abs(scoreByFeature[featureID, default: 0]) < 0.0001 {
-                scoreByFeature[featureID] = 0
+            switch action {
+            case .like:
+                likeCountByTag[storageKey, default: 0] += intensity
+            case .dislike:
+                dislikeCountByTag[storageKey, default: 0] += intensity
+            case .neutral:
+                break
             }
-            if exposureByFeature[featureID, default: 0] <= 0.0001 {
-                exposureByFeature[featureID] = 0
+
+            if likeCountByTag[storageKey, default: 0] <= 0.0001 {
+                likeCountByTag[storageKey] = 0
+            }
+            if dislikeCountByTag[storageKey, default: 0] <= 0.0001 {
+                dislikeCountByTag[storageKey] = 0
+            }
+            if exposureByTag[storageKey, default: 0] <= 0.0001 {
+                exposureByTag[storageKey] = 0
             }
         }
 
         totalSwipes = max(0, totalSwipes + adjustSwipeCount)
     }
 
-    func normalizedScore(for featureID: TasteFeatureID) -> Double {
-        let exposure = exposureByFeature[featureID, default: 0]
+    func preferenceRatio(for storageKey: String, positive: Bool) -> Double {
+        let exposure = exposureByTag[storageKey, default: 0]
         guard exposure > 0 else { return 0 }
-        return scoreByFeature[featureID, default: 0] / exposure
+        if positive {
+            return likeCountByTag[storageKey, default: 0] / exposure
+        } else {
+            return dislikeCountByTag[storageKey, default: 0] / exposure
+        }
     }
 
-    func insights(positive: Bool, limit: Int, minimumExposure: Double = 0.7) -> [TasteInsight] {
-        let candidates = TasteFeatureCatalog.features.compactMap { feature -> TasteInsight? in
-            let exposure = exposureByFeature[feature.id, default: 0]
-            guard exposure >= minimumExposure else { return nil }
+    func insights(positive: Bool, limit: Int, minimumExposure: Double = 1.5) -> [TasteInsight] {
+        exposureByTag
+            .compactMap { storageKey, exposure -> TasteInsight? in
+                guard exposure >= minimumExposure,
+                      let tag = DishTagRef(storageKey: storageKey) else {
+                    return nil
+                }
+                let ratio = preferenceRatio(for: storageKey, positive: positive)
+                guard ratio >= 0.34 else { return nil }
+                let confidence = min(1, exposure / 6)
+                return TasteInsight(tag: tag, score: ratio, confidence: confidence)
+            }
+            .sorted { lhs, rhs in
+                if lhs.score == rhs.score {
+                    return lhs.confidence > rhs.confidence
+                }
+                return lhs.score > rhs.score
+            }
+            .prefix(limit)
+            .map { $0 }
+    }
 
-            let score = normalizedScore(for: feature.id)
-            let pass = positive ? score > 0.12 : score < -0.12
-            guard pass else { return nil }
-
-            let confidence = min(1, exposure / 4)
-            return TasteInsight(feature: feature, score: score, confidence: confidence)
-        }
-
-        let sorted: [TasteInsight]
-        if positive {
-            sorted = candidates.sorted { $0.score > $1.score }
-        } else {
-            sorted = candidates.sorted { $0.score < $1.score }
-        }
-        return Array(sorted.prefix(limit))
+    var coveredTagCount: Int {
+        exposureByTag.values.filter { $0 > 0.0001 }.count
     }
 }
