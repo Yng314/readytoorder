@@ -9,6 +9,7 @@ import SwiftUI
 
 struct TasteLearningView: View {
     @Environment(AppSession.self) private var appSession
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(\.scenePhase) private var scenePhase
 
     @State private var viewModel = TasteTrainerViewModel()
@@ -22,7 +23,11 @@ struct TasteLearningView: View {
                 AppBackgroundView()
 
                 GeometryReader { proxy in
-                    let layout = TasteLearningLayout(size: proxy.size)
+                    let layout = TasteLearningLayout(
+                        size: proxy.size,
+                        safeAreaInsets: proxy.safeAreaInsets,
+                        dynamicTypeSize: dynamicTypeSize
+                    )
 
                     ZStack {
                         TasteLearningDeckSection(
@@ -37,28 +42,29 @@ struct TasteLearningView: View {
                         )
                         .frame(width: layout.cardWidth, height: layout.cardHeight, alignment: .center)
                         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-                        .padding(.bottom, layout.cardLift)
+                        .offset(y: layout.cardCenterYOffset)
 
+                        TasteLearningActionBar(
+                            canUndo: viewModel.canUndo,
+                            hasCurrentDish: viewModel.currentDish != nil,
+                            isAnimatingSwipe: isAnimatingSwipe,
+                            onUndo: undoLastSwipe,
+                            onAdvanceNeutral: animateNeutralAdvance
+                        )
+                        .frame(maxWidth: layout.actionBarWidth)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                        .padding(.top, layout.actionBarTop)
+                    }
+                    .overlay(alignment: .top) {
                         TasteLearningTopBar(
                             statusText: tasteStatusText,
                             statusColor: tasteStatusColor,
                             onOpenProfile: openProfile
                         )
-
-                        VStack {
-                            Spacer()
-                            TasteLearningActionBar(
-                                canUndo: viewModel.canUndo,
-                                hasCurrentDish: viewModel.currentDish != nil,
-                                isAnimatingSwipe: isAnimatingSwipe,
-                                onUndo: undoLastSwipe,
-                                onAdvanceNeutral: animateNeutralAdvance
-                            )
-                            .padding(.bottom, layout.actionBottomPadding)
-                        }
+                        .padding(.horizontal, layout.horizontalInset)
+                        .padding(.top, layout.topPadding)
                     }
-                    .padding(.horizontal, 18)
-                    .padding(.top, 10)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .navigationBarTitleDisplayMode(.inline)
@@ -204,22 +210,26 @@ struct TasteLearningView: View {
 }
 
 private struct TasteLearningLayout {
-    let cardLift: CGFloat = 100
+    let horizontalInset: CGFloat
+    let topPadding: CGFloat
     let cardWidth: CGFloat
     let cardHeight: CGFloat
-    let actionBottomPadding: CGFloat
+    let actionBarWidth: CGFloat
+    let cardCenterYOffset: CGFloat
+    let actionBarTop: CGFloat
 
-    init(size: CGSize) {
-        let availableWidth = max(0, size.width - 36)
-        let maxCardWidth = min(availableWidth, 360)
-        let maxCardHeight = max(360, size.height - 200)
-        let resolvedCardHeight = max(0, min(maxCardHeight, maxCardWidth * 1.5))
-        let resolvedCardWidth = resolvedCardHeight * (2.0 / 3.0)
-        let cardBottomY = (size.height / 2.0) - (cardLift / 2.0) + (resolvedCardHeight / 2.0)
+    init(size: CGSize, safeAreaInsets: EdgeInsets, dynamicTypeSize: DynamicTypeSize) {
+        horizontalInset = 30
+        topPadding = min(18, 10 + safeAreaInsets.top * 0.2)
 
-        cardWidth = resolvedCardWidth
-        cardHeight = resolvedCardHeight
-        actionBottomPadding = max(18, (size.height - cardBottomY) / 2.0)
+        let availableWidth = max(0, size.width - horizontalInset * 2)
+        cardWidth = availableWidth
+        cardHeight = availableWidth * 1.5
+        actionBarWidth = min(cardWidth, dynamicTypeSize.isAccessibilitySize ? 320 : 340)
+        cardCenterYOffset = -(AppChromeMetrics.bottomTabBarHeight / 2.0)
+
+        let actionGap: CGFloat = dynamicTypeSize.isAccessibilitySize ? 24 : 20
+        actionBarTop = (size.height / 2.0) + cardCenterYOffset + (cardHeight / 2.0) + actionGap
     }
 }
 

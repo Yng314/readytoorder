@@ -5,7 +5,7 @@ struct BottomPillTabBarRow: View {
     @GestureState private var dragLocationX: CGFloat?
 
     private let tabSpacing: CGFloat = 8
-    private let tabHeight: CGFloat = 52
+    private let tabHeight: CGFloat = AppChromeMetrics.bottomTabBarHeight
 
     var body: some View {
         GeometryReader { geometry in

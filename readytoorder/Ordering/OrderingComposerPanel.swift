@@ -10,8 +10,11 @@ struct OrderingComposerPanel: View {
     @FocusState private var isComposerFocused: Bool
 
     private enum ComposerMetrics {
-        static let outerControlHeight: CGFloat = 38
-        static let sendButtonSize: CGFloat = 28
+        static let outerControlHeight: CGFloat = AppChromeMetrics.bottomTabBarHeight / 1.5
+        static let sendButtonSize: CGFloat = outerControlHeight - 6
+        static let horizontalTextPadding: CGFloat = 14
+        static let trailingCapsulePadding: CGFloat = 6
+        static let verticalCapsulePadding: CGFloat = 3
     }
 
     private var hasAttachments: Bool {
@@ -88,9 +91,9 @@ struct OrderingComposerPanel: View {
 
             sendButton
         }
-        .padding(.leading, 18)
-        .padding(.trailing, 8)
-        .padding(.vertical, 5)
+        .padding(.leading, ComposerMetrics.horizontalTextPadding)
+        .padding(.trailing, ComposerMetrics.trailingCapsulePadding)
+        .padding(.vertical, ComposerMetrics.verticalCapsulePadding)
         .frame(maxWidth: .infinity, minHeight: ComposerMetrics.outerControlHeight, alignment: .leading)
         .modifier(OrderingGlassCapsuleStyle())
     }
@@ -98,7 +101,7 @@ struct OrderingComposerPanel: View {
     private var sendButton: some View {
         Button(action: sendPrimaryAction) {
             Image(systemName: "arrow.up")
-                .font(.system(size: 16, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
                 .foregroundStyle(.white)
                 .frame(width: ComposerMetrics.sendButtonSize, height: ComposerMetrics.sendButtonSize)
                 .background(

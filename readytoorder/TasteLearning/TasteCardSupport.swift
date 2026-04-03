@@ -56,10 +56,6 @@ struct DishSwipeCard: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipShape(cardShape)
-            .overlay(
-                cardShape
-                    .stroke(.white.opacity(0.82), lineWidth: 1)
-            )
             .shadow(color: .black.opacity(0.14), radius: 18, x: 0, y: 10)
     }
 

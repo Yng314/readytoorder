@@ -6,38 +6,35 @@ struct TasteLearningTopBar: View {
     let onOpenProfile: () -> Void
 
     var body: some View {
-        VStack(spacing: 0) {
-            HStack(spacing: 10) {
-                Spacer()
-                Text(statusText)
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(statusColor)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
-                    .background(statusColor.opacity(0.12), in: Capsule())
-                    .overlay(
-                        Capsule()
-                            .stroke(statusColor.opacity(0.3), lineWidth: 1)
-                    )
-
-                Button(action: onOpenProfile) {
-                    Image(systemName: "person.crop.circle.badge.sparkles")
-                        .font(.title3.weight(.semibold))
-                        .foregroundStyle(.primary)
-                        .frame(width: 42, height: 42)
-                        .background(.ultraThinMaterial, in: Circle())
-                        .overlay(
-                            Circle()
-                                .stroke(.white.opacity(0.72), lineWidth: 1)
-                        )
-                        .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
-                }
-                .buttonStyle(.plain)
-                .accessibilityLabel("打开口味画像")
-            }
-
+        HStack(spacing: 10) {
             Spacer()
+            Text(statusText)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(statusColor)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 7)
+                .background(statusColor.opacity(0.12), in: Capsule())
+                .overlay(
+                    Capsule()
+                        .stroke(statusColor.opacity(0.3), lineWidth: 1)
+                )
+
+            Button(action: onOpenProfile) {
+                Image(systemName: "person.crop.circle.badge.sparkles")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.primary)
+                    .frame(width: 42, height: 42)
+                    .background(.ultraThinMaterial, in: Circle())
+                    .overlay(
+                        Circle()
+                            .stroke(.white.opacity(0.72), lineWidth: 1)
+                    )
+                    .shadow(color: .black.opacity(0.08), radius: 8, x: 0, y: 4)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("打开口味画像")
         }
+        .frame(maxWidth: .infinity, alignment: .trailing)
     }
 }
 
