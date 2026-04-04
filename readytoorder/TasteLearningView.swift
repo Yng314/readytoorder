@@ -17,6 +17,9 @@ struct TasteLearningView: View {
     @State private var isAnimatingSwipe = false
     @State private var isShowingProfileSheet = false
 
+    private let foregroundFeedbackDistance: CGFloat = 100
+    private let backgroundRevealDistance: CGFloat = 350
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -35,9 +38,9 @@ struct TasteLearningView: View {
                             cardHeight: layout.cardHeight,
                             dragOffset: dragOffset,
                             isAnimatingSwipe: isAnimatingSwipe,
-                            swipeFeedbackProgress: swipeFeedbackProgress,
-                            swipeFeedbackColor: swipeFeedbackColor,
-                            swipeFeedbackIcon: swipeFeedbackIcon,
+                            foregroundFeedbackProgress: foregroundFeedbackProgress,
+                            backgroundRevealProgress: backgroundRevealProgress,
+                            swipeFeedbackStyle: swipeFeedbackStyle,
                             swipeGesture: swipeGesture
                         )
                         .frame(width: layout.cardWidth, height: layout.cardHeight, alignment: .center)
@@ -109,16 +112,16 @@ struct TasteLearningView: View {
         return .blue
     }
 
-    private var swipeFeedbackProgress: CGFloat {
-        min(1, abs(dragOffset.width) / 150)
+    private var foregroundFeedbackProgress: CGFloat {
+        min(1, abs(dragOffset.width) / foregroundFeedbackDistance)
     }
 
-    private var swipeFeedbackColor: Color {
-        dragOffset.width >= 0 ? .green : .red
+    private var backgroundRevealProgress: CGFloat {
+        min(1, abs(dragOffset.width) / backgroundRevealDistance)
     }
 
-    private var swipeFeedbackIcon: String {
-        dragOffset.width >= 0 ? "heart.fill" : "xmark"
+    private var swipeFeedbackStyle: TasteDeckSwipeFeedbackStyle {
+        dragOffset.width >= 0 ? .like : .dislike
     }
 
     private var swipeGesture: some Gesture {

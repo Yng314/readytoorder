@@ -4,18 +4,25 @@ import UIKit
 
 struct DishSwipeCard: View {
     let dish: DishCandidate
+    let surfaceOpacity: Double
 
     private let textHorizontalPadding: CGFloat = 20
     private let textTopPadding: CGFloat = 22
     private let frostStart: CGFloat = 0.33
     private let frostFullStop: CGFloat = 0.24
     private let frostEnd: CGFloat = 0.50
+    private let cardCornerRadius: CGFloat = 30
+
+    init(dish: DishCandidate, surfaceOpacity: Double = 1.0) {
+        self.dish = dish
+        self.surfaceOpacity = surfaceOpacity
+    }
 
     var body: some View {
-        let cardShape = RoundedRectangle(cornerRadius: 30, style: .continuous)
+        let cardShape = RoundedRectangle(cornerRadius: cardCornerRadius, style: .continuous)
 
         DishCardImageView(imageDataURL: dish.imageDataURL)
-            .overlay(topFrostOverlay)
+            .overlay(cardSurfaceOverlay)
             .overlay(alignment: .topLeading) {
                 VStack(alignment: .leading, spacing: 10) {
                     Text(dish.name)
@@ -57,6 +64,11 @@ struct DishSwipeCard: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .clipShape(cardShape)
             .shadow(color: .black.opacity(0.14), radius: 18, x: 0, y: 10)
+    }
+
+    private var cardSurfaceOverlay: some View {
+        topFrostOverlay
+            .opacity(surfaceOpacity)
     }
 
     private var topFrostOverlay: some View {
